@@ -112,7 +112,7 @@ def build_narration(scenes, work_dir, voice=None):
         durations.append(len(seg) / SR)
         parts.append(seg)
         word_times.append([(w, s0 + pad_before, s1 + pad_before) for w, s0, s1 in timings[i]])
-    tail = np.zeros(int(0.8 * SR), np.float32)
+    tail = np.zeros(int(3.0 * SR), np.float32)   # room for the end card
     track = np.concatenate(parts + [tail])
     durations[-1] += len(tail) / SR
 

@@ -17,7 +17,7 @@ import time
 
 import skia
 
-from explainer_engine import (BASE_W, MONO, MONO_BOLD, SANS_BOLD, Renderer, clamp, ease, ease_io, ffmpeg_exe)
+from explainer_engine import (BASE_W, MONO, MONO_BOLD, SANS_BOLD, SANS_REG, Renderer, clamp, ease, ease_io, ffmpeg_exe)
 
 PALETTE = {
     "blue": (79, 140, 255), "cyan": (34, 211, 238), "purple": (168, 110, 255), "green": (52, 211, 120),
@@ -326,11 +326,13 @@ def compile_scenes(scenes, durations, word_times):
             cur.append(w)
         if cur:
             chunks.append(cur)
-        out.append({"start": t, "dur": dur, "kicker": f'{kick_n:02d} · {sc.get("kicker", "")}', "title": sc.get("title", ""),
+        out.append({"start": t, "dur": dur, "kicker": sc.get("kicker", ""), "chapter": kick_n, "title": sc.get("title", ""),
                     "objs": objs, "links": links, "beats": beats, "cam": cam, "chunks": chunks,
                     "prev_objs": prev_objs, "prev_links": prev_links})
         prev_objs, prev_links = objs, links
         t += dur
+    for sc in out:
+        sc["chapters"] = kick_n + 1
     return out, t
 
 
@@ -343,6 +345,7 @@ class MotionRenderer(Renderer):
         self.dust = [(rng.uniform(-9, 9), rng.uniform(0, 5), rng.uniform(-7, 7), rng.uniform(0.6, 1.8)) for _ in range(70)]
         self.end_cams = {}
         self.focus_cams = {}
+        self.vignette = self._make_vignette()
 
     def _make_background(self):
         surf = skia.Surface(self.w, self.h)
@@ -354,7 +357,45 @@ class MotionRenderer(Renderer):
             skia.Point(540 * k, STAGE_CY * k), 720 * k, [skia.Color(40, 70, 140, 70), skia.Color(0, 0, 0, 0)])))
         return surf.makeImageSnapshot()
 
+    def _make_vignette(self):
+        surf = skia.Surface(self.w, self.h)
+        c = surf.getCanvas()
+        c.clear(skia.ColorTRANSPARENT)
+        k = self.k
+        c.drawPaint(skia.Paint(Shader=skia.GradientShader.MakeRadial(
+            skia.Point(540 * k, 900 * k), 1250 * k, [skia.Color(0, 0, 0, 0), skia.Color(0, 0, 0, 0), skia.Color(0, 0, 0, 170)],
+            [0, 0.55, 1])))
+        return surf.makeImageSnapshot()
+
     # --- drawing helpers
+    def floor_ring(self, cam, x, y, z, r, rgb, a, width=2.0, dash=None, phase=0.0, n=40):
+        if a <= 0.01 or r <= 0:
+            return
+        pts = []
+        for i in range(n + 1):
+            u = 2 * math.pi * i / n
+            q = cam.proj((x + r * math.cos(u), y + 0.02, z + r * math.sin(u)))
+            pts.append((q[0], q[1]))
+        self.polyline(pts, rgb, a, width, dash=dash, phase=phase)
+
+    def beam(self, cam, x, y, z, h, rgb, a):
+        """Soft vertical light column rising from the floor."""
+        if a <= 0.01:
+            return
+        b, t = cam.proj((x, y, z)), cam.proj((x, y + h, z))
+        w = 0.55 * FOCAL / b[2]
+        k = self.k
+        paint = skia.Paint(AntiAlias=True, Shader=skia.GradientShader.MakeLinear(
+            [skia.Point(b[0] * k, b[1] * k), skia.Point(t[0] * k, t[1] * k)], [self.color(rgb, a), self.color(rgb, 0)]))
+        path = skia.Path()
+        for i, (px, py) in enumerate([(b[0] - w, b[1]), (t[0] - w * 0.6, t[1]), (t[0] + w * 0.6, t[1]), (b[0] + w, b[1])]):
+            if i == 0:
+                path.moveTo(px * k, py * k)
+            else:
+                path.lineTo(px * k, py * k)
+        path.close()
+        self.c.drawPath(path, paint)
+
     def glow(self, x, y, r, rgb, a, squash=1.0):
         if a <= 0.01 or r <= 0:
             return
@@ -498,8 +539,8 @@ class MotionRenderer(Renderer):
                 continue
             self.circle(p[0], p[1], clamp(40 / p[2], 0.6, 3.5), fill=(160, 190, 255), a=0.22 * math.sin(math.pi * yy / 5))
 
-    def object_items(self, st, cam, T):
-        """Projected, depth-sorted draw items for one object."""
+    def object_items(self, st, cam, T, mirror=False):
+        """Projected, depth-sorted draw items for one object (mirror=True: its reflection in the floor)."""
         o = st["o"]
         typ, s = o["type"], max(0.0, st["s"]) * (1 + st["bump"]) * float(o.get("size", 1.0))
         rgb = mix(st["rgb"], PALETTE["red"], st["b"])
@@ -508,6 +549,7 @@ class MotionRenderer(Renderer):
         ox, oz = px + math.sin(T * 55) * 0.05 * st["b"], pz
         lift = st["y"] + st["h"] * (0.25 + 0.06 * math.sin(T * 3))
         tl = st["tl"]
+        m = -1 if mirror else 1
 
         def count_scale(i):
             if i >= len(st["count_times"]):
@@ -519,9 +561,9 @@ class MotionRenderer(Renderer):
         for p in parts:
             if p[0] == "face":
                 _, verts, n, col, emit = p
-                wv = [(ox + v[0] * s, lift + v[1] * s, oz + v[2] * s) for v in verts]
+                wv = [(ox + v[0] * s, m * (lift + v[1] * s), oz + v[2] * s) for v in verts]
                 c = [sum(v[i] for v in wv) / len(wv) for i in range(3)]
-                if n[0] * (cam.pos[0] - c[0]) + n[1] * (cam.pos[1] - c[1]) + n[2] * (cam.pos[2] - c[2]) <= 0:
+                if n[0] * (cam.pos[0] - c[0]) + m * n[1] * (cam.pos[1] - c[1]) + n[2] * (cam.pos[2] - c[2]) <= 0:
                     continue
                 pr = [cam.proj(v) for v in wv]
                 depth = sum(q[2] for q in pr) / len(pr)
@@ -532,14 +574,40 @@ class MotionRenderer(Renderer):
                 items.append((depth, "poly", [(q[0], q[1]) for q in pr], fill, mix(col, (255, 255, 255), 0.5)))
             elif p[0] == "sphere":
                 _, cen, r, col = p
-                q = cam.proj((ox + cen[0] * s, lift + cen[1] * s, oz + cen[2] * s))
+                q = cam.proj((ox + cen[0] * s, m * (lift + cen[1] * s), oz + cen[2] * s))
                 items.append((q[2], "sphere", (q[0], q[1]), r * s * FOCAL / q[2], col))
             elif p[0] == "line":
                 _, pts, col, wdt = p
-                pr = [cam.proj((ox + v[0] * s, lift + v[1] * s, oz + v[2] * s)) for v in pts]
+                pr = [cam.proj((ox + v[0] * s, m * (lift + v[1] * s), oz + v[2] * s)) for v in pts]
                 items.append((sum(q[2] for q in pr) / len(pr) - 0.01, "line", [(q[0], q[1]) for q in pr], col, wdt))
         items.sort(key=lambda it: -it[0])
         return items
+
+    def draw_reflection(self, st, cam, T):
+        if st["a"] <= 0.01 or st["o"]["type"] == "layer" or st["y"] > 0.05:
+            return
+        for it in self.object_items(st, cam, T, mirror=True):
+            if it[1] == "poly":
+                self.poly(it[2], it[3], 0.13 * st["a"])
+            elif it[1] == "sphere":
+                self.sphere(it[2][0], it[2][1], it[3], it[4], 0.13 * st["a"])
+
+    def draw_floor_fx(self, st, cam, T):
+        """Shockwave when an object lands or a packet arrives; spinning ring + light beam while highlighted."""
+        o, a = st["o"], st["a"]
+        x, z, y = st["pos"][0], st["pos"][1], st["y"]
+        size = o["size"]
+        tl = st["tl"]
+        if not o.get("carried") and 0 <= tl - o["appear"] < 0.8:
+            u = (tl - o["appear"]) / 0.8
+            self.floor_ring(cam, x, y, z, size * (0.5 + 1.6 * ease(u)), st["rgb"], 0.7 * (1 - u), 3.0)
+        for ta in o.get("arrivals", []):
+            if 0 <= tl - ta < 0.7:
+                u = (tl - ta) / 0.7
+                self.floor_ring(cam, x, y, z, size * (0.6 + 1.4 * ease(u)), (255, 255, 255), 0.6 * (1 - u), 2.5)
+        if st["h"] > 0.01:
+            self.floor_ring(cam, x, y, z, 1.05 * size, st["rgb"], 0.85 * st["h"] * a, 3.0, dash=(18, 12), phase=-T * 60)
+            self.beam(cam, x, y, z, 3.2 * size, st["rgb"], 0.16 * st["h"] * a)
 
     def draw_object(self, st, cam, T):
         a = st["a"]
@@ -610,6 +678,9 @@ class MotionRenderer(Renderer):
             pts = [tip, (tip[0] - 16 * math.cos(ang - 0.45), tip[1] - 16 * math.sin(ang - 0.45)),
                    (tip[0] - 16 * math.cos(ang + 0.45), tip[1] - 16 * math.sin(ang + 0.45))]
             self.poly(pts, (190, 210, 255), 0.9 * a)
+            u = (T * 0.6 + (len(l["from"]) * 7 + len(l["to"]) * 3) % 10 / 10) % 1.0
+            q = cam.proj(tuple(p0[i] + (p1[i] - p0[i]) * u for i in range(3)))
+            self.glow(q[0], q[1], 22, (150, 190, 255), 0.55 * a * math.sin(math.pi * u))
             if l.get("label"):
                 m = cam.proj(tuple((p0[i] + p1[i]) / 2 for i in range(3)))
                 self.pill(l["label"], m[0], m[1] - 22, a * 0.95, font=MONO, size=17)
@@ -619,13 +690,15 @@ class MotionRenderer(Renderer):
 
         def at(v):
             return tuple((1 - v) ** 2 * p0[i] + 2 * (1 - v) * v * mid[i] + v * v * p1[i] for i in range(3))
-        for k in range(7, -1, -1):
-            v = u - k * 0.035
+        for k in range(13, -1, -1):
+            v = u - k * 0.022
             if v < 0 or v > 1:
                 continue
             q = cam.proj(at(v))
-            r = 190 / q[2] * (1 - k * 0.09)
-            self.glow(q[0], q[1], r * 3.2, rgb, 0.18 * a * (1 - k / 8))
+            r = 190 / q[2] * (1 - k * 0.06)
+            if k:
+                self.circle(q[0], q[1], r * 0.8, fill=rgb, a=0.35 * a * (1 - k / 14))
+            self.glow(q[0], q[1], r * 3.2, rgb, 0.16 * a * (1 - k / 14))
             if k == 0:
                 self.circle(q[0], q[1], r, fill=mix(rgb, (255, 255, 255), 0.6), a=a)
                 if label:
@@ -634,18 +707,28 @@ class MotionRenderer(Renderer):
     def draw_callout(self, text, x, a, rgb):
         if a <= 0.01:
             return
-        s = ease_back(x)
-        size = self.fit_size(text, SANS_BOLD, 44, 880, 0.5)
-        w = self.text_width(text, SANS_BOLD, size) + 70
-        cy = 470
+        s = 0.9 + 0.1 * ease_back(x)
+        size = self.fit_size(text, SANS_BOLD, 44, 850, 0.5)
+        w = self.text_width(text, SANS_BOLD, size) + 96
+        cy = 478
         k = self.k
         self.c.save()
         self.c.translate(540 * k, cy * k)
         self.c.scale(s, s)
         self.c.translate(-540 * k, -cy * k)
-        self.glow(540, cy, w * 0.55, rgb, 0.18 * a, squash=0.35)
-        self.rrect(540 - w / 2, cy - 42, w, 84, 22, fill=(16, 20, 34), a=0.92 * a, edge=rgb, edge_a=0.9 * a, edge_w=2)
-        self.text(text, 540, cy + size * 0.36, SANS_BOLD, size, (245, 246, 250), a, "center")
+        self.glow(540, cy, w * 0.6, rgb, 0.2 * a, squash=0.35)
+        x0 = 540 - w / 2
+        self.rrect(x0, cy - 44, w, 88, 18, fill=(14, 18, 32), a=0.94 * a, edge=mix(rgb, (0, 0, 0), 0.3), edge_a=0.8 * a, edge_w=1.5)
+        self.rrect(x0, cy - 44, 10, 88, 5, fill=rgb, a=a)
+        self.pill("KEY IDEA", 540, cy - 52, a, font=MONO_BOLD, size=15, active=True)
+        reveal = ease_io(clamp(x * 1.6 - 0.15))
+        self.c.save()
+        self.c.clipRect(skia.Rect.MakeLTRB((x0 + 20) * k, (cy - 44) * k, (x0 + 20 + (w - 20) * reveal) * k, (cy + 44) * k))
+        self.text(text, 545, cy + size * 0.36, SANS_BOLD, size, (245, 246, 250), a, "center")
+        self.c.restore()
+        if reveal < 1:
+            cx = x0 + 20 + (w - 20) * reveal
+            self.rrect(cx - 2, cy - 30, 4, 60, 2, fill=rgb, a=a)
         self.c.restore()
 
     def draw_captions(self, sc, tl):
@@ -679,6 +762,79 @@ class MotionRenderer(Renderer):
             x += w + space
         self.c.restore()
 
+    # --- header / HUD
+    def draw_header(self, sc, prev, tl, t):
+        e = ease(tl / 0.5) if prev else ease(tl / 0.6)
+        # segmented chapter progress across the top
+        n, ch = sc["chapters"], sc["chapter"]
+        gap, x0, w_all = 8, 90, 900
+        seg = (w_all - gap * (n - 1)) / n
+        for i in range(n):
+            x = x0 + i * (seg + gap)
+            self.rrect(x, 112, seg, 6, 3, fill=(60, 66, 90), a=0.7)
+            if i < ch:
+                self.rrect(x, 112, seg, 6, 3, fill=ACCENT, a=0.95)
+            elif i == ch:
+                self.rrect(x, 112, seg * clamp(tl / sc["dur"]), 6, 3, fill=ACCENT, a=0.95)
+        # chapter chip + section name
+        new_chapter = prev is None or prev["chapter"] != ch
+        ka = e if new_chapter else 1.0
+        if prev and new_chapter and e < 1:
+            self.text(f"CHAPTER {prev['chapter'] + 1:02d}", 540, 214 - 14 * e, MONO_BOLD, 18, ACCENT, 1 - e, "center")
+            self.text(prev["kicker"].upper(), 540, 246 - 14 * e, MONO, 20, (140, 150, 180), 1 - e, "center")
+        self.text(f"CHAPTER {ch + 1:02d} / {n:02d}", 540, 214 + 14 * (1 - ka), MONO_BOLD, 18, ACCENT, ka, "center")
+        self.text(sc["kicker"].upper(), 540, 246 + 14 * (1 - ka), MONO, 20, (140, 150, 180), ka, "center")
+        # title: words rise in one after another
+        if prev and e < 1:
+            self.text(prev["title"], 540, 318 - 16 * e, SANS_BOLD, self.fit_size(prev["title"], SANS_BOLD, 54, 960, 0.6),
+                      (245, 246, 250), 1 - e, "center", blur=e * 6)
+        size = self.fit_size(sc["title"], SANS_BOLD, 54, 960, 0.6)
+        words = sc["title"].split()
+        widths = [self.text_width(w, SANS_BOLD, size) for w in words]
+        space = size * 0.28
+        x = 540 - (sum(widths) + space * (len(words) - 1)) / 2
+        for i, (w, wd) in enumerate(zip(words, widths)):
+            u = ease_back((tl - 0.12 - i * 0.07) / 0.45)
+            a = ease((tl - 0.12 - i * 0.07) / 0.3)
+            self.text(w, x, 318 + 26 * (1 - u), SANS_BOLD, size, (245, 246, 250), a)
+            x += wd + space
+        self.rrect(540 - 46 * e, 352, 92 * e, 5, 2.5, fill=ACCENT, a=0.95 * e)
+
+    def draw_end_card(self, t, total):
+        u = (t - (total - 2.7)) / 0.6
+        if u <= 0:
+            return
+        a = ease(u)
+        self.c.drawRect(skia.Rect.MakeWH(self.w, self.h), self.fill_paint((5, 6, 12), 0.88 * a))
+        cy = 900
+        r = 92 * (0.85 + 0.15 * ease_back(u))
+        self.glow(540, cy, 260, ACCENT, 0.25 * a)
+        self.circle(540, cy, r, fill=(16, 18, 30), a=a, edge=ACCENT, edge_a=a, edge_w=5)
+        k = self.k
+        arc = skia.Rect.MakeXYWH((540 - r - 16) * k, (cy - r - 16) * k, (2 * r + 32) * k, (2 * r + 32) * k)
+        self.c.drawArc(arc, (t * 135) % 360, 120, False, self.stroke_paint(ACCENT, 0.8 * a, 4))
+        initial = (self.handle.lstrip("@")[:1] or "D").upper()
+        self.text(initial, 540, cy + 34, SANS_BOLD, 96, (250, 250, 252), a, "center")
+        self.text(self.handle or "", 540, cy + 175, SANS_BOLD, 52, (245, 246, 250), ease(u - 0.2), "center")
+        self.text("A new 3D explainer every day", 540, cy + 225, SANS_REG, 30, (160, 170, 195), ease(u - 0.35), "center")
+        b = ease_back(u - 0.5)
+        if b > 0:
+            w = 300 * (1 + 0.04 * math.sin(t * 6)) * b
+            self.rrect(540 - w / 2, cy + 280, w, 84, 42, fill=ACCENT, a=a)
+            self.text("FOLLOW", 540, cy + 335, SANS_BOLD, 36, (15, 15, 20), a * clamp(b), "center")
+
+    def draw_sparks(self, cam, x, y, z, u, rgb):
+        if not 0 <= u < 1:
+            return
+        c = cam.proj((x, y, z))
+        sc_ = FOCAL / c[2]
+        for i in range(12):
+            ang = i * math.pi / 6 + 0.3
+            d = (0.3 + 1.5 * ease(u)) * sc_ * 0.55
+            px, py = c[0] + math.cos(ang) * d, c[1] + math.sin(ang) * d * 0.7 - 30 * u
+            self.circle(px, py, 4.5 * (1 - u) + 1, fill=mix(rgb, (255, 255, 255), 0.5), a=1 - u)
+        self.glow(c[0], c[1], 90 * (1 - u) + 20, rgb, 0.5 * (1 - u))
+
     # --- frame
     def frame3d(self, scenes, t, total):
         self.c.drawImage(self.bg, 0, 0)
@@ -692,7 +848,10 @@ class MotionRenderer(Renderer):
 
         cv = self.cam_at(si, tl, scenes)
         orbit = 7 * math.sin(t * 0.23) + 3 * math.sin(t * 0.61)
-        cam = Camera(cv[0] + orbit, cv[1] + 1.5 * math.sin(t * 0.37), cv[2] * (1 + 0.02 * math.sin(t * 0.5)), cv[3], cv[4], cv[5])
+        swing = (12 if si % 2 else -12) * (1 - ease_io(tl / 1.3)) if prev else 0
+        push = 1 - 0.07 * ease_io(tl / max(sc["dur"], 1))
+        cam = Camera(cv[0] + orbit + swing, cv[1] + 1.5 * math.sin(t * 0.37), cv[2] * push * (1 + 0.015 * math.sin(t * 0.5)),
+                     cv[3], cv[4], cv[5])
 
         self.draw_grid(cam, t)
         self.draw_dust(cam, t)
@@ -708,6 +867,13 @@ class MotionRenderer(Renderer):
                 st = self.outgoing_state(o, tl)
                 if st:
                     outgoing.append(st)
+        all_states = list(states.values()) + outgoing
+        all_states.sort(key=lambda s: (s["o"]["type"] != "layer", -cam.proj((s["pos"][0], s["y"] + 0.5, s["pos"][1]))[2]))
+
+        for st in all_states:
+            self.draw_reflection(st, cam, t)
+        for st in all_states:
+            self.draw_floor_fx(st, cam, t)
 
         old_states = {s["o"]["id"]: s for s in outgoing}
         if tl < 0.45:
@@ -717,8 +883,6 @@ class MotionRenderer(Renderer):
         for l in sc["links"].values():
             self.draw_link(l, states, cam, tl, t)
 
-        all_states = list(states.values()) + outgoing
-        all_states.sort(key=lambda s: (s["o"]["type"] != "layer", -cam.proj((s["pos"][0], s["y"] + 0.5, s["pos"][1]))[2]))
         for st in all_states:
             self.draw_object(st, cam, t)
 
@@ -735,14 +899,17 @@ class MotionRenderer(Renderer):
                         if u < 0:
                             continue
                         self.packet(p0, p1, u % 1.0, cam, rgb, "", a * 0.9, arc=0.25)
-            if b["do"] == "send" and b["t"] <= tl <= b["t"] + 1.25:
+            if b["do"] == "send" and b["t"] <= tl <= b["t"] + 1.6:
                 A, B = states.get(b.get("from")), states.get(b.get("to"))
                 if A and B:
-                    u = ease_io((tl - b["t"]) / 0.95)
+                    rgb = PALETTE.get(b.get("color", "yellow"), ACCENT)
                     p0 = (A["pos"][0], A["y"] + obj_height(A["o"]["type"]) * A["o"]["size"] + 0.2, A["pos"][1])
                     p1 = (B["pos"][0], B["y"] + obj_height(B["o"]["type"]) * B["o"]["size"] + 0.2, B["pos"][1])
-                    fade = 1 - ease((tl - b["t"] - 0.95) / 0.3)
-                    self.packet(p0, p1, u, cam, PALETTE.get(b.get("color", "yellow"), ACCENT), b.get("label", ""), fade)
+                    if tl <= b["t"] + 1.25:
+                        u = ease_io((tl - b["t"]) / 0.95)
+                        fade = 1 - ease((tl - b["t"] - 0.95) / 0.3)
+                        self.packet(p0, p1, u, cam, rgb, b.get("label", ""), fade)
+                    self.draw_sparks(cam, p1[0], p1[1], p1[2], (tl - b["t"] - 0.95) / 0.55, rgb)
 
         for st in all_states:
             self.draw_label(st, cam)
@@ -755,30 +922,19 @@ class MotionRenderer(Renderer):
                 self.draw_callout(b.get("text", ""), (tl - b["t"]) / 0.45, (1 - out) * ease((tl - b["t"]) / 0.2),
                                   PALETTE.get(b.get("color", "yellow"), ACCENT))
 
-        # header
-        e = ease(tl / 0.5) if prev else ease(tl / 0.6)
-        if prev and e < 1:
-            if prev["kicker"] != sc["kicker"]:
-                self.text(prev["kicker"], 540, 236 - 10 * e, MONO, 24, (130, 140, 170), 1 - e, "center")
-            self.text(prev["title"], 540, 312 - 14 * e, SANS_BOLD, self.fit_size(prev["title"], SANS_BOLD, 52, 960, 0.6),
-                      (245, 246, 250), 1 - e, "center", blur=e * 8)
-        ka = 1.0 if (prev and prev["kicker"] == sc["kicker"]) else e
-        self.text(sc["kicker"], 540, 236 + 10 * (1 - ka), MONO, 24, (130, 140, 170), ka, "center")
-        self.text(sc["title"], 540, 312 + 18 * (1 - e), SANS_BOLD, self.fit_size(sc["title"], SANS_BOLD, 52, 960, 0.6),
-                  (245, 246, 250), e, "center", blur=(1 - e) * 8)
-        self.rrect(540 - 40 * e, 344, 80 * e, 4, 2, fill=ACCENT, a=0.9 * e)
-
-        self.draw_captions(sc, tl)
-
+        self.c.drawImage(self.vignette, 0, 0)
+        self.draw_header(sc, prev, tl, t)
+        if t < total - 2.7:
+            self.draw_captions(sc, tl)
         if self.handle:
-            self.text(self.handle, 1010, 150, MONO_BOLD, 20, (255, 255, 255), 0.5, "right")
+            self.text(self.handle, 1010, 165, MONO_BOLD, 20, (255, 255, 255), 0.5, "right")
         self.rrect(0, 1908, BASE_W * clamp(t / total), 12, 0, fill=ACCENT, a=0.85)
+        self.draw_end_card(t, total)
 
-        fade = min(clamp(t / 0.35), clamp((total - t) / 0.5))
+        fade = min(clamp(t / 0.35), clamp((total - t) / 0.4))
         if fade < 1:
             self.c.drawRect(skia.Rect.MakeWH(self.w, self.h), self.fill_paint((5, 6, 10), 1 - fade))
         return self.buf
-
 
 def prime_end_cams(r, scenes):
     for i, sc in enumerate(scenes):

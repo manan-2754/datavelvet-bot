@@ -26,7 +26,8 @@ BASE = Path(__file__).parent
 load_dotenv(BASE / ".env", override=True)
 
 import storyboard as sbm  # noqa: E402
-from motion3d import render_motion  # noqa: E402
+from motion3d import compile_scenes, render_motion  # noqa: E402
+from sound import mix_audio  # noqa: E402
 from voice import build_narration  # noqa: E402
 
 OUTPUT = BASE / "output"
@@ -49,10 +50,14 @@ def make_video(sb, out_dir, preview=False):
     if total > 178:
         raise RuntimeError(f"Video would be {total:.0f}s - over the 3 minute Shorts limit")
 
+    print("\n🎵 Music + sound effects")
+    compiled, _ = compile_scenes(sb["scenes"], durations, word_times)
+    mixed = mix_audio(wav, compiled, total, out_dir / "audio" / "final_mix.wav", seed=len(sb["topic"]))
+
     w, h = (1080, 1920) if preview else (2160, 3840)
     print(f"\n🎬 Rendering {w}x{h}")
     video = out_dir / "video.mp4"
-    render_motion(sb["scenes"], durations, word_times, wav, video, w, h, 30, HANDLE)
+    render_motion(sb["scenes"], durations, word_times, mixed, video, w, h, 30, HANDLE)
 
     meta = {**sb["youtube"], "instagram_caption": sb["instagram_caption"], "topic": sb["topic"],
             "duration": round(total, 1), "voice": voice, "resolution": f"{w}x{h}"}
