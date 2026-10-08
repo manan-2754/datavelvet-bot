@@ -68,6 +68,7 @@ def upload_video(video_path, meta, privacy=None):
         "status": {
             "privacyStatus": privacy or os.getenv("YT_PRIVACY") or "public",
             "selfDeclaredMadeForKids": False,
+            "containsSyntheticMedia": True,   # YouTube's "Altered or synthetic content" (AI) disclosure
         },
     }
     media = MediaFileUpload(str(video_path), mimetype="video/mp4", chunksize=16 * 1024 * 1024, resumable=True)

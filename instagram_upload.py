@@ -92,9 +92,16 @@ def upload_reel(video_path, caption):
     url, asset_api = host_on_github(small)
     print(f"  Instagram: video hosted at {url}")
     try:
-        container = _check(requests.post(f"https://{HOST}/{VERSION}/{uid}/media", data={
-            "media_type": "REELS", "video_url": url, "caption": caption,
-            "share_to_feed": "true", "access_token": token}, timeout=60))
+        fields = {"media_type": "REELS", "video_url": url, "caption": caption, "share_to_feed": "true",
+                  "is_ai_generated": "true",   # Instagram's "AI info" self-disclosure label
+                  "access_token": token}
+        r = requests.post(f"https://{HOST}/{VERSION}/{uid}/media", data=fields, timeout=60)
+        if r.status_code >= 400 and "is_ai_generated" in r.text:
+            print(f"  ⚠️ Instagram rejected is_ai_generated ({r.text[:160]}) - posting with an AI note in the caption instead")
+            fields.pop("is_ai_generated")
+            fields["caption"] = caption + "\n\n(Made with AI)"
+            r = requests.post(f"https://{HOST}/{VERSION}/{uid}/media", data=fields, timeout=60)
+        container = _check(r)
         cid = container["id"]
         print("  Instagram: processing...")
         for _ in range(60):
