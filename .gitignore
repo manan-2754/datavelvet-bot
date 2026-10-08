@@ -1,0 +1,16 @@
+.env
+token.json
+client_secret.json
+output/
+__pycache__/
+*.mp3
+*.mp4
+*.jpg
+temp_frames/
+temp_chart/
+venv/
+.env.local
+*.wav
+legacy_requirements_v3.txt
+client_secret*.json
+*.pkl

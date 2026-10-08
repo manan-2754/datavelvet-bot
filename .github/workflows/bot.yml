@@ -1,0 +1,87 @@
+name: 3D explainer - create + post
+
+on:
+  schedule:
+    # 4 videos/day (UTC). = 9am, 1pm, 5pm, 9pm Eastern (EDT). GitHub may start these a few minutes late.
+    - cron: '7 13 * * *'
+    - cron: '7 17 * * *'
+    - cron: '7 21 * * *'
+    - cron: '7 1 * * *'
+  workflow_dispatch:
+    inputs:
+      post:
+        description: 'Upload after rendering'
+        type: boolean
+        default: true
+
+concurrency:
+  group: explainer-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  create-and-post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libegl1 libgl1
+
+      - name: Install Python deps
+        run: pip install -r requirements.txt
+
+      - name: Refresh Instagram token (once a day)
+        if: github.event.schedule == '7 13 * * *' && vars.AUTO_POST_INSTAGRAM == 'true'
+        continue-on-error: true
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: python instagram_upload.py --refresh
+
+      - name: Create video and post
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUTO_POST_YOUTUBE: ${{ vars.AUTO_POST_YOUTUBE }}
+          AUTO_POST_INSTAGRAM: ${{ vars.AUTO_POST_INSTAGRAM }}
+          CHANNEL_HANDLE: ${{ vars.CHANNEL_HANDLE }}
+          RUN_UNTIL: ${{ vars.RUN_UNTIL }}
+          YT_PRIVACY: ${{ vars.YT_PRIVACY }}
+          PYTHONIOENCODING: utf-8
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.post }}" != "true" ]; then
+            python -u main.py
+          else
+            python -u main.py --post
+          fi
+
+      - name: Save topic progress
+        if: always()
+        run: |
+          git config user.name "explainer-bot"
+          git config user.email "explainer-bot@users.noreply.github.com"
+          git add state.json || true
+          git commit -m "bot: posted video [skip ci]" || exit 0
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done
+
+      - name: Keep a copy of the video (3 days)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-${{ github.run_number }}
+          path: output/
+          retention-days: 3
