@@ -1,5 +1,7 @@
 {
-  "used_topics": [],
+  "used_topics": [
+    "How virtual memory works"
+  ],
   "used_bank": [
     "dns_explained"
   ],
@@ -8,6 +10,12 @@
       "time": "2026-10-08T23:00:00+00:00",
       "topic": "How does DNS actually work?",
       "youtube_id": "VwpULb63iSg"
+    },
+    {
+      "time": "2026-10-08T23:30:28+00:00",
+      "topic": "How virtual memory works",
+      "youtube_id": "9P7QiMeIP9U",
+      "instagram_id": "18126836476852213"
     }
   ]
 }
