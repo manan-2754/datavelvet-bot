@@ -2,9 +2,10 @@ name: Watchdog - email if no video was posted
 
 on:
   schedule:
-    # ~1h40 after each posting slot (13:07, 19:07 and 01:07 UTC)
+    # ~2h40 after each posting slot (12:07, 16:07, 20:07, 00:07 UTC) - rendering takes up to ~1h in the cloud
     - cron: '45 14 * * *'
-    - cron: '45 20 * * *'
+    - cron: '45 18 * * *'
+    - cron: '45 22 * * *'
     - cron: '45 2 * * *'
   workflow_dispatch:
     inputs:

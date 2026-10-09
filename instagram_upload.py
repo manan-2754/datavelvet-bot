@@ -49,7 +49,7 @@ def whoami():
 
 
 def to_1080(video_path):
-    from mg import ffmpeg_exe
+    from audio_build import ffmpeg as ffmpeg_exe
     out = Path(tempfile.gettempdir()) / f"ig_{Path(video_path).parent.name}.mp4"
     subprocess.run([ffmpeg_exe(), "-y", "-loglevel", "error", "-i", str(video_path), "-vf", "scale=1080:1920:flags=lanczos",
                     "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",

@@ -1,11 +1,12 @@
-name: Holo explainer - create + post
+name: Motion-as-Code explainer - create + post
 
 on:
   schedule:
-    # 3 videos/day (UTC) = 9am, 3pm and 9pm Eastern (EDT). GitHub may start these a few minutes late.
-    - cron: '7 13 * * *'
-    - cron: '7 19 * * *'
-    - cron: '7 1 * * *'
+    # 4 videos/day (UTC) = 8am, 12pm, 4pm and 8pm Eastern (EDT). GitHub may start these a few minutes late.
+    - cron: '7 12 * * *'
+    - cron: '7 16 * * *'
+    - cron: '7 20 * * *'
+    - cron: '7 0 * * *'
   workflow_dispatch:
     inputs:
       post:
@@ -23,7 +24,7 @@ permissions:
 jobs:
   create-and-post:
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
 
@@ -32,13 +33,18 @@ jobs:
           python-version: '3.12'
           cache: pip
 
-      - name: Install system deps
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install system deps (ffmpeg; Chrome is preinstalled on the runner)
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libegl1 libgl1
+          sudo apt-get install -y ffmpeg
+          google-chrome --version
 
-      - name: Install Python deps
-        run: pip install -r requirements.txt
+      - name: Install Python + engine deps
+        run: |
+          pip install -r requirements.txt
+          cd app && bun install --frozen-lockfile
 
       - name: Create video and post
         env:
@@ -55,6 +61,8 @@ jobs:
           CHANNEL_HANDLE: ${{ vars.CHANNEL_HANDLE }}
           RUN_UNTIL: ${{ vars.RUN_UNTIL }}
           YT_PRIVACY: ${{ vars.YT_PRIVACY }}
+          RENDER_FPS: '30'
+          RENDER_SAMPLES: '2'
           PYTHONIOENCODING: utf-8
         run: |
           set -o pipefail
@@ -86,5 +94,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: video-${{ github.run_number }}
-          path: out/
+          path: out/*/video.mp4
           retention-days: 3

@@ -1,17 +1,21 @@
+# secrets
 .env
-token.json
-client_secret.json
-output/
-__pycache__/
-*.mp3
-*.mp4
-*.jpg
-temp_frames/
-temp_chart/
-venv/
 .env.local
-*.wav
-legacy_requirements_v3.txt
+token.json
 client_secret*.json
-*.pkl
+# renders + generated per run
 out/
+output/
+audio/voiceover.mp3
+data/
+__pycache__/
+*.pyc
+venv/
+# engine
+node_modules/
+.vite/
+dist
+analysis/models/
+analysis/.venv/
+analysis/.cache/
+legacy_requirements_v3.txt
