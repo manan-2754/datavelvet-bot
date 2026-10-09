@@ -136,9 +136,11 @@ def refresh_token():
     print(f"Instagram token refreshed - valid for {days} more days")
     if new != old and os.getenv("GH_PAT") and os.getenv("GITHUB_REPOSITORY"):
         print(f"::add-mask::{new}")
-        subprocess.run(["gh", "secret", "set", "IG_ACCESS_TOKEN", "--repo", os.environ["GITHUB_REPOSITORY"], "--body", new],
-                       check=True, env={**os.environ, "GH_TOKEN": os.environ["GH_PAT"]})
-        print("Saved refreshed token to the IG_ACCESS_TOKEN secret")
+        repos = [os.environ["GITHUB_REPOSITORY"]] + [r.strip() for r in os.getenv("IG_TOKEN_REPOS", "").split(",") if r.strip()]
+        for repo in dict.fromkeys(repos):   # every bot that posts to this Instagram account
+            r2 = subprocess.run(["gh", "secret", "set", "IG_ACCESS_TOKEN", "--repo", repo, "--body", new],
+                                env={**os.environ, "GH_TOKEN": os.environ["GH_PAT"]})
+            print(f"Saved refreshed token to {repo}" if r2.returncode == 0 else f"Could not update {repo} (check GH_PAT repo access)")
 
 
 if __name__ == "__main__":
