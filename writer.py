@@ -76,6 +76,19 @@ Simplifications are fine. Return ONLY JSON:
 {{"score": 1-10, "critical_errors": ["what is wrong + correct fact", ...], "minor_issues": ["...", ...]}}"""
 
 
+REPAIR = """Here is a short explainer script (JSON) and a senior reviewer's corrections. Return the SAME JSON structure
+with every correction applied: fix wrong facts, numbers and labels in "lines" AND in "data". Keep the plates, keep
+every cue as 1-3 words copied exactly from that scene's lines (update cues if you change the words), keep it short.
+
+CORRECTIONS:
+- {errors}
+
+SCRIPT:
+{script}
+
+Return ONLY the corrected JSON."""
+
+
 def _json_text(text):
     text = re.sub(r"<think>.*?</think>", "", text or "", flags=re.S).strip()
     text = re.sub(r"^```(json)?|```$", "", text, flags=re.M).strip()
@@ -282,7 +295,7 @@ def write_script(topic, used_formats=(), tries=6, seed=0):
     recent = list(used_formats)[-8:]
     avoid = ("- These plate sequences were used recently - do NOT reproduce any of them:\n" +
              "\n".join(f"    {r}" for r in recent) + "\n") if recent else ""
-    feedback, err, best = "", None, None
+    feedback, err, cands = "", None, []
     for i in range(tries):
         prompt = PROMPT.format(topic=topic, plates=PLATES, n=n, avoid=avoid, feedback=feedback)
         try:
@@ -302,10 +315,25 @@ def write_script(topic, used_formats=(), tries=6, seed=0):
         sc["review"] = rv
         if not rv["critical"] and rv["score"] >= 7:
             return sc
-        if not rv["critical"] and (best is None or rv["score"] > best["review"]["score"]):
-            best = sc
+        cands.append(sc)
         err = "; ".join(rv["critical"] + rv["minor"])[:500]
         feedback = "\nA senior reviewer REJECTED the previous draft. Fix every point:\n- " + "\n- ".join(rv["critical"] + rv["minor"]) + "\n"
-    if best:
-        return best
+        if i >= 2 and max(c["review"]["score"] for c in cands) >= 7:
+            break                                    # good enough to repair - save LLM quota and time
+    # nothing came back perfectly clean: repair the best draft with the reviewer's own corrections
+    for sc in sorted(cands, key=lambda c: (c["review"]["score"], -len(c["review"]["critical"])), reverse=True)[:2]:
+        rv = sc["review"]
+        if rv["score"] < 7:
+            continue
+        try:
+            body = {k: sc[k] for k in ("topic", "scenes", "youtube", "instagram_caption")}
+            fixed = json.loads(llm(REPAIR.format(script=json.dumps(body, ensure_ascii=False),
+                                                  errors="\n- ".join(rv["critical"] + rv["minor"])), label="repair"))
+            out = validate(fixed, used_formats)
+            out["topic"] = out.get("topic") or topic
+            out["review"] = {**rv, "repaired": True}
+            print(f"  repaired the best draft ({rv['score']}/10) using the reviewer's corrections")
+            return out
+        except Exception as e:
+            print(f"  repair failed: {e}")
     raise RuntimeError(f"No usable script: {err}")
