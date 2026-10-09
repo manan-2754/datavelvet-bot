@@ -78,6 +78,16 @@ def sfx_shimmer():
     return (x * np.sin(np.pi * t / t[-1]) ** 2 * (0.7 + 0.3 * np.sin(2 * np.pi * 12 * t)) * 0.16).astype(np.float32)
 
 
+def sfx_impact():
+    """Cinematic hit for the opening hook: sub boom + bright noise burst."""
+    n = int(1.2 * SR)
+    t = np.arange(n) / SR
+    f = 90 * np.exp(-t * 3) + 38
+    boom = np.sin(2 * np.pi * np.cumsum(f) / SR) * _decay(n, 0.35)
+    burst = _noise(n, 4, 9) * _decay(n, 0.06) * 2.5
+    return ((boom + burst) * 0.7).astype(np.float32)
+
+
 # ---------------------------------------------------------------- music bed
 def music_bed(seconds, seed=0):
     """Warm minor-key pad + soft arpeggio + sub bass, ~88 BPM. Returns stereo (n, 2)."""
@@ -146,7 +156,7 @@ def read_wav(path):
     return x
 
 
-def mix_audio(narration_wav, compiled_scenes, total, out_path, seed=0):
+def mix_audio(narration_wav, compiled_scenes, total, out_path, seed=0, hook=True):
     voice = read_wav(narration_wav)
     n = max(len(voice), int(total * SR))
     voice = np.pad(voice, (0, n - len(voice)))
@@ -193,6 +203,8 @@ def mix_audio(narration_wav, compiled_scenes, total, out_path, seed=0):
             elif b["do"] == "focus":
                 place(sfx_whoosh(0.8, seed=int(t * 10)), t, 0.3)
     place(chime, total - 2.6, 0.5)  # end card
+    if hook:
+        place(sfx_impact(), 0.0, 0.8)
 
     stereo = np.stack([voice + music[:, 0] + fx * 0.7, voice + music[:, 1] + fx * 0.7], axis=1)
     stereo = np.tanh(stereo * 1.1) / np.tanh(1.1)          # gentle limiter

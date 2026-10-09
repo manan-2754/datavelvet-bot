@@ -34,21 +34,37 @@ EXAMPLE = """{"kicker": "the root", "title": "Start at the very top",
            {"cue": "who handles", "do": "send", "from": "root", "to": "resolver", "label": "ask .com", "color": "purple"},
            {"cue": "dot com address", "do": "text", "text": "Try the .com servers", "color": "purple"}]}"""
 
+SERIES = {
+    "How It Works": "Curiosity-driven: open with a surprising fact about something people use every day, then reveal "
+                    "what really happens under the hood, step by step.",
+    "Interview Prep": "Frame the topic as a classic technical interview question (\"You're asked: ...\"). Explain it step "
+                      "by step, then end with the model answer to say in the interview. Never claim a specific company "
+                      "asked it unless that is widely documented - say \"a classic interview question\" instead.",
+    "System Design": "Frame it as designing or scaling a real system: start with the problem at scale (users, requests, "
+                     "data), then build the architecture piece by piece and show where it breaks and how it is fixed.",
+}
+
 PROMPT = """You write scripts for a faceless YouTube Shorts / Instagram Reels channel that teaches software
 engineering and computer science concepts step by step with high-motion 3D diagram animations.
 
 Topic: "{topic}"
-
+Series: "{series}" - {series_brief}
+{insights}{feedback}
 THE NARRATION: a friendly senior engineer talking to one person. Casual, confident, plain English, short
-sentences, contractions, a little personality. No hype words, no emojis, no "in this video". First sentence is
-a curiosity hook. Teach it step by step with one concrete real-world example, end with a one-line recap
+sentences, contractions, a little personality. No hype words, no emojis, no "in this video". The FIRST sentence is
+the hook: under 12 words, bold and specific, it must stop the scroll in the first second (a surprising claim,
+a mistake people make, or a question they can't answer). Teach it step by step with one concrete real-world example, end with a one-line recap
 ("say this in the interview" style) and "Follow for more." Write numbers and symbols the way they are SPOKEN
 ("google dot com", "ten megabytes") because the narration is read by a text-to-speech voice.
 
 THE VISUALS: each scene is a small 3D system diagram on a floor grid, seen from above at an angle, on a
 TALL phone screen. The animation must show exactly what the narrator is saying at that moment.
 
-JSON format - return ONLY: {{"topic": "...", "scenes": [...], "youtube": {{...}}, "instagram_caption": "..."}}
+JSON format - return ONLY: {{"topic": "...", "hooks": [...], "scenes": [...], "youtube": {{...}}, "instagram_caption": "..."}}
+
+"hooks": 3 different on-screen hook lines for the first second of the video, max 6 words each, punchy, no emojis
+(e.g. "Your RAM is lying to you", "90% of devs get this wrong"). They are shown in giant text while the first
+sentence is spoken, so they must match its meaning. Wrap the single most important word in **double asterisks**.
 
 Each scene:
 - "kicker": section name, 2-3 lowercase words. Consecutive scenes of one section repeat it.
@@ -88,14 +104,85 @@ Example scene:
 Rules:
 - 9 to 12 scenes, total narration 260-340 words (about 100-140 seconds).
 - Facts must be accurate; numbers realistic.
-- "youtube": {{"title": max 70 chars + " #shorts", "description": 2-3 sentences + 5-7 hashtags, "tags": 6-10 strings}}
+- "youtube": {{"title": max 60 chars, curiosity-driven (do not add the series name or #shorts - added automatically),
+   "description": 2-3 sentences + 5-7 hashtags, "tags": 6-10 strings}}
 - "instagram_caption": 2-4 short lines + a "save this" call to action + 6-8 hashtags.
 """
 
 
-def _gemini(prompt, key):
+REVIEW = """You are a strict senior technical editor reviewing a script for a short educational video before it is
+published to thousands of developers. Topic: "{topic}". Series: "{series}".
+
+SCRIPT (numbered scenes, then on-screen text):
+{script}
+
+HOOK OPTIONS:
+{hooks}
+
+This is a ~2 minute SHORT for beginners, so normal simplifications and skipped sub-steps are FINE.
+Separate real errors from nitpicks:
+- "critical_errors": ONLY statements an expert would call outright WRONG (wrong mechanism, wrong order of steps,
+  wrong numbers, made-up claims about specific companies). Not simplifications, not missing detail, not wording.
+- "minor_issues": simplifications, missing nuance, awkward wording, weak hook - things that would make it better.
+Also judge: does it teach the topic clearly step by step, and is the first sentence a strong scroll-stopping hook?
+
+Return ONLY JSON: {{"score": 1-10 overall quality, "critical_errors": ["what is wrong + the correct fact", ...],
+"minor_issues": ["...", ...], "best_hook": index of the strongest hook option (0-based)}}"""
+
+
+def _script_text(sb):
+    lines = []
+    for i, sc in enumerate(sb["scenes"]):
+        lines.append(f"{i + 1}. [{sc['title']}] {sc['narration']}")
+    extras = [b.get("text") for sc in sb["scenes"] for b in sc["beats"] if b.get("text")]
+    extras += [o["label"] + (f" ({o['sub']})" if o.get("sub") else "") for sc in sb["scenes"] for o in sc["objects"]]
+    return "\n".join(lines) + "\nON-SCREEN TEXT: " + "; ".join(dict.fromkeys(extras))
+
+
+def review(sb, series, key):
+    """Quality gate: a second model pass fact-checks and scores the script."""
+    hooks = "\n".join(f"{i}. {h}" for i, h in enumerate(sb.get("hooks", [])))
+    text = _gemini(REVIEW.format(topic=sb["topic"], series=series, script=_script_text(sb), hooks=hooks or "(none)"), key,
+                   label="quality gate review")
+    data = json.loads(re.sub(r"^```(json)?|```$", "", text.strip(), flags=re.M).strip())
+    return {"score": int(data.get("score", 0)), "factual_errors": [str(x) for x in data.get("critical_errors") or []],
+            "other_issues": [str(x) for x in data.get("minor_issues") or []], "best_hook": int(data.get("best_hook", 0) or 0)}
+
+
+# Fallbacks when Gemini doesn't answer, in priority order (OpenAI-compatible APIs).
+# OpenRouter: free models first (the account has no credits); OpenCode needs account funds to work.
+FALLBACKS = [
+    ("OpenRouter", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY",
+     ["nvidia/nemotron-3-ultra-550b-a55b:free", "nvidia/nemotron-3-super-120b-a12b:free", "nvidia/nemotron-3.5-lightning:free"]),
+    ("Groq", "https://api.groq.com/openai/v1", "GROQ_API_KEY", ["openai/gpt-oss-120b", "qwen/qwen3.8-27b"]),
+    ("OpenCode", "https://opencode.ai/zen/v1", "OPENCODE_API_KEY", ["gemini-3.8-flash", "claude-sonnet-5-5", "gpt-5.4-mini"]),
+]
+
+
+def _json_text(text):
+    """Strip reasoning blocks / code fences and return just the outermost JSON object."""
+    text = re.sub(r"<think>.*?</think>", "", text or "", flags=re.S).strip()
+    text = re.sub(r"^```(json)?|```$", "", text, flags=re.M).strip()
+    a, b = text.find("{"), text.rfind("}")
+    return text[a:b + 1] if a != -1 and b > a else text
+
+
+def _openai_compatible(name, base, key, model, prompt):
+    r = requests.post(f"{base}/chat/completions", headers={"Authorization": f"Bearer {key}"}, timeout=300, json={
+        "model": model, "messages": [{"role": "user", "content": prompt}], "temperature": 0.7,
+        "max_tokens": 5000 if name == "Groq" else 12000, "response_format": {"type": "json_object"}})
+    data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    if r.status_code != 200 or "choices" not in data:
+        raise RuntimeError(f"{r.status_code}: {r.text[:160]}")
+    text = data["choices"][0]["message"].get("content") or ""
+    json.loads(_json_text(text))   # must be valid JSON, otherwise try the next model
+    return text
+
+
+def _gemini(prompt, key, label="storyboard"):
+    """Ask Gemini; if it fails, fall back to OpenRouter -> Groq -> OpenCode (in that order)."""
     last = None
-    for attempt in range(3):
+    for attempt in range(2):
         for model in MODELS:
             try:
                 r = requests.post(
@@ -107,15 +194,29 @@ def _gemini(prompt, key):
                 if r.status_code == 200:
                     parts = r.json()["candidates"][0]["content"]["parts"]
                     text = "".join(p.get("text", "") for p in parts if not p.get("thought"))
-                    print(f"  storyboard written by {model}")
-                    return text
+                    print(f"  {label} by {model}")
+                    return _json_text(text)
                 last = f"{model} {r.status_code}: {r.text[:160]}"
                 print(f"  {last}")
             except Exception as e:
                 last = f"{model}: {e}"
                 print(f"  {last}")
-        time.sleep(20 * (attempt + 1))
-    raise RuntimeError(f"All Gemini models failed: {last}")
+        if attempt == 0:
+            time.sleep(15)
+    print("  Gemini unavailable - trying fallback models")
+    for name, base, env, models in FALLBACKS:
+        fkey = os.getenv(env, "").strip()
+        if not fkey:
+            continue
+        for model in models:
+            try:
+                text = _openai_compatible(name, base, fkey, model, prompt)
+                print(f"  {label} by {name} / {model}")
+                return _json_text(text)
+            except Exception as e:
+                last = f"{name}/{model}: {e}"
+                print(f"  {last}")
+    raise RuntimeError(f"All models failed (Gemini + fallbacks): {last}")
 
 
 def _cut(s, n):
@@ -231,8 +332,11 @@ def validate(sb):
     title = _cut(yt.get("title") or sb.get("topic", "Explained"), 95)
     if "#shorts" not in title.lower():
         title = _cut(title, 86) + " #shorts"
+    hooks = [_cut(re.sub(r"\s+", " ", str(h)), 48) for h in (sb.get("hooks") or []) if str(h).strip()][:3]
     return {
         "topic": sb.get("topic", ""),
+        "hooks": hooks,
+        "hook": sb.get("hook") or (hooks[0] if hooks else ""),
         "scenes": clean,
         "youtube": {"title": title, "description": str(yt.get("description", ""))[:4500],
                     "tags": [str(t)[:30] for t in (yt.get("tags") or [])][:12]},
@@ -240,22 +344,45 @@ def validate(sb):
     }
 
 
-def write_storyboard(topic, key=None, tries=3):
+def write_storyboard(topic, series="How It Works", insights="", key=None, tries=3):
+    """Write a storyboard, then pass it through the quality gate; retry with the reviewer's notes if it fails."""
     key = key or os.getenv("GEMINI_API_KEY", "").strip()
     if not key:
         raise RuntimeError("GEMINI_API_KEY is not set")
-    prompt = PROMPT.format(topic=topic, types=list(OBJ_TYPES), colors=list(PALETTE), example=EXAMPLE)
-    err = None
+    feedback, err, best = "", None, None
     for i in range(tries):
+        prompt = PROMPT.format(topic=topic, series=series, series_brief=SERIES.get(series, ""), insights=insights,
+                               feedback=feedback, types=list(OBJ_TYPES), colors=list(PALETTE), example=EXAMPLE)
         text = _gemini(prompt, key).strip()
         try:
             if text.startswith("```"):
                 text = re.sub(r"^```(json)?|```$", "", text, flags=re.M).strip()
-            return validate(json.loads(text))
+            sb = validate(json.loads(text))
         except Exception as e:
             err = e
             print(f"  storyboard attempt {i + 1} rejected: {e}")
-    raise RuntimeError(f"Could not get a valid storyboard: {err}")
+            continue
+        try:
+            rv = review(sb, series, key)
+        except Exception as e:
+            print(f"  quality gate unavailable ({e}) - accepting the validated draft")
+            return sb
+        print(f"  quality gate: score {rv['score']}/10, {len(rv['factual_errors'])} real error(s), {len(rv['other_issues'])} minor note(s)")
+        if sb["hooks"]:
+            sb["hook"] = sb["hooks"][min(max(rv["best_hook"], 0), len(sb["hooks"]) - 1)]
+        sb["review"] = rv
+        if not rv["factual_errors"] and rv["score"] >= 7:
+            return sb
+        if not rv["factual_errors"] and (best is None or rv["score"] > best["review"]["score"]):
+            best = sb
+        err = "; ".join(rv["factual_errors"] + rv["other_issues"])[:600]
+        print(f"  quality gate rejected draft {i + 1}: {err}")
+        feedback = ("\nA senior editor REJECTED the previous draft of this script. Fix every point:\n- "
+                    + "\n- ".join(rv["factual_errors"] + rv["other_issues"]) + "\n")
+    if best is not None:
+        print(f"  using best fact-checked draft (score {best['review']['score']}/10)")
+        return best
+    raise RuntimeError(f"Could not get a storyboard past the quality gate: {err}")
 
 
 # ---------- topic queue ----------

@@ -63,3 +63,17 @@ Secrets are never committed: `.env`, `token.json`, `client_secret.json` are in `
 - Shorts must be ≤ 3 min; the bot refuses anything over 178 s (typical video: 100–140 s).
 - YouTube/Instagram may limit reach or monetisation of fully automated, templated channels — check the stats after
   the first couple of weeks and vary topics/voices if needed.
+
+## Growth features
+
+| Feature | How it works | Where |
+|---|---|---|
+| **Hook in the first second** | Gemini writes 3 hooks, the quality gate picks the strongest; it opens the video as giant kinetic text with a flash + impact sound | `storyboard.py`, `motion3d.draw_hook` |
+| **Learn from your numbers** | Before each video the bot pulls YouTube views/likes/comments for past posts, tells Gemini what worked and what flopped, and gives better series more slots | `analytics.py` |
+| **Series** | "How It Works", "Interview Prep", "System Design" - episode numbers on screen, in titles and captions | `storyboard.SERIES`, `state.json → series_counts` |
+| **Interview angle** | "Interview Prep" frames topics as classic interview questions and ends with the model answer (never invents which company asked it) | `storyboard.SERIES` |
+| **Variety** | Each video rotates colour theme + camera angle (5 looks), voice (2) and music progression (3) | `motion3d.THEMES`, `voice.py`, `sound.py` |
+| **Human touch** | Put your own short vertical clips in `assets/human/intro/` (≈2 s, before the video) and/or `assets/human/outro/` (after the end card). The bot picks a different one each time. Commit them to the repo so the cloud bot can use them. | `human.py` |
+| **Quality gate** | A second Gemini pass fact-checks every script. Real errors → rewritten (up to 3 tries) with the editor's notes; if it can't pass, the run is skipped and you get an email instead of a wrong video | `storyboard.review` |
+
+Force a series for a local test: `python main.py --series "Interview Prep"` (local runs never post and never touch the topic queue).

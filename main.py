@@ -25,8 +25,10 @@ from dotenv import load_dotenv
 BASE = Path(__file__).parent
 load_dotenv(BASE / ".env", override=True)
 
+import analytics  # noqa: E402
 import storyboard as sbm  # noqa: E402
-from motion3d import compile_scenes, render_motion  # noqa: E402
+from human import add_human_clips  # noqa: E402
+from motion3d import THEMES, compile_scenes, render_motion  # noqa: E402
 from sound import mix_audio  # noqa: E402
 from voice import build_narration  # noqa: E402
 
@@ -39,7 +41,7 @@ def slugify(s):
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")[:50] or "video"
 
 
-def make_video(sb, out_dir, preview=False):
+def make_video(sb, out_dir, preview=False, theme=None, series_label=""):
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "storyboard.json").write_text(json.dumps(sb, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -52,15 +54,20 @@ def make_video(sb, out_dir, preview=False):
 
     print("\n🎵 Music + sound effects")
     compiled, _ = compile_scenes(sb["scenes"], durations, word_times)
-    mixed = mix_audio(wav, compiled, total, out_dir / "audio" / "final_mix.wav", seed=len(sb["topic"]))
+    mixed = mix_audio(wav, compiled, total, out_dir / "audio" / "final_mix.wav", seed=len(sb["topic"]),
+                      hook=bool(sb.get("hook")))
 
     w, h = (1080, 1920) if preview else (2160, 3840)
-    print(f"\n🎬 Rendering {w}x{h}")
+    print(f"\n🎬 Rendering {w}x{h} (theme: {(theme or THEMES[0])['name']})")
     video = out_dir / "video.mp4"
-    render_motion(sb["scenes"], durations, word_times, mixed, video, w, h, 30, HANDLE)
+    render_motion(sb["scenes"], durations, word_times, mixed, video, w, h, 30, HANDLE,
+                  theme=theme, hook=sb.get("hook", ""), series_label=series_label)
+    video = add_human_clips(video, w, h, seed=sb["topic"])
 
     meta = {**sb["youtube"], "instagram_caption": sb["instagram_caption"], "topic": sb["topic"],
-            "duration": round(total, 1), "voice": voice, "resolution": f"{w}x{h}"}
+            "duration": round(total, 1), "voice": voice, "resolution": f"{w}x{h}",
+            "hook": sb.get("hook", ""), "series": sb.get("series", ""), "episode": sb.get("episode"),
+            "theme": (theme or THEMES[0])["name"], "review": sb.get("review")}
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     shutil.rmtree(out_dir / "audio", ignore_errors=True)
     print(f"\n✅ {video} ({video.stat().st_size / 1e6:.1f} MB, {total:.0f}s)")
@@ -68,7 +75,9 @@ def make_video(sb, out_dir, preview=False):
 
 
 def upload(video, meta, state):
-    record = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"), "topic": meta["topic"]}
+    record = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"), "topic": meta["topic"],
+              "series": meta.get("series"), "episode": meta.get("episode"), "hook": meta.get("hook"),
+              "theme": meta.get("theme"), "duration": meta.get("duration")}
     ok = True
     if os.getenv("AUTO_POST_YOUTUBE", "false").lower() == "true":
         try:
@@ -94,6 +103,7 @@ def main():
     ap.add_argument("--topic", help="override the next topic")
     ap.add_argument("--preview", action="store_true", help="render 1080p instead of 4K")
     ap.add_argument("--post", action="store_true", help="upload after rendering")
+    ap.add_argument("--series", choices=list(sbm.SERIES), help="force a series instead of letting the stats decide")
     args = ap.parse_args()
 
     if args.post and date.today().isoformat() > RUN_UNTIL:
@@ -101,14 +111,18 @@ def main():
         return 0
 
     state = sbm.load_state()
+    print("📊 Channel stats")
+    print(f"  updated {analytics.refresh_stats(state)} videos - {analytics.summary(state)}")
+    series = args.series or analytics.pick_series(state)
+    episode = state.setdefault("series_counts", {}).get(series, 0) + 1
     bank_name = None
     if args.storyboard:
         sb = sbm.validate(json.loads(Path(args.storyboard).read_text(encoding="utf-8")))
     else:
         topic = args.topic or sbm.next_topic(state)
-        print(f"📌 Topic: {topic}")
+        print(f"📌 Topic: {topic}  |  series: {series} #{episode}")
         try:
-            sb = sbm.write_storyboard(topic)
+            sb = sbm.write_storyboard(topic, series=series, insights=analytics.insights_text(state))
             sb["topic"] = sb.get("topic") or topic
         except Exception as e:
             print(f"⚠️  Gemini failed ({e}) - using a hand-written storyboard")
@@ -121,12 +135,25 @@ def main():
     if bank_name:
         state["used_bank"].append(bank_name)
 
-    out_dir = OUTPUT / f"{time.strftime('%Y%m%d-%H%M%S')}_{slugify(sb['topic'])}"
-    video, meta = make_video(sb, out_dir, args.preview)
+    # series branding + variety
+    sb["series"], sb["episode"] = series, episode
+    base_title = re.sub(r"\s*#shorts\s*$", "", sb["youtube"]["title"], flags=re.I)
+    for name in sbm.SERIES:   # Gemini sometimes adds the series itself - we add it below
+        base_title = re.sub(rf"\s*[\(\[|:-]*\s*{re.escape(name)}\s*[\)\]]?", "", base_title, flags=re.I).strip(" |:-")
+    sb["youtube"]["title"] = f"{base_title[:62]} | {series} #{episode} #shorts"
+    sb["instagram_caption"] = f"{series} · Ep {episode}\n\n" + sb["instagram_caption"]
+    theme = THEMES[len(state.get("posts", [])) % len(THEMES)]
+    label = f"{series.upper()} · EP {episode:02d}"
 
-    ok = upload(video, meta, state) if args.post else True
-    if not args.storyboard:
-        sbm.save_state(state)
+    out_dir = OUTPUT / f"{time.strftime('%Y%m%d-%H%M%S')}_{slugify(sb['topic'])}"
+    video, meta = make_video(sb, out_dir, args.preview, theme=theme, series_label=label)
+
+    if not args.post:
+        print("\n(local run - nothing posted, topic queue unchanged)")
+        return 0
+    state["series_counts"][series] = episode
+    ok = upload(video, meta, state)
+    sbm.save_state(state)
     return 0 if ok else 2
 
 

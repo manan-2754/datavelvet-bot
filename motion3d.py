@@ -33,6 +33,24 @@ OBJ_TYPES = tuple(TYPE_COLORS)
 BEAT_TYPES = ("show", "hide", "highlight", "send", "flow", "connect", "break", "focus", "reset", "text", "set", "count")
 
 ACCENT = (250, 204, 21)
+BG_COLORS = ((6, 7, 12), (10, 12, 22), (5, 6, 10), (40, 70, 140))   # top, middle, bottom, centre glow
+DEFAULT_YAW, DEFAULT_PITCH = -24, 54
+HOOK_DUR = 1.9   # seconds the opening hook stays on screen
+
+THEMES = [
+    {"name": "gold",    "accent": (250, 204, 21), "bg": ((6, 7, 12), (10, 12, 22), (5, 6, 10), (40, 70, 140)), "yaw": -24, "pitch": 54},
+    {"name": "cyan",    "accent": (34, 211, 238), "bg": ((5, 9, 14), (8, 16, 26), (4, 7, 11), (20, 90, 130)), "yaw": -30, "pitch": 50},
+    {"name": "magenta", "accent": (236, 92, 160), "bg": ((9, 6, 14), (16, 10, 26), (7, 5, 11), (100, 40, 130)), "yaw": -18, "pitch": 57},
+    {"name": "lime",    "accent": (163, 230, 53), "bg": ((6, 9, 9), (10, 18, 18), (5, 8, 8), (30, 100, 90)), "yaw": -28, "pitch": 52},
+    {"name": "orange",  "accent": (251, 146, 60), "bg": ((10, 7, 7), (20, 12, 12), (8, 5, 5), (120, 60, 40)), "yaw": -20, "pitch": 55},
+]
+
+
+def apply_theme(theme):
+    """Variety: switch accent colour, background tint and camera angle for this video."""
+    global ACCENT, BG_COLORS, DEFAULT_YAW, DEFAULT_PITCH
+    ACCENT, BG_COLORS = tuple(theme["accent"]), tuple(theme["bg"])
+    DEFAULT_YAW, DEFAULT_PITCH = theme["yaw"], theme["pitch"]
 LIGHT = (0.29, 0.83, -0.46)   # normalised direction towards the light
 STAGE_CY = 960
 FOCAL = 2100
@@ -314,7 +332,7 @@ def compile_scenes(scenes, durations, word_times):
                     links[key] = {"from": b["from"], "to": b["to"], "label": b.get("label", "") if b["do"] == "connect" else "",
                                   "carried": False, "appear": b["t"]}
         c = sc.get("camera") if isinstance(sc.get("camera"), dict) else {}
-        cam = auto_camera(objs, yaw=float(c.get("yaw", -24)), pitch=float(c.get("pitch", 54)))
+        cam = auto_camera(objs, yaw=float(c.get("yaw", DEFAULT_YAW)), pitch=float(c.get("pitch", DEFAULT_PITCH)))
         if c.get("zoom"):
             cam = cam[:2] + (cam[2] / clamp(float(c["zoom"]), 0.5, 2.0),) + cam[3:]
         # captions: chunks of <= 4 words, split on pauses
@@ -346,15 +364,17 @@ class MotionRenderer(Renderer):
         self.end_cams = {}
         self.focus_cams = {}
         self.vignette = self._make_vignette()
+        self.hook = ""
+        self.series_label = ""
 
     def _make_background(self):
         surf = skia.Surface(self.w, self.h)
         c = surf.getCanvas()
         k = self.k
         c.drawPaint(skia.Paint(Shader=skia.GradientShader.MakeLinear(
-            [skia.Point(0, 0), skia.Point(0, self.h)], [skia.Color(6, 7, 12), skia.Color(10, 12, 22), skia.Color(5, 6, 10)])))
+            [skia.Point(0, 0), skia.Point(0, self.h)], [skia.Color(*BG_COLORS[0]), skia.Color(*BG_COLORS[1]), skia.Color(*BG_COLORS[2])])))
         c.drawPaint(skia.Paint(Shader=skia.GradientShader.MakeRadial(
-            skia.Point(540 * k, STAGE_CY * k), 720 * k, [skia.Color(40, 70, 140, 70), skia.Color(0, 0, 0, 0)])))
+            skia.Point(540 * k, STAGE_CY * k), 720 * k, [skia.Color(*BG_COLORS[3], 70), skia.Color(0, 0, 0, 0)])))
         return surf.makeImageSnapshot()
 
     def _make_vignette(self):
@@ -823,6 +843,66 @@ class MotionRenderer(Renderer):
             self.rrect(540 - w / 2, cy + 280, w, 84, 42, fill=ACCENT, a=a)
             self.text("FOLLOW", 540, cy + 335, SANS_BOLD, 36, (15, 15, 20), a * clamp(b), "center")
 
+    def draw_hook(self, t):
+        """Giant kinetic hook text over the opening second - stops the scroll."""
+        if not self.hook or t >= HOOK_DUR:
+            return
+        out = ease((t - (HOOK_DUR - 0.35)) / 0.35)
+        a = 1 - out
+        self.c.drawRect(skia.Rect.MakeWH(self.w, self.h), self.fill_paint((4, 5, 9), 0.62 * a))
+        parts, bold = [], False
+        for chunk in self.hook.split("**"):
+            for w in chunk.split():
+                parts.append((w, bold))
+            bold = not bold
+        size = 92
+        while True:
+            lines, cur, cur_w = [], [], 0
+            for w, b in parts:
+                ww = self.text_width(w, SANS_BOLD, size)
+                sp = size * 0.28 if cur else 0
+                if cur and cur_w + sp + ww > 940:
+                    lines.append(cur)
+                    cur, cur_w, sp = [], 0, 0
+                cur.append((w, b, ww))
+                cur_w += sp + ww
+            lines.append(cur)
+            if len(lines) <= 3 or size <= 56:
+                break
+            size -= 6
+        punch = 1.18 - 0.18 * ease_back(t / 0.32)
+        k = self.k
+        cy = 820
+        self.c.save()
+        self.c.translate(540 * k, cy * k)
+        self.c.scale(punch, punch)
+        self.c.translate(-540 * k, -cy * k)
+        lh = size * 1.18
+        y0 = cy - lh * (len(lines) - 1) / 2 + size * 0.35
+        wi = 0
+        for li, line in enumerate(lines):
+            total = sum(w for _, _, w in line) + size * 0.28 * (len(line) - 1)
+            x = 540 - total / 2
+            for w, b, ww in line:
+                appear = ease((t - 0.05 - wi * 0.06) / 0.18)
+                yy = y0 + li * lh + 30 * (1 - appear)
+                if b:
+                    sweep = ease((t - 0.25) / 0.35)
+                    if sweep > 0:
+                        self.rrect(x - 10, yy - size * 0.92, (ww + 20) * sweep, size * 1.15, 14, fill=ACCENT, a=0.95 * a)
+                self.text(w, x, yy, SANS_BOLD, size, (15, 15, 20) if b and ease((t - 0.25) / 0.35) > 0.5 else (250, 250, 252),
+                          a * appear)
+                x += ww + size * 0.28
+                wi += 1
+        self.c.restore()
+        if t < 0.14:
+            self.c.drawRect(skia.Rect.MakeWH(self.w, self.h), self.fill_paint((255, 255, 255), 0.55 * (1 - t / 0.14)))
+
+    def draw_series_chip(self, a):
+        if self.series_label and a > 0.01:
+            w = self.pill_width(self.series_label, MONO_BOLD, 17)
+            self.pill(self.series_label, 90 + w / 2, 160, a, font=MONO_BOLD, size=17)
+
     def draw_sparks(self, cam, x, y, z, u, rgb):
         if not 0 <= u < 1:
             return
@@ -923,11 +1003,15 @@ class MotionRenderer(Renderer):
                                   PALETTE.get(b.get("color", "yellow"), ACCENT))
 
         self.c.drawImage(self.vignette, 0, 0)
-        self.draw_header(sc, prev, tl, t)
-        if t < total - 2.7:
+        hook_on = bool(self.hook) and t < HOOK_DUR
+        if not hook_on or t > HOOK_DUR - 0.35:
+            self.draw_header(sc, prev, tl, t)
+        if t < total - 2.7 and not hook_on:
             self.draw_captions(sc, tl)
+        self.draw_series_chip(ease((t - (HOOK_DUR if self.hook else 0)) / 0.5))
         if self.handle:
             self.text(self.handle, 1010, 165, MONO_BOLD, 20, (255, 255, 255), 0.5, "right")
+        self.draw_hook(t)
         self.rrect(0, 1908, BASE_W * clamp(t / total), 12, 0, fill=ACCENT, a=0.85)
         self.draw_end_card(t, total)
 
@@ -941,9 +1025,13 @@ def prime_end_cams(r, scenes):
         r.end_cams[i] = r.cam_at(i, sc["dur"], scenes)
 
 
-def render_motion(scenes, durations, word_times, audio_path, out_path, width=2160, height=3840, fps=30, handle="", log=print):
+def render_motion(scenes, durations, word_times, audio_path, out_path, width=2160, height=3840, fps=30, handle="", log=print,
+                  theme=None, hook="", series_label=""):
+    if theme:
+        apply_theme(theme)
     compiled, total = compile_scenes(scenes, durations, word_times)
     r = MotionRenderer(width, height, fps, handle)
+    r.hook, r.series_label = hook, series_label
     prime_end_cams(r, compiled)
     n_frames = int(math.ceil(total * fps))
     cmd = [ffmpeg_exe(), "-y", "-loglevel", "error",
@@ -967,9 +1055,13 @@ def render_motion(scenes, durations, word_times, audio_path, out_path, width=216
     return total
 
 
-def render_stills(scenes, durations, word_times, times, out_pattern, width=1080, height=1920, handle=""):
+def render_stills(scenes, durations, word_times, times, out_pattern, width=1080, height=1920, handle="",
+                  theme=None, hook="", series_label=""):
+    if theme:
+        apply_theme(theme)
     compiled, total = compile_scenes(scenes, durations, word_times)
     r = MotionRenderer(width, height, 30, handle)
+    r.hook, r.series_label = hook, series_label
     prime_end_cams(r, compiled)
     for i, t in enumerate(times):
         r.frame3d(compiled, t, total)
