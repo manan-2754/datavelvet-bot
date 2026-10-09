@@ -2,10 +2,8 @@ name: 3D explainer - create + post
 
 on:
   schedule:
-    # 4 videos/day (UTC). = 9am, 1pm, 5pm, 9pm Eastern (EDT). GitHub may start these a few minutes late.
-    - cron: '7 13 * * *'
+    # 2 videos/day (UTC) = 1pm and 9pm Eastern (EDT). GitHub may start these a few minutes late.
     - cron: '7 17 * * *'
-    - cron: '7 21 * * *'
     - cron: '7 1 * * *'
   workflow_dispatch:
     inputs:

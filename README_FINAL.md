@@ -1,8 +1,8 @@
-# 3D Explainer Bot — 4K step-by-step tech explainers, auto-posted 4×/day
+# 3D Explainer Bot — 4K step-by-step tech explainers, auto-posted 2×/day
 
 Every run: **topic → Gemini storyboard → natural English narration with word timestamps → 4K (2160×3840) high-motion 3D diagram render, every animation fired on the exact word that describes it → YouTube Shorts + Instagram Reels**.
 
-Runs on GitHub Actions 4 times a day (9am / 1pm / 5pm / 9pm Eastern), so your PC can be off. It stops posting after `RUN_UNTIL` (default 2027-02-08 = 4 months).
+Runs on GitHub Actions 2 times a day (1pm / 9pm Eastern), so your PC can be off. It stops posting after `RUN_UNTIL` (default 2027-02-08 = 4 months).
 
 ## Files
 
@@ -59,7 +59,7 @@ python main.py --storyboard storyboards/dns_explained.json
 Secrets are never committed: `.env`, `token.json`, `client_secret.json` are in `.gitignore`.
 
 ## Limits worth knowing
-- YouTube API quota: 10,000 units/day, one upload = 1,600 → max 6 uploads/day (we do 4).
+- YouTube API quota: 10,000 units/day, one upload = 1,600 → max 6 uploads/day shared by both bots (2 + 2 = 4).
 - Shorts must be ≤ 3 min; the bot refuses anything over 178 s (typical video: 100–140 s).
 - YouTube/Instagram may limit reach or monetisation of fully automated, templated channels — check the stats after
   the first couple of weeks and vary topics/voices if needed.
