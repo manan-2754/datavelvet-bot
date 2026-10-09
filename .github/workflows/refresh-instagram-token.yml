@@ -1,0 +1,41 @@
+name: Refresh Instagram token
+
+on:
+  schedule:
+    - cron: '20 12 * * *'   # daily, before the first video of the day
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check GH_PAT can manage this repo's secrets
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: gh secret list --repo "$GITHUB_REPOSITORY" > /dev/null && echo "GH_PAT OK - can read/write repo secrets"
+
+      - name: Refresh the 60-day Instagram token and save it back
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          PYTHONIOENCODING: utf-8
+        run: |
+          pip install -q requests python-dotenv
+          python instagram_upload.py --refresh
+
+      - name: Email me if the refresh failed
+        if: failure()
+        env:
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: |
+          echo "Instagram token refresh failed - posting to Instagram will stop when the token expires." > run.log
+          python notify.py --failed run.log
