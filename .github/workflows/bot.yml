@@ -1,9 +1,10 @@
-name: 3D explainer - create + post
+name: Holo explainer - create + post
 
 on:
   schedule:
-    # 2 videos/day (UTC) = 1pm and 9pm Eastern (EDT). GitHub may start these a few minutes late.
-    - cron: '7 17 * * *'
+    # 3 videos/day (UTC) = 9am, 3pm and 9pm Eastern (EDT). GitHub may start these a few minutes late.
+    - cron: '7 13 * * *'
+    - cron: '7 19 * * *'
     - cron: '7 1 * * *'
   workflow_dispatch:
     inputs:
@@ -85,5 +86,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: video-${{ github.run_number }}
-          path: output/
+          path: out/
           retention-days: 3

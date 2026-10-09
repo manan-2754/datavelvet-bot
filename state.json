@@ -40,9 +40,32 @@
       "duration": 108.8,
       "youtube_id": "lSAY6wbyT_A",
       "instagram_id": "18076383422549123"
+    },
+    {
+      "time": "2026-10-09T14:38:36+00:00",
+      "topic": "How browsers render a webpage",
+      "palette": "Midnight Citrus",
+      "format": "holo_flow:3|holo_tree:4|definition:4|holo_pipeline:4|holo_layers:3|holo_chart:4|compare:3|steps:3",
+      "youtube_id": "sM8pNlXKfok",
+      "instagram_id": "18117438377093748"
     }
   ],
   "series_counts": {
     "How It Works": 1
-  }
+  },
+  "used_formats": [
+    "holo_flow:3|holo_tree:4|definition:4|holo_pipeline:4|holo_layers:3|holo_chart:4|compare:3|steps:3"
+  ],
+  "used_palettes": [
+    "0:0"
+  ],
+  "used_combos": [
+    "{\"bg_pattern\": \"halftone\", \"cam\": \"crane\", \"caption\": \"boxed\", \"connector\": \"elbow\", \"depth\": \"deep\", \"entrance\": \"grow\", \"floor\": \"grid\", \"fonts\": 5, \"header\": \"bignum\", \"light\": \"top\", \"motion\": \"snappy\", \"prim\": \"box\", \"render3d\": \"blueprint\", \"shadow\": \"outline\", \"shape\": \"sharp\", \"transition\": \"split\"}"
+  ],
+  "used_signatures": [
+    "81b7fc1a6bd3d340"
+  ],
+  "used_layout_seqs": [
+    "hook,holo_flow,holo_tree,definition,holo_pipeline,holo_layers,holo_chart,compare,steps"
+  ]
 }

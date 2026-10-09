@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-from explainer_engine import ffmpeg_exe
+from mg import ffmpeg_exe
 
 SR = 48000
 LEAD_IN = 0.35      # silence before the first word

@@ -1,159 +1,146 @@
 """
-3D Explainer Video Factory
+Motion Graphics Bot - premium 2D motion-graphics explainers. Every video gets its own format (scene layouts chosen
+from the content, never the same sequence twice) and its own design DNA (palette, type, shapes, connectors, motion).
 
-topic -> Gemini storyboard -> per-scene narration with word timings -> 4K word-synced 3D diagram render
-      -> (optional) upload to YouTube Shorts + Instagram Reels
-
-Usage:
-  python main.py                                  # make one video from the next topic
-  python main.py --post                           # make one video and upload it (what the cloud job runs)
-  python main.py --storyboard storyboards/x.json  # render a specific storyboard
-  python main.py --preview                        # 1080p instead of 4K (much faster, for testing)
+  python main.py                      # write + render one video in 4K (nothing posted)
+  python main.py --preview --show     # 1080p, then open it in VLC
+  python main.py --script out/x/script.json   # re-render an existing script
 """
 import argparse
 import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import time
-from datetime import date, datetime, timezone
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 BASE = Path(__file__).parent
-load_dotenv(BASE / ".env", override=True)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE / ".env", override=True)
+except ImportError:
+    pass
 
-import analytics  # noqa: E402
-import storyboard as sbm  # noqa: E402
-from human import add_human_clips  # noqa: E402
-from motion3d import THEMES, compile_scenes, render_motion  # noqa: E402
-from sound import mix_audio  # noqa: E402
+import mg  # noqa: E402
+import style  # noqa: E402
+from ui_sound import mix_screen  # noqa: E402
 from voice import build_narration  # noqa: E402
 
-OUTPUT = BASE / "output"
-RUN_UNTIL = os.getenv("RUN_UNTIL") or "2027-02-08"      # stop posting after 4 months
-HANDLE = os.getenv("CHANNEL_HANDLE", "")
+OUTPUT = BASE / "out"
+STATE = BASE / "state.json"
+HANDLE = os.getenv("CHANNEL_HANDLE", "@datavelvet")
+RUN_UNTIL = os.getenv("RUN_UNTIL") or "2027-02-08"
+VLC = r"C:\Program Files\VideoLAN\VLC\vlc.exe"
 
 
 def slugify(s):
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")[:50] or "video"
 
 
-def make_video(sb, out_dir, preview=False, theme=None, series_label=""):
-    out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "storyboard.json").write_text(json.dumps(sb, indent=2, ensure_ascii=False), encoding="utf-8")
+def load_state():
+    st = json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else {}
+    for k in ("used_topics", "posts", "used_formats", "used_palettes", "used_combos", "used_signatures", "used_layout_seqs"):
+        st.setdefault(k, [])
+    return st
 
-    print("\n🔊 Narration")
-    wav, durations, voice, word_times = build_narration(sb["scenes"], out_dir / "audio")
+
+def make_video(script, dna, out_dir, preview=False):
+    out_dir.mkdir(parents=True, exist_ok=True)
+    pal = style.palette(dna["palette"], dna["rot"])
+    (out_dir / "script.json").write_text(json.dumps({**script, "dna": dna}, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"🎨 Design: {pal['name']} | fonts {style.FONT_PAIRS[dna['fonts']][0]} | "
+          + ", ".join(f"{k}={dna[k]}" for k in style.OPTIONS))
+    print(f"🧩 Format: {script.get('format') or ' > '.join(s['layout'] for s in script['scenes'])}")
+    print("🔊 Narration")
+    wav, durations, voice, words = build_narration(script["scenes"], out_dir / "audio")
     total = sum(durations)
     print(f"  voice: {voice}, total {total:.1f}s")
     if total > 178:
         raise RuntimeError(f"Video would be {total:.0f}s - over the 3 minute Shorts limit")
-
-    print("\n🎵 Music + sound effects")
-    compiled, _ = compile_scenes(sb["scenes"], durations, word_times)
-    mixed = mix_audio(wav, compiled, total, out_dir / "audio" / "final_mix.wav", seed=len(sb["topic"]),
-                      hook=bool(sb.get("hook")))
-
     w, h = (1080, 1920) if preview else (2160, 3840)
-    print(f"\n🎬 Rendering {w}x{h} (theme: {(theme or THEMES[0])['name']})")
-    video = out_dir / "video.mp4"
-    render_motion(sb["scenes"], durations, word_times, mixed, video, w, h, 30, HANDLE,
-                  theme=theme, hook=sb.get("hook", ""), series_label=series_label)
-    video = add_human_clips(video, w, h, seed=sb["topic"])
-
-    meta = {**sb["youtube"], "instagram_caption": sb["instagram_caption"], "topic": sb["topic"],
-            "duration": round(total, 1), "voice": voice, "resolution": f"{w}x{h}",
-            "hook": sb.get("hook", ""), "series": sb.get("series", ""), "episode": sb.get("episode"),
-            "theme": (theme or THEMES[0])["name"], "review": sb.get("review")}
+    video = mg.Video(script, durations, words, dna, w, h, 30, HANDLE)
+    print("🎵 Sound design")
+    gains = {"pop": 0.55, "tick": 0.35, "whoosh": 0.0}
+    sfx = [(t, kind, gains[kind]) for t, kind in video.sound_events()]
+    mixed = mix_screen(wav, sfx, video.total, out_dir / "audio" / "mix.wav", seed=dna["seed"] % 997, hook=True)
+    print(f"🎬 Rendering {w}x{h}")
+    out = out_dir / "video.mp4"
+    mg.render(video, mixed, out)
+    meta = {**script.get("youtube", {}), "instagram_caption": script.get("instagram_caption", ""),
+            "topic": script["topic"], "duration": round(total, 1), "voice": voice, "palette": pal["name"],
+            "format": script.get("format"), "dna": dna}
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     shutil.rmtree(out_dir / "audio", ignore_errors=True)
-    print(f"\n✅ {video} ({video.stat().st_size / 1e6:.1f} MB, {total:.0f}s)")
-    return video, meta
+    print(f"✅ {out} ({out.stat().st_size / 1e6:.1f} MB, {total:.0f}s)")
+    return out, meta
 
 
 def upload(video, meta, state):
-    record = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"), "topic": meta["topic"],
-              "series": meta.get("series"), "episode": meta.get("episode"), "hook": meta.get("hook"),
-              "theme": meta.get("theme"), "duration": meta.get("duration")}
+    from datetime import datetime, timezone
+    rec = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"), "topic": meta["topic"],
+           "palette": meta["palette"], "format": meta["format"]}
     ok = True
     if os.getenv("AUTO_POST_YOUTUBE", "false").lower() == "true":
         try:
             from youtube_upload import upload_video
-            record["youtube_id"] = upload_video(video, meta)
+            rec["youtube_id"] = upload_video(video, meta)
         except Exception as e:
             ok = False
             print(f"❌ YouTube upload failed: {e}")
     if os.getenv("AUTO_POST_INSTAGRAM", "false").lower() == "true":
         try:
             from instagram_upload import upload_reel
-            record["instagram_id"] = upload_reel(video, meta["instagram_caption"])
+            rec["instagram_id"] = upload_reel(video, meta["instagram_caption"])
         except Exception as e:
             ok = False
             print(f"❌ Instagram upload failed: {e}")
-    state["posts"].append(record)
+    state["posts"].append(rec)
     return ok
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--storyboard", help="render this storyboard JSON instead of writing a new one")
+    ap.add_argument("--script", help="render this script JSON instead of writing a new one")
     ap.add_argument("--topic", help="override the next topic")
-    ap.add_argument("--preview", action="store_true", help="render 1080p instead of 4K")
-    ap.add_argument("--post", action="store_true", help="upload after rendering")
-    ap.add_argument("--series", choices=list(sbm.SERIES), help="force a series instead of letting the stats decide")
+    ap.add_argument("--preview", action="store_true", help="1080p instead of 4K")
+    ap.add_argument("--show", action="store_true", help="open the result in VLC")
+    ap.add_argument("--post", action="store_true", help="upload after rendering (what the cloud job runs)")
     args = ap.parse_args()
-
+    from datetime import date
     if args.post and date.today().isoformat() > RUN_UNTIL:
-        print(f"Posting window ended on {RUN_UNTIL} - nothing to do.")
+        print(f"Posting window ended on {RUN_UNTIL}.")
         return 0
-
-    state = sbm.load_state()
-    print("📊 Channel stats")
-    print(f"  updated {analytics.refresh_stats(state)} videos - {analytics.summary(state)}")
-    series = args.series or analytics.pick_series(state)
-    episode = state.setdefault("series_counts", {}).get(series, 0) + 1
-    bank_name = None
-    if args.storyboard:
-        sb = sbm.validate(json.loads(Path(args.storyboard).read_text(encoding="utf-8")))
+    state = load_state()
+    topic = None
+    if args.script:
+        script = json.loads(Path(args.script).read_text(encoding="utf-8"))
+        dna = script.pop("dna", None) or style.new_dna(state)
     else:
-        topic = args.topic or sbm.next_topic(state)
-        print(f"📌 Topic: {topic}  |  series: {series} #{episode}")
-        try:
-            sb = sbm.write_storyboard(topic, series=series, insights=analytics.insights_text(state))
-            sb["topic"] = sb.get("topic") or topic
-        except Exception as e:
-            print(f"⚠️  Gemini failed ({e}) - using a hand-written storyboard")
-            bank_name, sb = sbm.bank_storyboard(state)
-            if not sb:
-                print("❌ No storyboard available - skipping this run")
-                return 1
-        if not args.topic and not bank_name:
-            state["used_topics"].append(topic)
-    if bank_name:
-        state["used_bank"].append(bank_name)
-
-    # series branding + variety
-    sb["series"], sb["episode"] = series, episode
-    base_title = re.sub(r"\s*#shorts\s*$", "", sb["youtube"]["title"], flags=re.I)
-    for name in sbm.SERIES:   # Gemini sometimes adds the series itself - we add it below
-        base_title = re.sub(rf"\s*[\(\[|:-]*\s*{re.escape(name)}\s*[\)\]]?", "", base_title, flags=re.I).strip(" |:-")
-    sb["youtube"]["title"] = f"{base_title[:62]} | {series} #{episode} #shorts"
-    sb["instagram_caption"] = f"{series} · Ep {episode}\n\n" + sb["instagram_caption"]
-    theme = THEMES[len(state.get("posts", [])) % len(THEMES)]
-    label = f"{series.upper()} · EP {episode:02d}"
-
-    out_dir = OUTPUT / f"{time.strftime('%Y%m%d-%H%M%S')}_{slugify(sb['topic'])}"
-    video, meta = make_video(sb, out_dir, args.preview, theme=theme, series_label=label)
-
+        import writer
+        topics = json.loads((BASE / "topics.json").read_text(encoding="utf-8"))
+        fresh = [t for t in topics if t not in state["used_topics"]] or topics
+        topic = args.topic or fresh[0]
+        print(f"📌 Topic: {topic}")
+        last = state["used_formats"][-1].count("|") + 1 if state["used_formats"] else None
+        script = writer.write_script(topic, state["used_formats"], last, seed=time.time_ns())
+        script["topic"] = script.get("topic") or topic
+        dna = style.new_dna(state, seed=time.time_ns())
+    out_dir = OUTPUT / f"{time.strftime('%Y%m%d-%H%M%S')}_{slugify(script['topic'])}"
+    video, meta = make_video(script, dna, out_dir, args.preview)
+    if args.show and Path(VLC).exists():
+        subprocess.Popen([VLC, str(video)])
     if not args.post:
-        print("\n(local run - nothing posted, topic queue unchanged)")
+        print("(local run - nothing posted, state unchanged)")
         return 0
-    state["series_counts"][series] = episode
+    if topic and not args.topic:
+        state["used_topics"].append(topic)
+    layouts = [s["layout"] for s in script["scenes"]]
+    style.remember(state, dna, layouts)
+    state["used_formats"].append(script.get("format") or "|".join(layouts))
     ok = upload(video, meta, state)
-    sbm.save_state(state)
+    STATE.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
     return 0 if ok else 2
 
 
