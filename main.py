@@ -11,6 +11,7 @@ Motion-as-Code bot - explainer videos in the hand-plotted engineering style, ful
 import argparse
 import json
 import os
+import random
 import re
 import shutil
 import subprocess
@@ -68,11 +69,22 @@ def load_state():
     return st
 
 
+def pick_seed(state):
+    """Visual seed for a video: hologram tint, floors, reveal styles and camera moves all derive from it.
+    It never repeats the previous video's tint or camera rotation."""
+    last = next((p.get("seed") for p in reversed(state.get("posts", [])) if p.get("seed")), None)
+    rng = random.SystemRandom()
+    while True:
+        s = rng.randrange(1, 2 ** 31)
+        if last is None or (s % 6 != last % 6 and (s >> 7) % 4 != (last >> 7) % 4):
+            return s
+
+
 def make_video(script, show=False):
     out_dir = OUT / f"{time.strftime('%Y%m%d-%H%M%S')}_{slugify(script['topic'])}"
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "script.json").write_text(json.dumps(script, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"🧩 Plates: {script.get('format') or ' > '.join(s['plate'] for s in script['scenes'])}")
+    print(f"🧩 Plates: {script.get('format') or ' > '.join(s['plate'] for s in script['scenes'])}  (visual seed {script.get('seed')})")
     print("🔊 Narration")
     dur, voice = audio_build.narrate(script)
     print(f"  {voice}, {dur:.1f}s")
@@ -95,7 +107,8 @@ def make_video(script, show=False):
                     "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "-shortest", str(video)], check=True)
     raw.unlink(missing_ok=True)
     meta = {**script.get("youtube", {}), "instagram_caption": script.get("instagram_caption", ""), "topic": script["topic"],
-            "duration": round(dur, 1), "voice": voice, "format": script.get("format"), "review": script.get("review")}
+            "duration": round(dur, 1), "voice": voice, "format": script.get("format"), "seed": script.get("seed"),
+            "review": script.get("review")}
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"✅ {video} ({video.stat().st_size / 1e6:.1f} MB, {dur:.0f}s)")
     if show and Path(VLC).exists():
@@ -104,7 +117,8 @@ def make_video(script, show=False):
 
 
 def upload(video, meta, state):
-    rec = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"), "topic": meta["topic"], "format": meta.get("format")}
+    rec = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"), "topic": meta["topic"], "format": meta.get("format"),
+           "seed": meta.get("seed")}
     ok = True
     if os.getenv("AUTO_POST_YOUTUBE", "false").lower() == "true":
         try:
@@ -157,6 +171,7 @@ def main():
                 STATE.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
             raise
         script["topic"] = script.get("topic") or topic
+    script["seed"] = script.get("seed") or pick_seed(state)
     video, meta = make_video(script, args.show)
     if not args.post:
         print("(local run - nothing posted, state unchanged)")

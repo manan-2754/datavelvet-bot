@@ -132,13 +132,18 @@ def narrate(script, voice=None):
     subprocess.run([ffmpeg(), "-v", "error", "-y", "-i", str(wav), "-c:a", "libmp3lame", "-b:a", "256k",
                     str(ROOT / "audio" / "voiceover.mp3")], check=True)
     scenes = [{"plate": s["plate"], "title": s.get("title", ""), "data": s.get("data", {}),
-               "meta": {"i": i, "n": n, "topic": script.get("topic", "")}} for i, s in enumerate(script["scenes"])]
+               "meta": {"i": i, "n": n, "topic": script.get("topic", ""), "seed": script.get("seed", 0)}} for i, s in enumerate(script["scenes"])]
     (ROOT / "data" / "lyrics.json").write_text(json.dumps({"source": "audio_build.narrate (edge-tts)", "lines": lines,
                                                            "scenes": scenes}, indent=1, ensure_ascii=False), encoding="utf-8")
     return len(y) / SR, voice
 
 
 # ------------------------------------------------------------------ sound design
+def _q(a, b):
+    """`a ?? b` exactly as the TS plates resolve a cue (an empty cue stays empty)."""
+    return a if a is not None else b
+
+
 class Cues:
     """Mirrors the plates' cue lookup (scenes/_gen.ts GenPlate.cue)."""
 
@@ -240,6 +245,10 @@ def mix(script):
                 put("pen_line", T(w, -0.45), -12, dur=0.4)
                 put("zap_slash", T(w, 0.05), -8)
                 put("zap_slash", T(w, 0.2), -10)
+            elif m == "holo":
+                put("projector_run", t0, -24, dur=max(1.0, nxt - t0))
+                put("scan_sweep", T(w, -0.3), -8)
+                put("impact_small", T(w, 0.6), -10)
             else:
                 put("impact_slam", T(w), -7)
                 put("pen_line", T(w, -0.1), -14, dur=0.7)
@@ -268,10 +277,60 @@ def mix(script):
                 ws = cue(d.get("stampCue"), 3, 4)
                 ts = max(T(ws, 0.05) or 0, (lastw["start"] + 0.6) if lastw else 0)
                 put("stamp", ts, -4, align="peak")
-        elif plate == "holo":
+        elif plate in ("holo", "scene3d"):
             put("projector_run", t0, -24, dur=max(1.0, nxt - t0))
+            ws3 = []
             for k, it in enumerate(its):
-                put("scan_sweep", T(cue(it.get("cue") or it.get("label"), k, len(its)), -0.05), -9)
+                w2 = cue(_q(it.get("cue"), it.get("label")), k, len(its))
+                put("scan_sweep", T(w2, -0.05), -9)
+                ws3.append(w2)
+            if plate == "scene3d" and len(its) > 1 and ws3[-1]:
+                tl = max(w["start"] for w in ws3 if w) + 0.35
+                put("pen_line", tl, -15, dur=0.5)
+                tp = T(cue(d.get("packetsCue"), len(its), len(its) + 1)) if d.get("packetsCue") else None
+                tp = max(tp or 0, t0 + 0.5) if tp else tl + 0.5
+                tt = tp
+                while tt < nxt - 0.3:
+                    put("spark_zip", tt, -10 if tt == tp else -22)
+                    tt += 0.6
+        elif plate == "layers":
+            put("projector_run", t0, -26, dur=max(1.0, nxt - t0))
+            last = None
+            for k, it in enumerate(its):
+                w2 = cue(_q(it.get("cue"), it.get("label")), k, len(its))
+                put("whoosh_soft", T(w2, -0.1), -12)
+                put("impact_small", T(w2, 0.45), -11)
+                put("ui_blip", T(w2, 0.35), -15, take=1 + k % 2)
+                last = w2
+            if last and len(its) > 1:
+                put("spark_zip", last["start"] + 0.8, -11)
+        elif plate == "orbit":
+            put("projector_run", t0, -24, dur=max(1.0, nxt - t0))
+            core = d.get("core") if isinstance(d.get("core"), dict) else {}
+            w0 = cue(_q(core.get("cue"), core.get("label")), 0, len(its) + 1)
+            put("scan_sweep", T(w0, -0.05), -8)
+            for k, it in enumerate(its):
+                w2 = cue(_q(it.get("cue"), it.get("label")), k + 1, len(its) + 1)
+                put("whoosh_soft", T(w2, -0.25), -14)
+                put("ui_blip", T(w2), -12, take=1 + k % 2)
+                put("spark_zip", T(w2, 0.6), -16)
+        elif plate == "tunnel":
+            put("projector_run", t0, -26, dur=max(1.0, nxt - t0))
+            for k, it in enumerate(its):
+                w2 = cue(_q(it.get("cue"), it.get("label")), k, len(its))
+                put("whoosh_fast", T(w2, 0.05), -9, take=1 + k % 2, align="peak")
+                put("impact_small", T(w2, 0.05), -12)
+        elif plate == "bars3d":
+            lastw = None
+            for k, it in enumerate(its):
+                w2 = cue(_q(it.get("cue"), it.get("value")), k, len(its))
+                put("pen_line", T(w2), -15, dur=0.5)
+                put("impact_slam" if k % 2 == 0 else "impact_small", T(w2, 0.55), -9)
+                for i in range(6):
+                    put("ui_tick", T(w2, i * 0.12), -21)
+                lastw = w2
+            if d.get("total") and lastw:
+                put("typewriter", max(T(cue(d.get("totalCue"), len(its), len(its) + 1)) or 0, lastw["end"] + 0.3), -14, dur=0.6)
         elif plate == "flows":
             cue((d.get("hub") or {}).get("cue"), 0, 5)
             first_node = None

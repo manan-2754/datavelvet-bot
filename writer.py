@@ -1,6 +1,7 @@
 """
 Script writer for the Motion-as-Code bot: an LLM (Gemini -> OpenRouter -> Groq -> OpenCode -> Gemini Lite) writes a
-short explainer as a sequence of plates (hook, title, specimen, holo, flows, form, stats, compare, outro), each
+short explainer as a sequence of plates (2D: hook, title, specimen, flows, form, stats, compare, outro; 3D holo: holo,
+scene3d, layers, orbit, tunnel, bars3d), each
 scene with its spoken lines and the data its plate draws. A validator enforces the plate schemas and exact cue
 words; a second model pass fact-checks it.
 """
@@ -20,19 +21,21 @@ FALLBACKS = [
     ("Groq", "https://api.groq.com/openai/v1", "GROQ_API_KEY", ["openai/gpt-oss-120b", "qwen/qwen3.8-27b"]),
     ("OpenCode", "https://opencode.ai/zen/v1", "OPENCODE_API_KEY", ["gemini-3.8-flash", "claude-sonnet-5-5", "gpt-5.4-mini"]),
 ]
-MIDDLE = ["title", "specimen", "holo", "flows", "form", "stats", "compare"]
-OBJECTS = ["server", "db", "globe", "cube", "pyramid", "chip"]
+MIDDLE = ["title", "specimen", "holo", "flows", "form", "stats", "compare", "scene3d", "layers", "orbit", "tunnel", "bars3d"]
+HOLO3D = {"holo", "scene3d", "layers", "orbit", "tunnel", "bars3d"}
+OBJECTS = ["server", "db", "globe", "cube", "pyramid", "chip", "router", "cloud", "lock", "gear", "user", "phone",
+           "laptop", "stack", "shield", "helix", "bot"]
+OBJ_TXT = "|".join(OBJECTS)
 
 PLATES = """
-PLATES (each scene picks one; the visuals are drawn from "data" exactly when the cue words are spoken):
-- "hook" (FIRST scene only): giant karaoke headline of the lines + one plotted motif.
-    data: {"motif": "dial"|"chart"|"number"|"strike", "value": short text (for number: a striking figure like "100,000" or "0.2 ms"; for strike: what gets crossed out, max 22 chars), "label": max 30 chars caption, "cue": 1-3 words}
+PLATES (each scene picks one; the visuals are drawn from "data" exactly when the cue words are spoken).
+2D plates (hand-plotted paper / graph style):
+- "hook" (FIRST scene only): giant karaoke headline of the lines + one motif.
+    data: {"motif": "dial"|"chart"|"number"|"strike"|"holo", "value": short text (for number: a striking figure like "100,000" or "0.2 ms"; for strike: what gets crossed out, max 22 chars), "object": for holo, one of OBJ, "label": max 30 chars caption, "cue": 1-3 words}
 - "title": the pen writes a key term huge, then 2-3 stacked process boxes.
     data: {"term": max 14 chars (one key word or acronym), "termCue": words, "note": max 44 chars, "items": [{"label": max 24 chars, "sub": max 56 chars, "cue": words}] x2-3}
 - "specimen": a paper specimen sheet: a helix spine with 2-4 property cards and a rubber stamp.
     data: {"items": [{"label": max 20 chars, "sub": max 70 chars, "cue": words}] x2-4, "stamp": max 20 chars verdict, "stampCue": words}
-- "holo": 1-3 real 3D wireframe objects printed out of scanning rings.
-    data: {"items": [{"label": max 18 chars, "object": one of server|db|globe|cube|pyramid|chip, "sub": max 28 chars, "cue": words}] x1-3}
 - "flows": a hub with 2-4 connected nodes, packets streaming, live counters ticking.
     data: {"hub": {"label": max 12 chars, "unit": short unit, "cue": words}, "items": [{"label": max 12 chars, "unit": short unit like "req/s", "value": number per second, "cue": words}] x2-4, "packetsCue": words, "countersCue": words}
 - "form": a paper process form: 3-5 numbered steps typed in, then a stamp.
@@ -41,9 +44,22 @@ PLATES (each scene picks one; the visuals are drawn from "data" exactly when the
     data: {"items": [{"value": number with unit, max 9 chars, e.g. "99.99%", "3 ms", "1,000,000", "label": max 30 chars, "cue": words}] x2-3, "total": max 32 chars, "totalCue": words}
 - "compare": A vs B headers and 2-4 typed rows.
     data: {"left": max 12 chars, "right": max 12 chars, "rows": [{"label": max 22 chars, "left": max 16 chars, "right": max 16 chars, "cue": words}] x2-4}
+3D HOLO plates (glowing hologram wireframes; a moving 3D camera flies, orbits and cranes around them):
+- "holo": showcase - 1-3 big hologram objects printed on pedestals, the camera circling them.
+    data: {"items": [{"label": max 18 chars, "object": one of OBJ, "sub": max 28 chars, "cue": words}] x1-3}
+- "scene3d": a 3D diorama - 2-4 hologram objects on a floor joined by glowing 3D links with packets flying between them.
+    data: {"items": [{"label": max 18 chars, "object": one of OBJ, "sub": max 28 chars, "cue": words}] x2-4, "link": "chain"|"hub"|"ring", "packetsCue": words}
+- "layers": an exploded 3D architecture stack - 3-5 floating layers (top to bottom) slide in, data falls through them.
+    data: {"items": [{"label": max 20 chars, "sub": max 28 chars, "object": optional one of OBJ, "cue": words}] x3-5}
+- "orbit": a core object with 2-5 satellites orbiting on tilted rings, tethered by data streams.
+    data: {"core": {"label": max 16 chars, "object": one of OBJ, "cue": words}, "items": [{"label": max 16 chars, "object": one of OBJ, "cue": words}] x2-5}
+- "tunnel": the camera flies a data packet through 3-5 glowing gates (a pipeline / journey / request path, in order).
+    data: {"items": [{"label": max 20 chars, "sub": max 28 chars, "cue": words}] x3-5}
+- "bars3d": a holographic 3D bar chart - 2-5 bars grow with their numbers counting up.
+    data: {"items": [{"value": number with unit, max 9 chars, "label": max 22 chars, "cue": words}] x2-5, "total": optional max 32 chars, "totalCue": words}
 - "outro" (LAST scene only): big closing line; its lines end with "Follow for more."
     data: {}
-"""
+""".replace("OBJ", OBJ_TXT)
 
 PROMPT = """You write scripts for "DataVelvet", a premium motion-graphics explainer channel (YouTube Shorts + Instagram
 Reels, vertical). Each video is a sequence of animated plates in a hand-plotted engineering style.
@@ -52,8 +68,11 @@ Topic: "{topic}"
 {plates}
 RULES
 - {n} scenes: scene 1 is "hook", the last is "outro", the middle scenes each use a DIFFERENT plate (never repeat one).
-  Choose the plate that best SHOWS what that scene explains (numbers -> stats, a process -> form or title, components
-  talking -> flows, physical things -> holo, two options -> compare, properties -> specimen).
+  Choose the plate that best SHOWS what that scene explains (numbers -> stats or bars3d, a process -> form, title or
+  tunnel, components talking -> flows or scene3d, architecture tiers -> layers, one thing with parts around it -> orbit,
+  physical things -> holo, two options -> compare, properties -> specimen).
+- AT LEAST 3 middle scenes must be 3D HOLO plates (holo, scene3d, layers, orbit, tunnel, bars3d) and at least 1 must be
+  a 2D plate; alternate them. Pick hologram objects that fit what is said.
 {avoid}- Each scene: "plate", "title" (max 26 chars; a punchy header), "lines" (1-2 short spoken sentences, max 32 words
   total), "data" as specified. EVERY cue is 1-3 words copied EXACTLY from that scene's own lines, in the order they
   are spoken, at the moment that thing should appear.
@@ -228,13 +247,16 @@ def validate(sc, used_formats=()):
             return ""
         out = {}
         if plate == "hook":
-            out = {"motif": d.get("motif") if d.get("motif") in ("dial", "chart", "number", "strike") else "number",
+            out = {"motif": d.get("motif") if d.get("motif") in ("dial", "chart", "number", "strike", "holo") else "number",
                    "value": _clip(d.get("value"), 22), "label": _clip(d.get("label"), 30), "cue": cue(d.get("cue"))}
+            if out["motif"] == "holo":
+                out["object"] = d.get("object") if d.get("object") in OBJECTS else random.choice(OBJECTS)
         elif plate == "outro":
             if not re.search(r"follow for more", text, re.I):
                 lines[-1] = lines[-1].rstrip() + " Follow for more."
         else:
-            lim = {"title": (2, 3), "specimen": (2, 4), "holo": (1, 3), "flows": (2, 4), "form": (3, 5), "stats": (2, 3), "compare": (2, 4)}[plate]
+            lim = {"title": (2, 3), "specimen": (2, 4), "holo": (1, 3), "flows": (2, 4), "form": (3, 5), "stats": (2, 3), "compare": (2, 4),
+                   "scene3d": (2, 4), "layers": (3, 5), "orbit": (2, 5), "tunnel": (3, 5), "bars3d": (2, 5)}[plate]
             raw = d.get("rows") if plate == "compare" else d.get("items")
             raw = [x for x in (raw or []) if isinstance(x, dict)][:lim[1]]
             if len(raw) < lim[0]:
@@ -242,13 +264,13 @@ def validate(sc, used_formats=()):
             its = []
             for it in raw:
                 o = {"label": _clip(it.get("label"), 26), "sub": _clip(it.get("sub"), 70), "cue": cue(it.get("cue"))}
-                if plate == "holo":
+                if plate in ("holo", "scene3d", "orbit") or (plate == "layers" and it.get("object")):
                     o["object"] = it.get("object") if it.get("object") in OBJECTS else random.choice(OBJECTS)
-                if plate in ("flows", "stats"):
+                if plate in ("flows", "stats", "bars3d"):
                     o["value"] = _clip(it.get("value"), 12)
                     o["unit"] = _clip(it.get("unit"), 10)
-                if plate == "stats" and not re.search(r"\d", o["value"]):
-                    raise ValueError("every stats value must contain a number")
+                if plate in ("stats", "bars3d") and not re.search(r"\d", o["value"]):
+                    raise ValueError(f"every {plate} value must contain a number")
                 if plate == "compare":
                     o["left"], o["right"] = _clip(it.get("left"), 16), _clip(it.get("right"), 16)
                     if not o["left"] or not o["right"]:
@@ -268,13 +290,24 @@ def validate(sc, used_formats=()):
                 out.update(hub={"label": _clip(h.get("label"), 12) or "SYSTEM", "unit": _clip(h.get("unit"), 10), "cue": cue(h.get("cue")),
                                 "value": _clip(h.get("value"), 12)},
                            packetsCue=cue(d.get("packetsCue")), countersCue=cue(d.get("countersCue")))
-            elif plate == "stats":
-                out.update(total=_clip(d.get("total"), 32), totalCue=cue(d.get("totalCue")))
+            elif plate in ("stats", "bars3d"):
+                if plate == "stats" or d.get("total"):
+                    out.update(total=_clip(d.get("total"), 32), totalCue=cue(d.get("totalCue")))
+            elif plate == "scene3d":
+                out.update(link=d.get("link") if d.get("link") in ("chain", "hub", "ring") else random.choice(["chain", "hub", "ring"]),
+                           packetsCue=cue(d.get("packetsCue")))
+            elif plate == "orbit":
+                c = d.get("core") if isinstance(d.get("core"), dict) else {}
+                out["core"] = {"label": _clip(c.get("label"), 16) or "CORE", "cue": cue(c.get("cue")),
+                               "object": c.get("object") if c.get("object") in OBJECTS else random.choice(OBJECTS)}
             elif plate == "compare":
                 out.update(left=_clip(d.get("left"), 12) or "A", right=_clip(d.get("right"), 12) or "B")
         clean.append({"plate": plate, "title": _clip(s.get("title"), 28), "lines": lines, "data": out})
     if len(seen) < 4:
         raise ValueError(f"only {len(seen)} different middle plates - use at least 4")
+    n3 = len(seen & HOLO3D)
+    if n3 < 2 or n3 == len(seen):
+        raise ValueError(f"{n3} 3D holo plates among {len(seen)} middle scenes - use at least 3 3D plates and at least one 2D plate")
     if stats["bad"] > max(3, stats["total"] * 0.3):
         raise ValueError(f"{stats['bad']} of {stats['total']} cues are not exact words from their scene's lines")
     words = sum(len(" ".join(s["lines"]).split()) for s in clean)

@@ -14,6 +14,7 @@ import { clamp, ease, mulberry32, noise1, prog, pulse } from '../engine/util';
 import {
   Plot, Cam2D, gridPass, setGrid, drawKaraoke, placeRow, drawPen, w2s, setWorld, label, rowWidth, type KWord, type Cam,
 } from './_vo';
+import { Rig, View, Pen3, styleFor, floor, handheld, type Style, type V3 } from './_holo3d';
 
 export const PAPER_GLSL = /* glsl */ `
 uniform vec4 uCam; uniform vec2 uRes;
@@ -138,7 +139,19 @@ export function wrapText(s: string, fam: string, size: number, maxW: number, max
   return out.slice(0, maxLines);
 }
 
+export const seedOf = (s: string) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
+
 export abstract class GenPlate extends Scene {
+  /** Live 3D holo layer (perspective rig + hologram pen), drawn over the background, under the UI. */
+  has3D = false;
+  rig = new Rig();
+  view: View | null = null;
+  style!: Style;
+  fx3: LineBatch | null = null;
+  floorAt: V3 | null = [0, 0, 0];
+  floorR = 7;
+  gridInk = 0.8;
+  viewCY = H / 2 - 150;
   /** Bone paper (ink) instead of graph paper in the dark. */
   paperMode = false;
   /** Draw the default header (plate number · topic, plate title). Paper plates draw their own band. */
@@ -169,6 +182,8 @@ export abstract class GenPlate extends Scene {
   drawUI(_ctx: CanvasRenderingContext2D, _t: number, _c: Cam): void {}
   /** Extra additive line drawing (glows, packets, 3D). */
   drawFX(_X: LineBatch, _t: number, _c: Cam): void {}
+  /** 3D holo drawing (world units, see _holo3d.ts). */
+  draw3D(_P: Pen3, _t: number): void {}
   /** Over the karaoke (stamps). */
   drawOver(_ctx: CanvasRenderingContext2D, _t: number, _c: Cam): void {}
   /** Post overrides on top of the plate defaults. */
@@ -186,7 +201,11 @@ export abstract class GenPlate extends Scene {
     this.ws = this.sl.flatMap((l) => l.words).filter((w) => norm(w.w));
     this.plot.paper = this.paperMode;
     this.lines = new LineBatch(60000, this.paperMode ? { blend: 'normal' } : {});
+    const meta = this.sc.meta ?? {};
+    this.style = styleFor(Number(meta.seed) || seedOf(String(meta.topic ?? '')), this.idx);
+    this.rig.t0 = this.t0;
     this.build();
+    if (this.has3D && !this.fx3) this.fx3 = new LineBatch(140000);
     if (this.captionY !== 'none' && this.ws.length) {
       const r = wrapKaraoke(this.ws, 0, this.captionY, 960, this.captionSize, ARCH(100, 700), 'cap', { maxRows: 4, minSize: 34 });
       const over = this.captionY + r.height - 880;          // keep the whole caption block on screen
@@ -230,8 +249,18 @@ export abstract class GenPlate extends Scene {
       (this.paper.u.uCam!.value as number[]).splice(0, 4, c.cx, c.cy, c.z, c.roll);
       this.paper.render(renderer, out);
     } else {
-      setGrid(this.grid, c, { reveal: [0, 0, this.idx === 0 ? 4200 * ease.outCubic(prog(t, 0, 1.6)) : 1e5], ink: 0.8, pen: ps ? [ps[0], ps[1], 1] : [0, 0, 0] });
+      setGrid(this.grid, c, { reveal: [0, 0, this.idx === 0 ? 4200 * ease.outCubic(prog(t, 0, 1.6)) : 1e5], ink: this.gridInk, pen: ps ? [ps[0], ps[1], 1] : [0, 0, 0] });
       this.grid.render(renderer, out);
+    }
+    if (this.has3D && this.fx3) {
+      const v = new View(handheld(this.rig.at(t), t, this.style.hand));
+      v.cy = this.viewCY;
+      this.view = v;
+      const Z = this.fx3; Z.clear();
+      const P3 = new Pen3(Z, v, this.style.tint);
+      if (this.floorAt) floor(P3, this.style.floor, this.floorAt, this.floorR, prog(t, this.t0 + 0.05, this.t0 + 1.1), this.style.tint, t);
+      this.draw3D(P3, t);
+      Z.render(renderer, out);
     }
     const U = this.ui; U.clear();
     if (this.paperMode) { this.drawUI(U.ctx, t, c); comp.draw(renderer, U.upload(), out); U.clear(); }
@@ -253,6 +282,33 @@ export abstract class GenPlate extends Scene {
       ? { bloom: 0.15, bloomThreshold: 1.4, vignette: 0.28, grain: 0.04, halation: 0.05, ca: 0.6, paper: 1 }
       : { bloom: 0.72, bloomThreshold: 0.84, vignette: 0.42, grain: 0.05 };
     return { ...base, zoom: 1 + 0.016 * hit, shake: [5 * hit * noise1(t * 60, 1), 5 * hit * noise1(t * 60, 2)], ...this.postFX(t) };
+  }
+
+  /** A label pinned to a 3D point: leader line + chip (screen space, kept clear of header and captions). */
+  tag(ctx: CanvasRenderingContext2D, p: V3, title: string, sub: string, a: number, o: { dx?: number; dy?: number; size?: number; hot?: number } = {}) {
+    const q = this.view?.P(p);
+    if (!q || a <= 0) return;
+    const dx = o.dx ?? 0, dy = o.dy ?? -70, size = o.size ?? 34;
+    const fam = ARCH(112.5, 900), tw = measure(title, fam, size), sw = sub ? measure(sub, F.mono(400), 18) : 0;
+    const bw = Math.max(tw, sw) + 36, bh = sub ? size + 44 : size + 22;
+    let x = q[0] + dx, y = q[1] + dy;
+    const right = dx >= 0;
+    let bx = right ? x : x - bw;
+    bx = clamp(bx, 30, W - 30 - bw); y = clamp(y, 330, 1330);
+    x = right ? bx : bx + bw;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = a;
+    ctx.strokeStyle = this.style.tintHex; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(q[0], q[1]); ctx.lineTo(x, y); ctx.stroke();
+    ctx.fillStyle = this.style.tintHex; ctx.beginPath(); ctx.arc(q[0], q[1], 4, 0, 6.3); ctx.fill();
+    ctx.fillStyle = rgba('ink2', 0.82); ctx.fillRect(bx, y - bh, bw, bh);
+    ctx.fillStyle = this.style.tintHex; ctx.fillRect(bx, y - 3, bw * ease.outCubic(clamp(a * 1.5)), 3);
+    ctx.font = font(fam, size);
+    ctx.fillStyle = (o.hot ?? 0) > 0 ? mixColor('signal', 'bone', 1 - (o.hot ?? 0)) : rgba('bone', 0.97);
+    ctx.textAlign = 'left';
+    ctx.fillText(title, bx + 18, y - bh + size + 8);
+    if (sub) { ctx.font = font(F.mono(400), 18); ctx.fillStyle = rgba('ash', 0.95); ctx.fillText(sub, bx + 18, y - 14); }
+    ctx.globalAlpha = 1;
   }
 
   drawHeader(ctx: CanvasRenderingContext2D, t: number, c: Cam) {

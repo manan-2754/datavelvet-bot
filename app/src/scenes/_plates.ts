@@ -8,7 +8,8 @@ import { type Word } from '../engine/lyrics';
 import { clamp, ease, noise1, prog, pulse, TAU } from '../engine/util';
 import { strokeText, type StrokeFontName } from '../engine/stroke';
 import { pt, arc, rectPts, bezier, lengths, at, w2s, setWorld, label, scl, type Cam, type P, type RGB } from './_vo';
-import { GenPlate, ARCH, wrapKaraoke, makeStamp, drawStamp, typeText, fitSize, wrapText, mixColor } from './_gen';
+import { asObj, drawObj, pedestal, type Obj, type Pen3 } from './_holo3d';
+import { GenPlate, seedOf as seedOfG, ARCH, wrapKaraoke, makeStamp, drawStamp, typeText, fitSize, wrapText, mixColor } from './_gen';
 
 const seedOf = (s: string) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
 const items = (d: any, max: number) => (Array.isArray(d?.items) ? d.items : []).slice(0, max);
@@ -30,6 +31,7 @@ export class Hook extends GenPlate {
   override header = false;
   override captionY: 'none' = 'none';
   motifY = 0; big = ''; bigT = 0; motif = 'dial';
+  holoKind: Obj = 'globe'; holoT = 0;
   build() {
     const d = this.data, P = this.plot;
     const r = wrapKaraoke(this.ws, 0, -600, 960, 118, ARCH(100, 800), 'q', { maxRows: 5, minSize: 58, lh: 1.08 });
@@ -37,7 +39,7 @@ export class Hook extends GenPlate {
     const cy = Math.max(-600 + r.height + 330, 140);
     this.motifY = cy;
     const w = this.cue(d.cue, 0, 1), t = w.start;
-    this.motif = ['dial', 'chart', 'number', 'strike'].includes(d.motif) ? d.motif : 'number';
+    this.motif = ['dial', 'chart', 'number', 'strike', 'holo'].includes(d.motif) ? d.motif : 'number';
     this.hits.push(t);
     if (this.motif === 'dial') {
       const R = 230;
@@ -58,6 +60,17 @@ export class Hook extends GenPlate {
       const e = pts[pts.length - 1]!;
       P.add([pt(e.x - 34, e.y + 6), e, pt(e.x - 6, e.y + 34)], t + 0.78, t + 0.86, 'signal', { pen: true, width: 5 });
       for (let i = 1; i < 5; i++) P.add([pt(x0, yb - i * 88), pt(x1, yb - i * 88)], t + 0.1, t + 0.4, 'cons', { dash: 10, alpha: 0.5, width: 1 });
+    } else if (this.motif === 'holo') {
+      this.has3D = true;
+      this.holoKind = asObj(d.object, seedOfG(String(this.sc.meta?.topic ?? '')));
+      this.holoT = t;
+      this.viewCY = 960 + cy * 0.85 + 40;
+      this.floorR = 3;
+      const R = this.rig, y0 = this.style.r() * TAU;
+      R.drift = 0.35 * this.style.spin;
+      R.key(this.t0, { tgt: [0, 0.9, 0], yaw: y0, pitch: 0.55, dist: 8, fov: 40 });
+      R.key(t, { tgt: [0, 0.6, 0], yaw: y0, pitch: 0.3, dist: 6.2 });
+      R.key(this.t1, { tgt: [0, 0.6, 0], yaw: y0, pitch: 0.36, dist: 6.6 });
     } else if (this.motif === 'number') {
       this.big = String(d.value ?? '').slice(0, 9);
       this.bigT = t;
@@ -68,7 +81,7 @@ export class Hook extends GenPlate {
       P.add([pt(380, cy - 180), pt(-380, cy + 180)], t + 0.2, t + 0.33, 'signal', { pen: true, width: 9 });
       P.note(String(d.value ?? '').slice(0, 26).toUpperCase(), 0, cy + 14, t - 0.35, { size: 40, col: 'bone', align: 'center', weight: 500 });
     }
-    if (d.label) P.note(String(d.label).slice(0, 34).toUpperCase(), 0, cy + (this.motif === 'number' ? 230 : 330), t + 0.7, { size: 30, col: 'signal', align: 'center', hot: 0.3, spacing: 0.08 });
+    if (d.label) P.note(String(d.label).slice(0, 34).toUpperCase(), 0, cy + (this.motif === 'number' ? 230 : this.motif === 'holo' ? 380 : 330), t + 0.7, { size: 30, col: 'signal', align: 'center', hot: 0.3, spacing: 0.08 });
     this.cam.key(this.t0, 0, -120, 0.92, -0.008);
     this.cam.key(t, 0, cy * 0.25, 1.0, 0.002, ease.inOutCubic);
     this.cam.key(this.t1, 0, cy * 0.3, 1.04, 0.006, ease.linear);
@@ -87,6 +100,11 @@ export class Hook extends GenPlate {
       ctx.fillText(txt, -measure(txt, fam, s) / 2, 0);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
+  }
+  override draw3D(P: Pen3, t: number) {
+    const st = this.style;
+    pedestal(P, [0, 0, 0], 0.8, t, prog(t, this.holoT - 0.5, this.holoT), st.tint);
+    drawObj(P, this.holoKind, [0, 0, 0], 0.85, t * 0.6 * st.spin, clamp((t - this.holoT + 0.3) / 0.9), t, st.reveal, st.tint, 3, pulse(t, this.holoT + 0.6, 0.3));
   }
   override postFX(t: number) { return { fade: 1 - prog(t, 0, 0.35), frame: ease.outCubic(prog(t, 0.1, 0.9)) * (1 - prog(t, this.t1 - 0.4, this.t1)) }; }
 }
@@ -260,127 +278,6 @@ export class Specimen extends GenPlate {
   override drawOver(ctx: CanvasRenderingContext2D, t: number, c: Cam) {
     if (this.stamp) drawStamp(ctx, c, this.stamp, t, this.tStamp, 0, 330, 0.6, -0.06);
   }
-}
-
-// ===================================================================== HOLO (live 3D hairlines)
-type V3 = [number, number, number];
-const OBJ = ['server', 'db', 'globe', 'cube', 'pyramid', 'chip'] as const;
-type Kind = typeof OBJ[number];
-function edges3(kind: Kind, t: number): { segs: [V3, V3][]; leds: V3[]; h: number } {
-  const segs: [V3, V3][] = [], leds: V3[] = [];
-  const ring = (y: number, r: number, n = 28) => { for (let i = 0; i < n; i++) { const a = (i / n) * TAU, b = ((i + 1) / n) * TAU; segs.push([[r * Math.cos(a), y, r * Math.sin(a)], [r * Math.cos(b), y, r * Math.sin(b)]]); } };
-  const box = (w: number, h: number, d: number, y0 = 0) => {
-    const c: V3[] = [[-w, y0, -d], [w, y0, -d], [w, y0, d], [-w, y0, d], [-w, y0 + h, -d], [w, y0 + h, -d], [w, y0 + h, d], [-w, y0 + h, d]];
-    for (const [a, b] of [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]]) segs.push([c[a]!, c[b]!]);
-  };
-  if (kind === 'server') {
-    box(0.5, 1.7, 0.5);
-    for (const y of [0.2, 0.67, 1.14]) {
-      const z = -0.505;
-      segs.push([[-0.4, y, z], [0.4, y, z]], [[0.4, y, z], [0.4, y + 0.3, z]], [[0.4, y + 0.3, z], [-0.4, y + 0.3, z]], [[-0.4, y + 0.3, z], [-0.4, y, z]]);
-      for (let k = 0; k < 2; k++) if (Math.sin(t * 5 + y * 7 + k * 2) > -0.2) leds.push([0.14 + k * 0.14, y + 0.15, z]);
-    }
-    return { segs, leds, h: 1.7 };
-  }
-  if (kind === 'db') {
-    for (const y of [0, 0.42, 0.84, 1.25]) ring(y, 0.62);
-    for (let i = 0; i < 8; i++) { const a = (i / 8) * TAU; segs.push([[0.62 * Math.cos(a), 0, 0.62 * Math.sin(a)], [0.62 * Math.cos(a), 1.25, 0.62 * Math.sin(a)]]); }
-    return { segs, leds, h: 1.25 };
-  }
-  if (kind === 'globe') {
-    const cy = 0.78, r = 0.72;
-    for (const k of [-0.6, -0.3, 0, 0.3, 0.6]) { const rr = r * Math.sqrt(1 - k * k); for (let i = 0; i < 28; i++) { const a = (i / 28) * TAU, b = ((i + 1) / 28) * TAU; segs.push([[rr * Math.cos(a), cy + k * r, rr * Math.sin(a)], [rr * Math.cos(b), cy + k * r, rr * Math.sin(b)]]); } }
-    for (let j = 0; j < 4; j++) {
-      const a0 = t * 0.5 + (j * Math.PI) / 4;
-      for (let i = 0; i < 28; i++) { const u = (i / 28) * TAU, v = ((i + 1) / 28) * TAU; segs.push([[r * Math.cos(u) * Math.cos(a0), cy + r * Math.sin(u), r * Math.cos(u) * Math.sin(a0)], [r * Math.cos(v) * Math.cos(a0), cy + r * Math.sin(v), r * Math.cos(v) * Math.sin(a0)]]); }
-    }
-    return { segs, leds, h: 1.5 };
-  }
-  if (kind === 'cube') { box(0.6, 1.2, 0.6); box(0.36, 0.72, 0.36, 0.24); return { segs, leds, h: 1.2 }; }
-  if (kind === 'pyramid') {
-    const b: V3[] = [[-0.7, 0, -0.7], [0.7, 0, -0.7], [0.7, 0, 0.7], [-0.7, 0, 0.7]], apex: V3 = [0, 1.35, 0];
-    for (let i = 0; i < 4; i++) { segs.push([b[i]!, b[(i + 1) % 4]!], [b[i]!, apex]); }
-    for (const y of [0.45, 0.9]) { const s = 0.7 * (1 - y / 1.35); segs.push([[-s, y, -s], [s, y, -s]], [[s, y, -s], [s, y, s]], [[s, y, s], [-s, y, s]], [[-s, y, s], [-s, y, -s]]); }
-    return { segs, leds, h: 1.35 };
-  }
-  box(0.62, 0.18, 0.62); box(0.3, 0.12, 0.3, 0.18);
-  for (let i = 0; i < 4; i++) { const o = -0.42 + i * 0.28; segs.push([[o, 0.09, -0.62], [o, 0.09, -0.85]], [[0.62, 0.09, o], [0.85, 0.09, o]], [[o, 0.09, 0.62], [o, 0.09, 0.85]], [[-0.62, 0.09, o], [-0.85, 0.09, o]]); }
-  if (Math.sin(t * 4) > 0) leds.push([0, 0.32, 0]);
-  return { segs, leds, h: 0.5 };
-}
-interface HObj { kind: Kind; x: number; base: number; word: Word; foot: number; s: number }
-export class Holo extends GenPlate {
-  objs: HObj[] = [];
-  build() {
-    const d = this.data, its = items(d, 3), n = Math.max(1, its.length);
-    const pos = n === 1 ? [[0, 230]] : n === 2 ? [[-250, 230], [250, 230]] : [[-260, -40], [260, -40], [0, 420]];
-    its.forEach((it: any, k: number) => {
-      const wd = this.cue(it.cue ?? it.label, k, n);
-      const kind: Kind = OBJ.includes(it.object) ? it.object : OBJ[k % OBJ.length]!;
-      const [x, base] = pos[k]!;
-      const s = n === 1 ? 230 : 160;
-      this.objs.push({ kind, x: x!, base: base!, word: wd, foot: 0.72, s });
-      this.plot.note(String(it.label ?? kind).slice(0, 20).toUpperCase(), x!, base! + 110, wd.start + 0.2, { size: 28, col: 'bone', align: 'center', weight: 500, spacing: 0.04 });
-      if (it.sub) this.plot.note(String(it.sub).slice(0, 30), x!, base! + 144, wd.start + 0.5, { size: 17, col: 'ash', align: 'center' });
-      this.hits.push(wd.start);
-    });
-    this.captionY = 700;
-  }
-  project(p: V3, o: HObj, yaw: number, c: Cam): [number, number, number] {
-    const [x, y, z] = p, PITCH = 0.42;
-    const x1 = x * Math.cos(yaw) - z * Math.sin(yaw), z1 = x * Math.sin(yaw) + z * Math.cos(yaw);
-    const depth = z1 * Math.cos(PITCH) - y * Math.sin(PITCH);
-    const k = 1 / (1 + 0.09 * depth);
-    const [sx, sy] = w2s(c, o.x + o.s * x1 * k, o.base - o.s * (y * Math.cos(PITCH) + z1 * Math.sin(PITCH)) * k);
-    return [sx, sy, depth];
-  }
-  override drawFX(X: LineBatch, t: number, c: Cam) {
-    const bone = LIN.bone, sig = LIN.signal, ash = LIN.ash;
-    for (const o of this.objs) {
-      const p = clamp((t - o.word.start + 0.05) / 0.9), pa = clamp((t - this.t0 - 0.1) / 0.5);
-      const yaw = t * 0.55 + o.x * 0.002;
-      const P3 = (q: V3) => this.project(q, o, yaw, c);
-      for (const [r, dash, col, a] of [[o.foot * 1.3, false, ash, 0.5], [o.foot * 1.7, true, sig, 0.7]] as const) {
-        for (let i = 0; i < 48; i++) {
-          if (dash && (i + Math.floor(t * 8)) % 3 === 0) continue;
-          const a0 = (i / 48) * TAU + (dash ? t * 0.6 : 0), a1 = ((i + 1) / 48) * TAU + (dash ? t * 0.6 : 0);
-          const s0 = P3([r * Math.cos(a0), 0, r * Math.sin(a0)]), s1 = P3([r * Math.cos(a1), 0, r * Math.sin(a1)]);
-          X.seg2(s0[0], s0[1], s1[0], s1[1], 1.6, scl(col as RGB, 0.9), a * pa * (0.55 + 0.45 * clamp(p * 3)));
-        }
-      }
-      if (p <= 0) continue;
-      const { segs, leds, h } = edges3(o.kind, t);
-      const ycut = p < 1 ? (h + 0.05) * ease.inOutQuad(p) : 1e9;
-      const cd = P3([0, h / 2, 0])[2];
-      const flick = p < 1 ? 0.7 + 0.3 * Math.abs(Math.sin(t * 37)) : 1;
-      for (const [a, b] of segs) {
-        let A = a, B = b;
-        if (A[1] > ycut && B[1] > ycut) continue;
-        if (A[1] > ycut || B[1] > ycut) {
-          const u = (ycut - A[1]) / (B[1] - A[1] || 1e-9);
-          const m: V3 = [A[0] + (B[0] - A[0]) * u, ycut, A[2] + (B[2] - A[2]) * u];
-          if (A[1] > ycut) A = m; else B = m;
-        }
-        const sa = P3(A), sb = P3(B);
-        if ((sa[2] + sb[2]) / 2 <= cd) {
-          X.seg2(sa[0], sa[1], sb[0], sb[1], 7, scl(bone, 0.16), flick);
-          X.seg2(sa[0], sa[1], sb[0], sb[1], 2.0, scl(bone, 1.15), flick);
-        } else {
-          for (let q = 0; q < 4; q += 2) X.seg2(sa[0] + (sb[0] - sa[0]) * (q / 4), sa[1] + (sb[1] - sa[1]) * (q / 4), sa[0] + (sb[0] - sa[0]) * ((q + 1) / 4), sa[1] + (sb[1] - sa[1]) * ((q + 1) / 4), 1.4, scl(ash, 0.8), 0.6 * flick);
-        }
-      }
-      for (const l of leds) if (l[1] <= ycut) { const s = P3(l); X.seg2(s[0] - 3, s[1], s[0] + 3, s[1], 6, scl(sig, 2.4), 1); }
-      if (p < 1) {
-        const r = o.foot * 1.4;
-        for (let i = 0; i < 40; i++) {
-          const a0 = (i / 40) * TAU, a1 = ((i + 1) / 40) * TAU;
-          const s0 = P3([r * Math.cos(a0), ycut, r * Math.sin(a0)]), s1 = P3([r * Math.cos(a1), ycut, r * Math.sin(a1)]);
-          X.seg2(s0[0], s0[1], s1[0], s1[1], 3.2, scl(sig, 2.2), 1);
-        }
-      }
-    }
-  }
-  override postFX() { return { bloom: 0.85, bloomThreshold: 0.8, halation: 0.3 }; }
 }
 
 // ===================================================================== FLOWS (hub, packets, live counters)
@@ -677,3 +574,5 @@ export class Outro extends GenPlate {
     return { fade: prog(t, this.t1 - 0.9, this.t1 - 0.05, ease.inCubic), frame: ease.outCubic(prog(t, this.tEnd, this.tEnd + 0.6)) };
   }
 }
+
+export * from './_plates3d';
