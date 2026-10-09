@@ -8,6 +8,11 @@ on:
     - cron: '45 22 * * *'
     - cron: '45 2 * * *'
   workflow_dispatch:
+    inputs:
+      test:
+        description: 'Just send a test email'
+        type: boolean
+        default: false
 
 jobs:
   check:
@@ -24,6 +29,10 @@ jobs:
           RUN_UNTIL: ${{ vars.RUN_UNTIL }}
           PYTHONIOENCODING: utf-8
         run: |
+          if [ "${{ inputs.test }}" = "true" ]; then
+            python notify.py --test
+            exit 0
+          fi
           if [ -n "$RUN_UNTIL" ] && [ "$(date -u +%F)" \> "$RUN_UNTIL" ]; then
             echo "Posting window is over - nothing to watch."
             exit 0
