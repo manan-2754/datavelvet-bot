@@ -1,6 +1,7 @@
 {
   "used_topics": [
-    "How virtual memory works"
+    "How virtual memory works",
+    "How browsers render a webpage"
   ],
   "used_bank": [
     "dns_explained"
@@ -9,13 +10,39 @@
     {
       "time": "2026-10-08T23:00:00+00:00",
       "topic": "How does DNS actually work?",
-      "youtube_id": "VwpULb63iSg"
+      "youtube_id": "VwpULb63iSg",
+      "stats": {
+        "views": 65,
+        "likes": 1,
+        "comments": 0,
+        "checked": "2026-10-09T07:19:56+00:00"
+      }
     },
     {
       "time": "2026-10-08T23:30:28+00:00",
       "topic": "How virtual memory works",
       "youtube_id": "9P7QiMeIP9U",
-      "instagram_id": "18126836476852213"
+      "instagram_id": "18126836476852213",
+      "stats": {
+        "views": 32,
+        "likes": 2,
+        "comments": 0,
+        "checked": "2026-10-09T07:19:56+00:00"
+      }
+    },
+    {
+      "time": "2026-10-09T07:25:43+00:00",
+      "topic": "How browsers render a webpage",
+      "series": "How It Works",
+      "episode": 1,
+      "hook": "Your **browser** is lying",
+      "theme": "magenta",
+      "duration": 108.8,
+      "youtube_id": "lSAY6wbyT_A",
+      "instagram_id": "18076383422549123"
     }
-  ]
+  ],
+  "series_counts": {
+    "How It Works": 1
+  }
 }
