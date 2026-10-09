@@ -1,7 +1,8 @@
 {
   "used_topics": [
     "How virtual memory works",
-    "How browsers render a webpage"
+    "How browsers render a webpage",
+    "How load balancers distribute traffic"
   ],
   "used_bank": [
     "dns_explained"
@@ -48,13 +49,20 @@
       "format": "holo_flow:3|holo_tree:4|definition:4|holo_pipeline:4|holo_layers:3|holo_chart:4|compare:3|steps:3",
       "youtube_id": "sM8pNlXKfok",
       "instagram_id": "18117438377093748"
+    },
+    {
+      "time": "2026-10-09T18:55:54+00:00",
+      "topic": "How load balancers distribute traffic",
+      "format": "hook:0|title:3|specimen:3|holo:3|flows:4|form:4|stats:3|compare:4|outro:0",
+      "youtube_id": "pTc0yF47i1A"
     }
   ],
   "series_counts": {
     "How It Works": 1
   },
   "used_formats": [
-    "holo_flow:3|holo_tree:4|definition:4|holo_pipeline:4|holo_layers:3|holo_chart:4|compare:3|steps:3"
+    "holo_flow:3|holo_tree:4|definition:4|holo_pipeline:4|holo_layers:3|holo_chart:4|compare:3|steps:3",
+    "hook:0|title:3|specimen:3|holo:3|flows:4|form:4|stats:3|compare:4|outro:0"
   ],
   "used_palettes": [
     "0:0"
@@ -71,307 +79,5 @@
   "failed_topics": {
     "Why is Redis so fast?": 2
   },
-  "queued_scripts": [
-    {
-      "topic": "How load balancers distribute traffic",
-      "scenes": [
-        {
-          "plate": "hook",
-          "title": "One IP, Thousand Servers",
-          "lines": [
-            "One public IP hides a fleet of ten thousand servers behind it."
-          ],
-          "data": {
-            "motif": "number",
-            "value": "10,000+",
-            "label": "Servers behind one VIP",
-            "cue": "ten thousand servers"
-          }
-        },
-        {
-          "plate": "title",
-          "title": "What Is A Load Balancer",
-          "lines": [
-            "It sits at the edge, accepts every connection, and decides which backend handles it."
-          ],
-          "data": {
-            "items": [
-              {
-                "label": "Single Entry Point",
-                "sub": "Clients talk to one Virtual IP only",
-                "cue": ""
-              },
-              {
-                "label": "Health Awareness",
-                "sub": "Routes only to verified healthy nodes",
-                "cue": ""
-              },
-              {
-                "label": "Algorithm Logic",
-                "sub": "Round robin, least connections, or IP hash",
-                "cue": ""
-              }
-            ],
-            "term": "LOAD BALANCER",
-            "termCue": "",
-            "note": "Traffic cop for the cloud"
-          }
-        },
-        {
-          "plate": "specimen",
-          "title": "Core Distribution Methods",
-          "lines": [
-            "Round robin spins through the list, least connections picks the freest box, IP hash sticks a user to one server."
-          ],
-          "data": {
-            "items": [
-              {
-                "label": "Round Robin",
-                "sub": "Sequential distribution, equal weight default",
-                "cue": "Round robin spins"
-              },
-              {
-                "label": "Least Connections",
-                "sub": "Sends new traffic to the idlest backend",
-                "cue": "least connections picks"
-              },
-              {
-                "label": "IP Hash",
-                "sub": "Deterministic mapping for session persistence",
-                "cue": "IP hash sticks"
-              }
-            ],
-            "stamp": "ALGO SELECTED",
-            "stampCue": "user to one server"
-          }
-        },
-        {
-          "plate": "holo",
-          "title": "Logical Topology",
-          "lines": [
-            "Clients hit the Virtual IP, the balancer inspects headers, then forwards to a healthy application server."
-          ],
-          "data": {
-            "items": [
-              {
-                "label": "Client",
-                "sub": "Initiates TCP handshake",
-                "cue": "Clients hit",
-                "object": "globe"
-              },
-              {
-                "label": "Load Balancer",
-                "sub": "Terminates TLS, picks target",
-                "cue": "balancer inspects",
-                "object": "server"
-              },
-              {
-                "label": "App Server",
-                "sub": "Executes business logic",
-                "cue": "forwards to",
-                "object": "server"
-              }
-            ]
-          }
-        },
-        {
-          "plate": "flows",
-          "title": "Live Traffic Split",
-          "lines": [
-            "Watch ten thousand requests per second split across four nodes, counters ticking in real time."
-          ],
-          "data": {
-            "items": [
-              {
-                "label": "Node A",
-                "sub": "",
-                "cue": "",
-                "value": "2500",
-                "unit": "req/s"
-              },
-              {
-                "label": "Node B",
-                "sub": "",
-                "cue": "",
-                "value": "2500",
-                "unit": "req/s"
-              },
-              {
-                "label": "Node C",
-                "sub": "",
-                "cue": "",
-                "value": "2500",
-                "unit": "req/s"
-              },
-              {
-                "label": "Node D",
-                "sub": "",
-                "cue": "",
-                "value": "2500",
-                "unit": "req/s"
-              }
-            ],
-            "hub": {
-              "label": "VIP Ingress",
-              "unit": "req/s",
-              "cue": "ten thousand requests",
-              "value": ""
-            },
-            "packetsCue": "split across four",
-            "countersCue": "counters ticking"
-          }
-        },
-        {
-          "plate": "form",
-          "title": "Request Lifecycle Steps",
-          "lines": [
-            "Step one: DNS resolves to the VIP. Step two: LB checks cached health list. Step three: forwards packet. Step four: backend replies via LB."
-          ],
-          "data": {
-            "items": [
-              {
-                "label": "1. DNS Resolution",
-                "sub": "Client gets Virtual IP address",
-                "cue": "DNS resolves"
-              },
-              {
-                "label": "2. Health Lookup",
-                "sub": "Reads pre-cached healthy pool",
-                "cue": "checks cached health"
-              },
-              {
-                "label": "3. Forward Decision",
-                "sub": "Applies algorithm, sends to backend",
-                "cue": "forwards packet"
-              },
-              {
-                "label": "4. Return Path",
-                "sub": "Response traverses LB back to client",
-                "cue": "replies via LB"
-              }
-            ],
-            "stamp": "ROUTED",
-            "stampCue": "backend replies",
-            "form": "FORM LB-01"
-          }
-        },
-        {
-          "plate": "stats",
-          "title": "Performance Overhead",
-          "lines": [
-            "Modern software LBs add under three milliseconds routing overhead while handling millions of concurrent connections."
-          ],
-          "data": {
-            "items": [
-              {
-                "label": "Routing overhead added",
-                "sub": "",
-                "cue": "under three milliseconds",
-                "value": "< 3 ms",
-                "unit": ""
-              },
-              {
-                "label": "Concurrent connections pe…",
-                "sub": "",
-                "cue": "millions of concurrent",
-                "value": "1M+",
-                "unit": ""
-              },
-              {
-                "label": "Availability target SLA",
-                "sub": "",
-                "cue": "",
-                "value": "99.99%",
-                "unit": ""
-              }
-            ],
-            "total": "Line rate throughput at scale",
-            "totalCue": "handling millions"
-          }
-        },
-        {
-          "plate": "compare",
-          "title": "Layer 4 vs Layer 7",
-          "lines": [
-            "Layer four routes by IP and port only. Layer seven reads HTTP headers and cookies for smart routing."
-          ],
-          "data": {
-            "rows": [
-              {
-                "label": "Visibility",
-                "sub": "",
-                "cue": "Layer four routes",
-                "left": "IP/Port only",
-                "right": "Full request pa…"
-              },
-              {
-                "label": "Routing Logic",
-                "sub": "",
-                "cue": "Layer seven reads",
-                "left": "Fast, stateless",
-                "right": "Content-based,…"
-              },
-              {
-                "label": "TLS Termination",
-                "sub": "",
-                "cue": "headers and cookies",
-                "left": "Passthrough",
-                "right": "Offload & inspe…"
-              },
-              {
-                "label": "Typical Use",
-                "sub": "",
-                "cue": "smart routing",
-                "left": "High throughput…",
-                "right": "Microservices,…"
-              }
-            ],
-            "left": "Layer 4 (TC…",
-            "right": "Layer 7 (HT…"
-          }
-        },
-        {
-          "plate": "outro",
-          "title": "",
-          "lines": [
-            "One Virtual IP, infinite scale. Follow for more."
-          ],
-          "data": {}
-        }
-      ],
-      "format": "hook:0|title:3|specimen:3|holo:3|flows:4|form:4|stats:3|compare:4|outro:0",
-      "youtube": {
-        "title": "How Load Balancers Distribute Traffic #shorts",
-        "description": "One Virtual IP manages 10,000 servers. We break down L4 vs L7, health checks, and why routing overhead stays under 3ms. Engineered for clarity.\n\n#LoadBalancer #SystemDesign #CloudComputing #DevOps #Networking #Shorts",
-        "tags": [
-          "load balancer",
-          "system design",
-          "cloud computing",
-          "devops",
-          "networking",
-          "scalability",
-          "backend engineering",
-          "tech explained"
-        ]
-      },
-      "instagram_caption": "One IP. Ten thousand servers. Zero confusion.\n\nWe visualize the algorithms, the health checks, and the sub-3ms overhead that keeps the internet standing.\n\nSave this for later.\n#LoadBalancer #SystemDesign #CloudNative #DevOpsLife #BackendEngineering #TechEducation #Infrastructure #DataVelvet",
-      "review": {
-        "score": 9,
-        "critical": [],
-        "minor": [
-          "[flows] hub JSON malformed: trailing comma and missing closing brace.",
-          "[form] Return Path item sub/cue truncated: \"Response traverses LB back to client\", cue: \"re)\" incomplete.",
-          "[stats] items truncated: \"Concurrent connections pe…\" and totalCue \"handling millio)\" incomplete.",
-          "[compare] rows truncated: \"Typical Use\", \"su)\" incomplete.",
-          "[outro] on-screen JSON empty; no visual cue for outro message.",
-          "Health check description implies per‑request lookup; in reality health status is updated asynchronously and cached.",
-          "IP hash statement suggests it binds a single user; actually it binds a client source IP (multiple users behind NAT may share same binding).",
-          "Round‑robin description omits mention of configurable weights; equal distribution only when weights are equal.",
-          "Phrase \"freest box\" is informal; better to say \"least loaded backend\".",
-          "Statement \"One public IP hides a fleet of ten thousand servers behind it\" omits that the load balancer performs NAT/port translation to map the VIP to backend IPs.",
-          "LB inspects headers only applies to Layer 7; Layer 4 LB does not inspect HTTP headers; could confuse beginners."
-        ]
-      }
-    }
-  ]
+  "queued_scripts": []
 }
