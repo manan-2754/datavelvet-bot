@@ -1,0 +1,31 @@
+name: Watchdog - email if no video was posted
+
+on:
+  schedule:
+    # ~1h40 after each posting slot (13:07, 17:07, 21:07, 01:07 UTC)
+    - cron: '45 14 * * *'
+    - cron: '45 18 * * *'
+    - cron: '45 22 * * *'
+    - cron: '45 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check that a video was posted
+        env:
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          RUN_UNTIL: ${{ vars.RUN_UNTIL }}
+          PYTHONIOENCODING: utf-8
+        run: |
+          if [ -n "$RUN_UNTIL" ] && [ "$(date -u +%F)" \> "$RUN_UNTIL" ]; then
+            echo "Posting window is over - nothing to watch."
+            exit 0
+          fi
+          python notify.py --watchdog

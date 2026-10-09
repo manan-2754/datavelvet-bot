@@ -63,11 +63,20 @@ jobs:
           YT_PRIVACY: ${{ vars.YT_PRIVACY }}
           PYTHONIOENCODING: utf-8
         run: |
+          set -o pipefail
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.post }}" != "true" ]; then
-            python -u main.py
+            python -u main.py 2>&1 | tee run.log
           else
-            python -u main.py --post
+            python -u main.py --post 2>&1 | tee run.log
           fi
+
+      - name: Email me if the video was not posted
+        if: failure() || cancelled()
+        env:
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: python notify.py --failed run.log
 
       - name: Save topic progress
         if: always()
