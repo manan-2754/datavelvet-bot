@@ -139,12 +139,23 @@ def main():
     if args.script:
         script = json.loads(Path(args.script).read_text(encoding="utf-8"))
         script = writer.validate(script) if "format" not in script else script
+    elif state.get("queued_scripts"):          # pre-approved scripts (already validated + fact-checked) go first
+        script = state["queued_scripts"].pop(0)
+        topic = script["topic"]
+        print(f"📌 Topic (queued script): {topic}")
     else:
         topics = json.loads((BASE / "topics.json").read_text(encoding="utf-8"))
-        fresh = [t for t in topics if t not in state["used_topics"]] or topics
+        failed = state.setdefault("failed_topics", {})
+        fresh = [t for t in topics if t not in state["used_topics"] and failed.get(t, 0) < 2] or topics
         topic = args.topic or fresh[0]
         print(f"📌 Topic: {topic}")
-        script = writer.write_script(topic, state["used_formats"], seed=time.time_ns())
+        try:
+            script = writer.write_script(topic, state["used_formats"], seed=time.time_ns())
+        except Exception:
+            if args.post:                    # a topic that fails twice is skipped, so it can never block the queue
+                failed[topic] = failed.get(topic, 0) + 1
+                STATE.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
+            raise
         script["topic"] = script.get("topic") or topic
     video, meta = make_video(script, args.show)
     if not args.post:

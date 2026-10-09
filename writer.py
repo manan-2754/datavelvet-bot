@@ -181,7 +181,21 @@ def format_signature(scenes):
     return "|".join(f"{s['plate']}:{len(s['data'].get('items') or s['data'].get('rows') or [])}" for s in scenes)
 
 
+def _unwrap(sc):
+    """Some models wrap the script ({"script": {...}}) - find the dict that holds the scenes."""
+    if isinstance(sc, dict) and "scenes" in sc:
+        return sc
+    if isinstance(sc, dict):
+        for v in sc.values():
+            if isinstance(v, dict) and "scenes" in v:
+                return v
+    if isinstance(sc, list):
+        return {"scenes": sc}
+    return sc if isinstance(sc, dict) else {}
+
+
 def validate(sc, used_formats=()):
+    sc = _unwrap(sc)
     scenes = sc.get("scenes") or []
     if len(scenes) < 6:
         raise ValueError(f"need at least 6 scenes, got {len(scenes)}")
@@ -318,8 +332,6 @@ def write_script(topic, used_formats=(), tries=6, seed=0):
         cands.append(sc)
         err = "; ".join(rv["critical"] + rv["minor"])[:500]
         feedback = "\nA senior reviewer REJECTED the previous draft. Fix every point:\n- " + "\n- ".join(rv["critical"] + rv["minor"]) + "\n"
-        if i >= 2 and max(c["review"]["score"] for c in cands) >= 7:
-            break                                    # good enough to repair - save LLM quota and time
     # nothing came back perfectly clean: repair the best draft with the reviewer's own corrections
     for sc in sorted(cands, key=lambda c: (c["review"]["score"], -len(c["review"]["critical"])), reverse=True)[:2]:
         rv = sc["review"]
