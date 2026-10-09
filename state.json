@@ -80,5 +80,266 @@
   "failed_topics": {
     "Why is Redis so fast?": 2
   },
-  "queued_scripts": []
+  "queued_scripts": [
+    {
+      "topic": "How Docker containers work under the hood",
+      "scenes": [
+        {
+          "plate": "hook",
+          "title": "",
+          "lines": [
+            "A container is not a tiny virtual machine.",
+            "It's just a process wearing a very clever disguise."
+          ],
+          "data": {
+            "motif": "holo",
+            "value": "",
+            "label": "NOT A VM",
+            "cue": "clever disguise",
+            "object": "cube"
+          }
+        },
+        {
+          "plate": "compare",
+          "title": "VM vs container",
+          "lines": [
+            "A virtual machine boots its own full operating system.",
+            "A container shares the host kernel instead."
+          ],
+          "data": {
+            "rows": [
+              {
+                "label": "WHAT BOOTS",
+                "sub": "",
+                "cue": "operating system",
+                "left": "Full guest OS",
+                "right": "Just your app"
+              },
+              {
+                "label": "KERNEL",
+                "sub": "",
+                "cue": "host kernel",
+                "left": "Its own",
+                "right": "The host's"
+              }
+            ],
+            "left": "VM",
+            "right": "CONTAINER"
+          }
+        },
+        {
+          "plate": "orbit",
+          "title": "The disguise",
+          "lines": [
+            "The disguise is Linux namespaces.",
+            "Each one hides something: process IDs, the network, the file system, the hostname."
+          ],
+          "data": {
+            "items": [
+              {
+                "label": "PID",
+                "sub": "",
+                "cue": "process IDs",
+                "object": "cube"
+              },
+              {
+                "label": "NET",
+                "sub": "",
+                "cue": "network",
+                "object": "router"
+              },
+              {
+                "label": "MOUNT",
+                "sub": "",
+                "cue": "file system",
+                "object": "db"
+              },
+              {
+                "label": "UTS",
+                "sub": "",
+                "cue": "hostname",
+                "object": "user"
+              }
+            ],
+            "core": {
+              "label": "YOUR PROCESS",
+              "cue": "Linux namespaces",
+              "object": "chip"
+            }
+          }
+        },
+        {
+          "plate": "layers",
+          "title": "Where files come from",
+          "lines": [
+            "Every container gets a thin writable layer on top.",
+            "Underneath sit read-only image layers: your app, its libraries, and a base OS."
+          ],
+          "data": {
+            "items": [
+              {
+                "label": "WRITABLE LAYER",
+                "sub": "your container's changes",
+                "cue": "writable layer"
+              },
+              {
+                "label": "YOUR APP",
+                "sub": "read-only image layer",
+                "cue": "your app"
+              },
+              {
+                "label": "LIBRARIES",
+                "sub": "read-only image layer",
+                "cue": "libraries"
+              },
+              {
+                "label": "BASE OS",
+                "sub": "e.g. debian or alpine",
+                "cue": "base OS",
+                "object": "stack"
+              }
+            ]
+          }
+        },
+        {
+          "plate": "tunnel",
+          "title": "docker run",
+          "lines": [
+            "When you type docker run, the CLI calls the Docker daemon.",
+            "It hands off to containerd, and runc creates the namespaces and starts your process."
+          ],
+          "data": {
+            "items": [
+              {
+                "label": "DOCKER CLI",
+                "sub": "docker run nginx",
+                "cue": "docker run"
+              },
+              {
+                "label": "DOCKERD",
+                "sub": "the Docker daemon",
+                "cue": "Docker daemon"
+              },
+              {
+                "label": "CONTAINERD",
+                "sub": "manages the lifecycle",
+                "cue": "containerd"
+              },
+              {
+                "label": "RUNC",
+                "sub": "namespaces + cgroups",
+                "cue": "runc"
+              }
+            ]
+          }
+        },
+        {
+          "plate": "title",
+          "title": "The fence",
+          "lines": [
+            "Then cgroups set hard limits on CPU and memory,",
+            "so one container can't starve the others."
+          ],
+          "data": {
+            "items": [
+              {
+                "label": "CPU LIMIT",
+                "sub": "a fixed share of processor time",
+                "cue": "CPU"
+              },
+              {
+                "label": "MEMORY LIMIT",
+                "sub": "go over it and the kernel kills it",
+                "cue": "memory"
+              }
+            ],
+            "term": "CGROUPS",
+            "termCue": "cgroups",
+            "note": "control groups, built into the Linux kernel"
+          }
+        },
+        {
+          "plate": "bars3d",
+          "title": "Why it's fast",
+          "lines": [
+            "No OS to boot means containers start in under a second.",
+            "A virtual machine can take thirty seconds or more."
+          ],
+          "data": {
+            "items": [
+              {
+                "label": "CONTAINER START",
+                "sub": "",
+                "cue": "containers start",
+                "value": "0.5 s",
+                "unit": ""
+              },
+              {
+                "label": "VM BOOT",
+                "sub": "",
+                "cue": "virtual machine",
+                "value": "30 s",
+                "unit": ""
+              }
+            ]
+          }
+        },
+        {
+          "plate": "scene3d",
+          "title": "One kernel, many boxes",
+          "lines": [
+            "Same kernel, many isolated processes.",
+            "One server can run hundreds of them side by side."
+          ],
+          "data": {
+            "items": [
+              {
+                "label": "HOST KERNEL",
+                "sub": "shared by everyone",
+                "cue": "Same kernel",
+                "object": "server"
+              },
+              {
+                "label": "CONTAINER A",
+                "sub": "its own namespaces",
+                "cue": "isolated processes",
+                "object": "cube"
+              },
+              {
+                "label": "CONTAINER B",
+                "sub": "its own limits",
+                "cue": "hundreds",
+                "object": "stack"
+              }
+            ],
+            "link": "hub",
+            "packetsCue": "side by side"
+          }
+        },
+        {
+          "plate": "outro",
+          "title": "",
+          "lines": [
+            "So a container is just a process, fenced in by the kernel.",
+            "Follow for more."
+          ],
+          "data": {}
+        }
+      ],
+      "format": "hook:0|compare:2|orbit:4|layers:4|tunnel:4|title:2|bars3d:2|scene3d:3|outro:0",
+      "youtube": {
+        "title": "How Docker containers ACTUALLY work #shorts",
+        "description": "A container is not a tiny VM - it is a Linux process isolated by namespaces and limited by cgroups. Here is what docker run really does. #docker #containers #linux #devops #programming",
+        "tags": [
+          "docker",
+          "containers",
+          "linux",
+          "namespaces",
+          "cgroups",
+          "devops"
+        ]
+      },
+      "instagram_caption": "A container is not a tiny VM.\nIt's a process in a very clever disguise.\nSave this for later.\n#docker #containers #linux #devops #coding #softwareengineering"
+    }
+  ]
 }
