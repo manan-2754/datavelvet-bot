@@ -4,7 +4,8 @@
     "How browsers render a webpage",
     "How load balancers distribute traffic",
     "How Docker containers work under the hood",
-    "How Paxos consensus works"
+    "How Paxos consensus works",
+    "What is serverless architecture?"
   ],
   "used_bank": [
     "dns_explained"
@@ -74,6 +75,14 @@
       "seed": 519403097,
       "youtube_id": "ru0fE5sd0NM",
       "instagram_id": "18076028366735422"
+    },
+    {
+      "time": "2026-10-10T06:25:56+00:00",
+      "topic": "What is serverless architecture?",
+      "format": "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
+      "seed": 1419082428,
+      "youtube_id": "5U_rtc8oRHs",
+      "instagram_id": "18114047927276016"
     }
   ],
   "series_counts": {
@@ -83,7 +92,8 @@
     "holo_flow:3|holo_tree:4|definition:4|holo_pipeline:4|holo_layers:3|holo_chart:4|compare:3|steps:3",
     "hook:0|title:3|specimen:3|holo:3|flows:4|form:4|stats:3|compare:4|outro:0",
     "hook:0|compare:2|orbit:4|layers:4|tunnel:4|title:2|bars3d:2|scene3d:3|outro:0",
-    "hook:0|holo:2|specimen:3|scene3d:3|form:3|layers:3|outro:0"
+    "hook:0|holo:2|specimen:3|scene3d:3|form:3|layers:3|outro:0",
+    "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring"
   ],
   "used_palettes": [
     "0:0"
@@ -100,5 +110,139 @@
   "failed_topics": {
     "Why is Redis so fast?": 2
   },
-  "queued_scripts": []
+  "queued_scripts": [],
+  "style_memory": [
+    {
+      "posted_at": "2026-10-10T06:30:12+00:00",
+      "style": {
+        "name": "Magenta Cipher / Cobalt signal",
+        "created": "2026-10-10T05:38:47+00:00",
+        "hook": null,
+        "tag": "pill",
+        "_h": {
+          "bg": 306.3,
+          "signal": 201.4,
+          "holo": 76.4
+        },
+        "palette": {
+          "ink": "#0E040D",
+          "ink2": "#1E0B1C",
+          "graphite": "#6F5B6D",
+          "ash": "#A696A4",
+          "bone": "#EEDEEC",
+          "signal": "#38B1F3",
+          "ember": "#559BFF",
+          "blood": "#0E88B2"
+        },
+        "holo": [
+          "#C6F057",
+          "#FBD662"
+        ],
+        "type": {
+          "wscale": 0.9,
+          "wtadd": -200,
+          "case": "upper"
+        },
+        "grid": {
+          "minor": 24,
+          "major": 72
+        },
+        "caption": {
+          "size": 44,
+          "dy": 40
+        },
+        "post": {
+          "bloom": 0.62,
+          "bloomThreshold": 0.74,
+          "vignette": 0.46,
+          "grain": 0.08,
+          "ca": 0.7,
+          "halation": 0.26
+        },
+        "cam2d": {
+          "zoom": 1.024,
+          "roll": 0.0004,
+          "hand": 1.13
+        },
+        "cam3d": {
+          "fov": 6.1,
+          "roll": -0.001,
+          "dist": 0.89,
+          "hand": 1.54
+        },
+        "scenes": [
+          {
+            "cam": "top",
+            "reveal": "glitch",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "dolly",
+            "reveal": "assemble",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "push",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "crane",
+            "reveal": "glitch",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "push",
+            "reveal": "scan",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "fly",
+            "reveal": "glitch",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "dolly",
+            "reveal": "scan",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "orbit",
+            "reveal": "draw",
+            "floor": "polar",
+            "spin": -1
+          }
+        ]
+      },
+      "format": "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
+      "angle": "question-chain"
+    }
+  ],
+  "scene_signatures": [
+    "depth|object:unfold,text:pop",
+    "stack|object:drop,object:rise,wave:draw",
+    "wave|beam:draw,cylinder:assemble,particles:fly",
+    "timeline|counter:scan,gauge:pop,ring:grow",
+    "radial|counter:glitch,matrix:assemble",
+    "grid|bars:grow,line:draw",
+    "pyramid|gauge:pop,object:assemble",
+    "cluster|network:pop,object:rise",
+    "ring|object:unfold,panel:pop"
+  ],
+  "compose_formats": [
+    "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring"
+  ]
 }
