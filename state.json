@@ -16,10 +16,11 @@
       "topic": "How does DNS actually work?",
       "youtube_id": "VwpULb63iSg",
       "stats": {
-        "views": 65,
-        "likes": 1,
-        "comments": 0,
-        "checked": "2026-10-09T07:19:56+00:00"
+        "yt_views": 92,
+        "yt_likes": 1,
+        "yt_comments": 0,
+        "score": 117,
+        "fetched": "2026-10-10T13:42:04+00:00"
       }
     },
     {
@@ -28,10 +29,17 @@
       "youtube_id": "9P7QiMeIP9U",
       "instagram_id": "18126836476852213",
       "stats": {
-        "views": 32,
-        "likes": 2,
-        "comments": 0,
-        "checked": "2026-10-09T07:19:56+00:00"
+        "yt_views": 1260,
+        "yt_likes": 30,
+        "yt_comments": 0,
+        "ig_reach": 199,
+        "ig_saved": 3,
+        "ig_shares": 1,
+        "ig_views": 231,
+        "ig_likes": 4,
+        "ig_comments": 2,
+        "score": 2740.5,
+        "fetched": "2026-10-10T13:42:04+00:00"
       }
     },
     {
@@ -43,7 +51,20 @@
       "theme": "magenta",
       "duration": 108.8,
       "youtube_id": "lSAY6wbyT_A",
-      "instagram_id": "18076383422549123"
+      "instagram_id": "18076383422549123",
+      "stats": {
+        "yt_views": 218,
+        "yt_likes": 2,
+        "yt_comments": 0,
+        "ig_reach": 445,
+        "ig_saved": 3,
+        "ig_shares": 1,
+        "ig_views": 506,
+        "ig_likes": 5,
+        "ig_comments": 0,
+        "score": 1301.5,
+        "fetched": "2026-10-10T13:42:05+00:00"
+      }
     },
     {
       "time": "2026-10-09T14:38:36+00:00",
@@ -51,7 +72,20 @@
       "palette": "Midnight Citrus",
       "format": "holo_flow:3|holo_tree:4|definition:4|holo_pipeline:4|holo_layers:3|holo_chart:4|compare:3|steps:3",
       "youtube_id": "sM8pNlXKfok",
-      "instagram_id": "18117438377093748"
+      "instagram_id": "18117438377093748",
+      "stats": {
+        "yt_views": 160,
+        "yt_likes": 3,
+        "yt_comments": 0,
+        "ig_reach": 337,
+        "ig_saved": 0,
+        "ig_shares": 1,
+        "ig_views": 374,
+        "ig_likes": 1,
+        "ig_comments": 0,
+        "score": 862.5,
+        "fetched": "2026-10-10T13:42:05+00:00"
+      }
     },
     {
       "time": "2026-10-09T18:55:54+00:00",
@@ -111,126 +145,7 @@
     "Why is Redis so fast?": 2
   },
   "queued_scripts": [],
-  "style_memory": [
-    {
-      "posted_at": "2026-10-10T06:30:12+00:00",
-      "style": {
-        "name": "Magenta Cipher / Cobalt signal",
-        "created": "2026-10-10T05:38:47+00:00",
-        "hook": null,
-        "tag": "pill",
-        "_h": {
-          "bg": 306.3,
-          "signal": 201.4,
-          "holo": 76.4
-        },
-        "palette": {
-          "ink": "#0E040D",
-          "ink2": "#1E0B1C",
-          "graphite": "#6F5B6D",
-          "ash": "#A696A4",
-          "bone": "#EEDEEC",
-          "signal": "#38B1F3",
-          "ember": "#559BFF",
-          "blood": "#0E88B2"
-        },
-        "holo": [
-          "#C6F057",
-          "#FBD662"
-        ],
-        "type": {
-          "wscale": 0.9,
-          "wtadd": -200,
-          "case": "upper"
-        },
-        "grid": {
-          "minor": 24,
-          "major": 72
-        },
-        "caption": {
-          "size": 44,
-          "dy": 40
-        },
-        "post": {
-          "bloom": 0.62,
-          "bloomThreshold": 0.74,
-          "vignette": 0.46,
-          "grain": 0.08,
-          "ca": 0.7,
-          "halation": 0.26
-        },
-        "cam2d": {
-          "zoom": 1.024,
-          "roll": 0.0004,
-          "hand": 1.13
-        },
-        "cam3d": {
-          "fov": 6.1,
-          "roll": -0.001,
-          "dist": 0.89,
-          "hand": 1.54
-        },
-        "scenes": [
-          {
-            "cam": "top",
-            "reveal": "glitch",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "dolly",
-            "reveal": "assemble",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "push",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "crane",
-            "reveal": "glitch",
-            "floor": "grid",
-            "spin": 1
-          },
-          {
-            "cam": "push",
-            "reveal": "scan",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "fly",
-            "reveal": "glitch",
-            "floor": "polar",
-            "spin": -1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "dolly",
-            "reveal": "scan",
-            "floor": "hex",
-            "spin": 1
-          },
-          {
-            "cam": "orbit",
-            "reveal": "draw",
-            "floor": "polar",
-            "spin": -1
-          }
-        ]
-      },
-      "format": "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
-      "angle": "question-chain"
-    }
-  ],
+  "style_memory": [],
   "scene_signatures": [
     "depth|object:unfold,text:pop",
     "stack|object:drop,object:rise,wave:draw",
@@ -244,5 +159,12 @@
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring"
-  ]
+  ],
+  "insights": {
+    "n": 0,
+    "updated": "2026-10-10T13:42:05+00:00",
+    "best": {},
+    "worst": {},
+    "lift": {}
+  }
 }
