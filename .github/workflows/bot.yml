@@ -56,6 +56,8 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AFFILIATES_JSON: ${{ vars.AFFILIATES_JSON }}
+          VIDEO_LENGTH: ${{ vars.VIDEO_LENGTH }}
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
@@ -74,6 +76,7 @@ jobs:
             data/audio.json
             audio/voiceover.mp3
             state.json
+            long_state.json
           retention-days: 1
       - name: Email me if the video was not prepared
         if: failure() || cancelled()

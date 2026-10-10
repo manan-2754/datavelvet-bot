@@ -32,6 +32,8 @@ import audio_build  # noqa: E402
 import analytics  # noqa: E402
 import composer  # noqa: E402
 import critic  # noqa: E402
+import links  # noqa: E402
+import longform  # noqa: E402
 import research  # noqa: E402
 import trends  # noqa: E402
 import writer  # noqa: E402
@@ -84,6 +86,18 @@ def add_sources(script, sources):
     script["instagram_caption"] = (script.get("instagram_caption", "") + "\n\nFact-checked. Sources: " +
                                    ", ".join(s.split("/")[2] for s in sources[:3] if "//" in s))[:2150]
     script["sources"] = sources
+
+
+def add_links(script, state):
+    """Affiliate links matched to the topic + a pointer to the latest long-form compilation."""
+    chosen = links.apply(script)
+    if chosen:
+        print(f"🔗 Links: {', '.join(ln.get('name') or ln['url'] for ln in chosen)}")
+    comp = None if script.get("long") else ((longform.load_long()["videos"] or [{}])[-1].get("youtube_id"))
+    if comp:
+        yt = script.setdefault("youtube", {})
+        yt["description"] = (f"▶ Full episode (8-10 min deep dive): https://youtu.be/{comp}\n\n" + yt.get("description", ""))[:4900]
+    script["links_done"] = True
 
 
 def features(script, meta):
@@ -152,18 +166,20 @@ def prepare_video(script, voice=None, tag=""):
     print("🔊 Narration")
     dur, voice = audio_build.narrate(script, voice)
     print(f"  {voice}, {dur:.1f}s")
-    if dur > 170:
+    if dur > 170 and not script.get("long"):
         raise RuntimeError(f"video would be {dur:.0f}s - too long for Shorts")
     env = env_with_tools()
     subprocess.run([sys.executable, str(BASE / "analysis" / "audio_vo.py")], cwd=BASE, env=env, check=True)
-    print("🧐 " + critic.review(env, tool))
+    print("🧐 " + critic.review(env, tool, land=bool(script.get("long"))))
     return {"out_dir": str(out_dir), "dur": dur, "voice": voice}
 
 
-def render_range(out, frm=None, to=None):
+def render_range(out, frm=None, to=None, land=False):
     """Render the whole video, or one frame-exact slice of it (split rendering across cloud machines)."""
     env = env_with_tools()
     cmd = [tool("bun"), "scripts/render.ts", "video", "--fps", FPS, "--samples", SAMPLES, "--shutter", "0.5", "--crf", "18", "--out", str(out)]
+    if land:
+        cmd += ["--land"]
     if frm is not None:
         cmd += ["--from", f"{frm:.6f}", "--to", f"{to:.6f}", "--noaudio"]
     if SAMPLES == "auto":
@@ -186,7 +202,7 @@ def make_video(script, show=False, voice=None, tag=""):
     ctx = prepare_video(script, voice, tag)
     print(f"🎬 Rendering 1080x1920 @ {FPS} fps (samples {SAMPLES})")
     raw = OUT / "raw.mp4"
-    render_range(raw)
+    render_range(raw, land=bool(script.get("long")))
     return finish_video(script, ctx, raw, show)
 
 
@@ -195,6 +211,8 @@ def finish_video(script, ctx, raw, show=False):
     out_dir.mkdir(parents=True, exist_ok=True)
     print("🎵 Sound design")
     mixed = audio_build.mix(script)
+    if script.get("long"):
+        print("📑 Chapters: " + " | ".join(longform.describe(script)))
     video = out_dir / "video.mp4"
     subprocess.run([audio_build.ffmpeg(), "-v", "error", "-y", "-i", str(raw), "-i", str(mixed), "-map", "0:v", "-map", "1:a",
                     "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "-shortest", str(video)], check=True)
@@ -244,6 +262,7 @@ def main():
     ap.add_argument("--lang", default=os.getenv("EXTRA_LANGS", ""), help="also render translated versions, e.g. es,pt")
     ap.add_argument("--stage", choices=["prepare", "render", "finish"], help="cloud split render: prepare -> N x render -> finish")
     ap.add_argument("--chunk", type=int, default=0, help="slice index for --stage render")
+    ap.add_argument("--long", action="store_true", help="an 8-10 min landscape long-form YouTube video (chapters)")
     args = ap.parse_args()
     if args.stage == "render":
         return stage_render(args.chunk)
@@ -254,6 +273,8 @@ def main():
         gh_output(has_video="false", chunks="[]")
         return 0
     state = load_state()
+    if args.long:
+        return run_long(args, state)
     art_director.prune(state)          # styles posted more than 3 hours ago are forgotten
     try:                               # the learning loop: fresh stats -> what works -> next script
         n = analytics.collect(state)
@@ -290,14 +311,16 @@ def main():
         print(f"📚 Research: {len(facts['sources'])} source(s)  {' '.join(facts['sources'])}")
         series = series_info(topic, state, fresh)
         level = pick_level(state)
+        mode = composer.length_mode(state)
+        print(f"⏱️ Length: {mode} (hook-first)")
         print(f"🎞️ Series: {series['name']} · EP {series['ep']} · level {level}" + (f"  (next: {series['next']})" if series.get("next") else ""))
         try:
             angle = art_director.pick_angle(state)
             print(f"🎬 Angle: {angle[0]}  (every scene composed from scratch)")
             try:
-                script = composer.write(topic, banned=state.get("scene_signatures", []), recent=state.get("compose_formats", []),
+                script = composer.write(topic, banned=state.get("scene_signatures", []) + longform.load_long()["scene_signatures"], recent=state.get("compose_formats", []),
                                         angle=angle, seed=time.time_ns(), facts=facts, hints=analytics.hints(state), level=level,
-                                        series=series)
+                                        series=series, mode=mode)
                 script.update(series=series, level=level, trend=trend)
                 add_sources(script, facts["sources"] + ((trend or {}).get("sources") or []))
             except Exception as e:
@@ -310,6 +333,8 @@ def main():
                 STATE.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
             raise
         script["topic"] = script.get("topic") or topic
+    if not args.script and not script.get("links_done"):
+        add_links(script, state)
     script["seed"] = script.get("seed") or pick_seed(state)
     script["angle"] = script.get("angle") or (angle[0] if angle else None)
     script["style"] = script.get("style") or art_director.new_genome(
@@ -336,6 +361,30 @@ def main():
     return publish(script, video, meta, state, topic, bool(args.topic))
 
 
+def run_long(args, state):
+    """The 8-10 min landscape video: outline -> chapters composed from scratch -> fresh genome -> narration."""
+    art_director.prune(state)
+    script = json.loads(Path(args.script).read_text(encoding="utf-8")) if args.script else         longform.write(state, longform.load_long(), topic=args.topic)
+    script["long"] = True
+    script["seed"] = script.get("seed") or pick_seed(state)
+    script["style"] = script.get("style") or art_director.new_genome(state, len(script["scenes"]))
+    if not script.get("links_done"):
+        add_links(script, state)
+    if args.stage == "prepare":
+        ctx = prepare_video(script)
+        parts = chunks(int(os.getenv("RENDER_CHUNKS", "20")))
+        BUNDLE.write_text(json.dumps({"script": script, "ctx": ctx, "topic": script["topic"], "topic_override": True, "chunks": parts},
+                                     ensure_ascii=False), encoding="utf-8")
+        gh_output(has_video="true", chunks=json.dumps(list(range(len(parts)))))
+        print(f"📦 Bundle ready: {len(parts)} slices of ~{ctx['dur'] / len(parts):.1f}s")
+        return 0
+    video, meta = make_video(script, args.show)
+    if not args.post:
+        print("(local run - nothing posted)")
+        return 0
+    return publish(script, video, meta, state, None, True)
+
+
 def gh_output(**kv):
     path = os.getenv("GITHUB_OUTPUT")
     if path:
@@ -351,7 +400,7 @@ def stage_render(i):
     out = OUT / "chunks" / f"chunk_{i:02d}.mp4"
     out.parent.mkdir(parents=True, exist_ok=True)
     print(f"🎬 Slice {i + 1}/{len(b['chunks'])}: {frm:.2f}s - {to:.2f}s @ {FPS} fps (samples {SAMPLES})")
-    render_range(out, frm, to)
+    render_range(out, frm, to, land=bool(b["script"].get("long")))
     return 0
 
 
@@ -375,6 +424,19 @@ def stage_finish(post):
 
 
 def publish(script, video, meta, state, topic, topic_override):
+    if script.get("long"):                     # long-form: YouTube only, its own state file
+        from youtube_upload import upload_video
+        thumb = Path(video).parent / "thumb.jpg"
+        subprocess.run([audio_build.ffmpeg(), "-v", "error", "-y", "-ss", f"{(meta.get('cover_ms') or 1500) / 1000:.2f}", "-i", str(video),
+                        "-frames:v", "1", "-vf", "scale=1280:720", "-q:v", "3", str(thumb)], check=False)
+        if os.getenv("AUTO_POST_YOUTUBE", "false").lower() != "true":
+            print("AUTO_POST_YOUTUBE is off - not uploading")
+            return 0
+        vid = upload_video(video, meta, thumbnail=thumb if thumb.exists() else None)
+        ls = longform.load_long()
+        longform.remember(ls, script, vid)
+        longform.save_long(ls)
+        return 0
     if topic and not topic_override:
         state["used_topics"].append(topic)
     state["used_formats"].append(script.get("format", ""))

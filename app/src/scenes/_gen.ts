@@ -5,7 +5,7 @@
 // captions in the lower third.
 import type * as THREE from 'three';
 import { Scene, type Frame, type PostOverrides } from '../engine/scene';
-import { FSPass, Layer2D, W, H } from '../engine/gl';
+import { FSPass, Layer2D, W, H, LAND } from '../engine/gl';
 import { LineBatch } from '../engine/lines';
 import { rgba } from '../engine/palette';
 import { F, font, measure } from '../engine/type';
@@ -156,7 +156,7 @@ export abstract class GenPlate extends Scene {
   floorAt: V3 | null = [0, 0, 0];
   floorR = 7;
   gridInk = 0.8;
-  viewCY = H / 2 - 150;
+  viewCY = LAND ? H / 2 - 50 : H / 2 - 150;
   /** The video's style genome (lyrics.json `style`). */
   G: any = {};
   /** Bone paper (ink) instead of graph paper in the dark. */
@@ -164,8 +164,8 @@ export abstract class GenPlate extends Scene {
   /** Draw the default header (plate number · topic, plate title). Paper plates draw their own band. */
   header = true;
   /** Caption block y (lower third), or 'none'. */
-  captionY: number | 'none' = 620;
-  captionSize = 50;
+  captionY: number | 'none' = LAND ? 340 : 620;
+  captionSize = LAND ? 42 : 50;
   grid = gridPass(24, 96);
   paper = new FSPass(PAPER_GLSL, { uCam: { value: [0, 0, 1, 0] }, uRes: { value: [W, H] } });
   plot = new Plot();
@@ -182,6 +182,7 @@ export abstract class GenPlate extends Scene {
   cursor = 0;
   hits: number[] = [];
   penFrom = 1e9;
+  tagBoxes: [number, number, number, number][] = [];
 
   /** Build strokes, notes, camera keys from this.data. */
   abstract build(): void;
@@ -221,8 +222,8 @@ export abstract class GenPlate extends Scene {
     if (this.has3D && !this.fx3) this.fx3 = new LineBatch(140000);
     if (this.captionY !== 'none' && this.ws.length) {
       if (this.G.caption?.dy) this.captionY += Number(this.G.caption.dy);
-      const r = wrapKaraoke(this.ws, 0, this.captionY, 960, this.captionSize, ARCH(100, 700), 'cap', { maxRows: 4, minSize: 34 });
-      const over = this.captionY + r.height - 880;          // keep the whole caption block on screen
+      const r = wrapKaraoke(this.ws, 0, this.captionY, LAND ? 1500 : 960, this.captionSize, ARCH(100, 700), 'cap', { maxRows: LAND ? 2 : 4, minSize: LAND ? 30 : 34 });
+      const over = this.captionY + r.height - (LAND ? 500 : 880);          // keep the whole caption block on screen
       if (over > 0) r.kws.forEach((k) => (k.y -= over));
       this.kw.push(...r.kws);
     }
@@ -269,7 +270,7 @@ export abstract class GenPlate extends Scene {
     }
     if (this.has3D && this.fx3) {
       const s0 = handheld(this.rig.at(t), t, this.style.hand), g3 = this.G.cam3d ?? {};
-      const v = new View({ ...s0, fov: clamp(s0.fov + (Number(g3.fov) || 0), 28, 75), roll: s0.roll + (Number(g3.roll) || 0) * (this.idx % 2 ? -1 : 1), dist: s0.dist * (Number(g3.dist) || 1) });
+      const v = new View({ ...s0, fov: clamp(s0.fov + (Number(g3.fov) || 0), 28, 75), roll: s0.roll + (Number(g3.roll) || 0) * (this.idx % 2 ? -1 : 1), dist: s0.dist * (Number(g3.dist) || 1) * (LAND ? 0.86 : 1) });
       v.cy = this.viewCY;
       this.view = v;
       const Z = this.fx3; Z.clear();
@@ -290,12 +291,19 @@ export abstract class GenPlate extends Scene {
       Z.render(renderer, out);
     }
     const U = this.ui; U.clear();
+    this.tagBoxes = [];
     if (this.paperMode) { this.drawUI(U.ctx, t, c); comp.draw(renderer, U.upload(), out); U.clear(); }
     const L = this.lines; L.clear();
     this.plot.draw(t, c, L);
     L.render(renderer, out);
     if (!this.paperMode) this.drawUI(U.ctx, t, c);
     if (this.header) this.drawHeader(U.ctx, t, c);
+    if (LAND && !this.paperMode && this.captionY !== 'none' && this.kw.length) {   // landscape: soft band keeps captions readable over 3D
+      const X2 = U.ctx; X2.setTransform(1, 0, 0, 1, 0, 0);
+      const gr = X2.createLinearGradient(0, H - 330, 0, H);
+      gr.addColorStop(0, rgba('ink', 0)); gr.addColorStop(0.45, rgba('ink', 0.72)); gr.addColorStop(1, rgba('ink', 0.9));
+      X2.fillStyle = gr; X2.fillRect(0, H - 330, W, 330);
+    }
     drawKaraoke(U.ctx, c, t, this.kw, { paper: this.paperMode, pop: 0.04 });
     this.plot.drawNotes(t, c, U.ctx);
     this.drawOver(U.ctx, t, c);
@@ -322,7 +330,14 @@ export abstract class GenPlate extends Scene {
     let x = q[0] + dx, y = q[1] + dy;
     const right = dx >= 0;
     let bx = right ? x : x - bw;
-    bx = clamp(bx, 30, W - 30 - bw); y = clamp(y, 330, 1330);
+    bx = clamp(bx, 30, W - 30 - bw); y = LAND ? clamp(y, 255, H - 250) : clamp(y, 330, 1330);
+    for (let g = 0; g < 6; g++) {                 // labels never overlap each other: step clear of the ones already drawn
+      const hit = this.tagBoxes.find(([x0, y0, x1, y1]) => bx < x1 + 10 && bx + bw > x0 - 10 && y > y0 - 8 && y - bh < y1 + 8);
+      if (!hit) break;
+      y = hit[3] + bh + 12;
+      if (y > (LAND ? H - 250 : 1330)) { y = hit[1] - 12; }
+    }
+    this.tagBoxes.push([bx, y - bh, bx + bw, y]);
     x = right ? bx : bx + bw;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = a;
@@ -350,13 +365,15 @@ export abstract class GenPlate extends Scene {
     const meta = this.sc.meta ?? {};
     const a = prog(t, this.t0, this.t0 + 0.35);
     const ink = this.paperMode ? 'ink' : 'bone';
-    setWorld(ctx, c, -480, -830);
-    label(ctx, `${String((meta.i ?? this.idx) + 1).padStart(2, '0')} / ${String(meta.n ?? '').padStart(2, '0')}`, 0, 0, { size: 18, col: rgba('signal', 0.95 * a), spacing: 4 });
-    label(ctx, (meta.series ? `${meta.series} · EP ${meta.ep ?? 1}${meta.level ? ' · ' + meta.level : ''}` : String(meta.topic ?? '')).toUpperCase().slice(0, 44), 110, 0, { size: 16, col: rgba(this.paperMode ? 'graphite' : 'ash', 0.9 * a), spacing: 3 });
+    setWorld(ctx, c, LAND ? -880 : -480, LAND ? -475 : -830);
+    const ch = this.data.chapter;
+    label(ctx, ch ? `CH ${String(ch.k).padStart(2, '0')} / ${String(ch.n).padStart(2, '0')}` : `${String((meta.i ?? this.idx) + 1).padStart(2, '0')} / ${String(meta.n ?? '').padStart(2, '0')}`, 0, 0, { size: 18, col: rgba('signal', 0.95 * a), spacing: 4 });
+    if (ch) label(ctx, String(ch.title ?? '').toUpperCase().slice(0, 52), 150, 0, { size: 16, col: rgba(this.paperMode ? 'graphite' : 'ash', 0.9 * a), spacing: 3 });
+    else label(ctx, (meta.series ? `${meta.series} · EP ${meta.ep ?? 1}${meta.level ? ' · ' + meta.level : ''}` : String(meta.topic ?? '')).toUpperCase().slice(0, 44), 110, 0, { size: 16, col: rgba(this.paperMode ? 'graphite' : 'ash', 0.9 * a), spacing: 3 });
     const title = caseOf(String(this.sc.title ?? ''));
     if (title) {
       const fam = ARCH(112.5, 900);
-      const s = fitSize(title, fam, 960, 76);
+      const s = fitSize(title, fam, LAND ? 1100 : 960, LAND ? 64 : 76);
       ctx.font = font(fam, s);
       ctx.fillStyle = rgba(ink, 0.96 * a);
       ctx.fillText(title, 0, 84 + 24 * (1 - ease.outCubic(a)));

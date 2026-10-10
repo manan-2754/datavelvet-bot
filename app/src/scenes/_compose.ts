@@ -3,6 +3,7 @@
 // animation, links between elements, the camera and the scene transition. The style genome then re-skins all of
 // it (palette, hologram tints, type, label style, camera feel, post). Two scenes only look alike if every one of
 // those choices matches, and the bot refuses to reuse a scene composition.
+import { W, H, LAND } from '../engine/gl';
 import { LIN, rgba } from '../engine/palette';
 import { F, font, measure } from '../engine/type';
 import { norm, type Word } from '../engine/lyrics';
@@ -265,11 +266,12 @@ export class Compose extends GenPlate {
     this.tones = { holo: st.tint, alt: hexToLinear(String(holo[1] ?? holo[0])), accent: LIN.signal, ink: scl(LIN.bone, 0.85), ember: LIN.ember };
     if (this.hookMode || this.cta) {
       this.header = false; this.captionY = 'none';
-      const r2 = wrapKaraoke(this.ws, 0, this.cta ? -560 : -680, 960, this.cta ? 104 : 96, ARCH(110, 850), 'q', { maxRows: 4, minSize: 54, lh: 1.08 });
+      const r2 = LAND ? wrapKaraoke(this.ws, 0, this.cta ? -330 : -380, 1560, this.cta ? 92 : 86, ARCH(110, 850), 'q', { maxRows: 3, minSize: 48, lh: 1.08 })
+        : wrapKaraoke(this.ws, 0, this.cta ? -560 : -680, 960, this.cta ? 104 : 96, ARCH(110, 850), 'q', { maxRows: 4, minSize: 54, lh: 1.08 });
       this.kw.push(...r2.kws);
-      this.viewCY = 960 + 330;
+      this.viewCY = LAND ? H / 2 + 150 : 960 + 330;
       const last = this.ws[this.ws.length - 1]; this.tEnd = last ? last.end : this.t1 - 1;
-    } else this.captionY = 680;
+    } else this.captionY = LAND ? 360 : 680;
     const raw: any[] = Array.isArray(d.elements) ? d.elements.slice(0, 9) : [];
     const n = Math.max(1, raw.length);
     raw.forEach((x, k) => {
@@ -419,15 +421,16 @@ export class Compose extends GenPlate {
         const q = v.P([X.pos[0], X.pos[1] + 0.55 * e.size, X.pos[2]]); if (!q) continue;
         const txt = e.type === 'counter' ? countUp(e.value || e.label, X.age / 0.9) : (e.label || e.value);
         const fam = ARCH(118, 900), size = clamp((150 * e.size * v.s.dist) / q[2], 40, 230) * (1 + 0.25 * (1 - ease.outExpo(clamp(X.age / 0.18))));
-        const s2 = Math.min(size, (940 * 100) / Math.max(1, measure(txt, fam, 100)));
+        const s2 = Math.min(size * (LAND ? 0.75 : 1), ((LAND ? 1300 : 940) * 100) / Math.max(1, measure(txt, fam, 100)));
         const half = measure(txt, fam, s2) / 2;
         ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = clamp(X.age / 0.15) * X.al;
         ctx.font = font(fam, s2); ctx.textAlign = 'center';
         ctx.fillStyle = mixColor('signal', 'bone', prog(t, e.word.start + 0.9, e.word.start + 1.5));
-        const tx = clamp(q[0], 30 + half, 1050 - half);
-        let ty = clamp(q[1], 380, 1400);
-        for (let g2 = 0; g2 < 6; g2++) { const hit = used.find(([x0, y0, x1, y1]) => tx + half > x0 && tx - half < x1 && ty > y0 && ty - s2 < y1); if (!hit) break; ty = Math.min(1460, hit[3] + s2 * 1.05); }
+        const tx = clamp(q[0], 30 + half, W - 30 - half);
+        let ty = LAND ? clamp(q[1], 200, H - 230) : clamp(q[1], 380, 1400);
+        for (let g2 = 0; g2 < 6; g2++) { const hit = used.find(([x0, y0, x1, y1]) => tx + half > x0 && tx - half < x1 && ty > y0 && ty - s2 < y1); if (!hit) break; ty = Math.min(LAND ? H - 170 : 1460, hit[3] + s2 * 1.05); }
         used.push([tx - half, ty - s2, tx + half, ty]);
+        this.tagBoxes.push([tx - half, ty - s2, tx + half, ty]);   // labels steer clear of big words too
         ctx.fillText(txt, tx, ty);
         ctx.textAlign = 'left'; ctx.globalAlpha = 1;
         if (e.type === 'counter' && e.label && e.value) this.tag(ctx, [X.pos[0], X.pos[1], X.pos[2]], e.label, e.sub, a, { dx: 40 * e.side, dy: 70, size: 26 });
@@ -455,34 +458,34 @@ export class Compose extends GenPlate {
     if (qz && Array.isArray(qz.options)) {
       const t0q = (this.ws[0]?.start ?? this.t0) + 0.4, a = prog(t, t0q, t0q + 0.3), rev = t >= this.quizT;
       ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = a;
-      const y0 = 1060, fam = ARCH(105, 800);
-      ctx.fillStyle = rgba('ink', 0.78); ctx.fillRect(70, y0 - 70, 940, 90 + qz.options.length * 92);
-      ctx.font = font(F.mono(500), 26); ctx.fillStyle = rgba('ash', 1); ctx.fillText(String(qz.question ?? '').toUpperCase(), 100, y0 - 22);
+      const y0 = LAND ? 330 : 1060, QX = LAND ? W - 820 : 70, fam = ARCH(105, 800);
+      ctx.fillStyle = rgba('ink', 0.78); ctx.fillRect(QX, y0 - 70, 940 - (LAND ? 190 : 0), 90 + qz.options.length * 92);
+      ctx.font = font(F.mono(500), 26); ctx.fillStyle = rgba('ash', 1); ctx.fillText(String(qz.question ?? '').toUpperCase(), QX + 30, y0 - 22);
       qz.options.forEach((o: string, i: number) => {
         const y = y0 + i * 92, right = i === qz.answer, tin = prog(t, t0q + 0.15 * i, t0q + 0.15 * i + 0.25);
         ctx.globalAlpha = a * tin * (rev && !right ? 0.35 : 1);
         ctx.strokeStyle = rev && right ? this.style.tintHex : rgba('bone', 0.6); ctx.lineWidth = rev && right ? 4 : 2;
-        if (rev && right) { ctx.fillStyle = rgba('signal', 0.22 + 0.2 * pulse(t, this.quizT, 0.3)); ctx.fillRect(100, y, 880, 72); }
-        ctx.strokeRect(100, y, 880, 72);
+        if (rev && right) { ctx.fillStyle = rgba('signal', 0.22 + 0.2 * pulse(t, this.quizT, 0.3)); ctx.fillRect(QX + 30, y, 880 - (LAND ? 190 : 0), 72); }
+        ctx.strokeRect(QX + 30, y, 880 - (LAND ? 190 : 0), 72);
         ctx.font = font(fam, 40); ctx.fillStyle = rgba(rev && right ? 'signal' : 'bone', 1);
-        ctx.fillText(`${'ABC'[i]}   ${o}`, 126, y + 51);
-        if (rev && !right) { ctx.fillStyle = rgba('bone', 0.8); ctx.fillRect(120, y + 36, 840, 3); }
+        ctx.fillText(`${'ABC'[i]}   ${o}`, QX + 56, y + 51);
+        if (rev && !right) { ctx.fillStyle = rgba('bone', 0.8); ctx.fillRect(QX + 50, y + 36, 840 - (LAND ? 190 : 0), 3); }
       });
       if (!rev && t > this.quizT - 1.6) {
         const left = Math.ceil(this.quizT - t), k = (this.quizT - t) % 1;
         ctx.globalAlpha = 1; ctx.strokeStyle = this.style.tintHex; ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.arc(920, y0 - 110, 46, -Math.PI / 2, -Math.PI / 2 + TAU * k); ctx.stroke();
-        ctx.font = font(ARCH(110, 900), 56); ctx.textAlign = 'center'; ctx.fillStyle = rgba('bone', 1); ctx.fillText(String(Math.max(1, left)), 920, y0 - 90); ctx.textAlign = 'left';
+        ctx.beginPath(); ctx.arc(QX + 850 - (LAND ? 190 : 0), y0 - 110, 46, -Math.PI / 2, -Math.PI / 2 + TAU * k); ctx.stroke();
+        ctx.font = font(ARCH(110, 900), 56); ctx.textAlign = 'center'; ctx.fillStyle = rgba('bone', 1); ctx.fillText(String(Math.max(1, left)), QX + 850 - (LAND ? 190 : 0), y0 - 90); ctx.textAlign = 'left';
       }
       ctx.globalAlpha = 1;
     }
     if (this.cta) {
       const a = prog(t, this.tEnd - 0.2, this.tEnd + 0.4), pos = (Number(this.sc.meta?.seed) || 0) % 3;
       ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = a;
-      const fam = ARCH(115, 900), txt = 'FOLLOW @DATAVELVET', s = Math.min(64, (900 * 100) / measure(txt, fam, 100));
-      const y = pos === 0 ? 1450 : pos === 1 ? 1600 : 1350;
-      ctx.font = font(fam, s); ctx.textAlign = 'center'; ctx.fillStyle = rgba('bone', 1); ctx.fillText(txt, 540, y);
-      ctx.fillStyle = this.style.tintHex; ctx.fillRect(540 - 300 * ease.outCubic(a), y + 22, 600 * ease.outCubic(a), 4);
+      const fam = ARCH(115, 900), txt = LAND ? 'SUBSCRIBE  ·  DATAVELVET' : 'FOLLOW @DATAVELVET', s = Math.min(64, (900 * 100) / measure(txt, fam, 100));
+      const y = LAND ? (pos === 0 ? 900 : pos === 1 ? 960 : 860) : pos === 0 ? 1450 : pos === 1 ? 1600 : 1350;
+      ctx.font = font(fam, s); ctx.textAlign = 'center'; ctx.fillStyle = rgba('bone', 1); ctx.fillText(txt, W / 2, y);
+      ctx.fillStyle = this.style.tintHex; ctx.fillRect(W / 2 - 300 * ease.outCubic(a), y + 22, 600 * ease.outCubic(a), 4);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
   }

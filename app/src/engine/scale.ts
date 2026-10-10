@@ -9,3 +9,6 @@ function readScale() {
 
 /** Physical pixels per logical pixel of the output (integer 1..4, default 1). */
 export const SCALE = readScale();
+
+/** Landscape 1920x1080 (long-form YouTube) instead of the vertical 1080x1920 Shorts canvas: `?land=1`. */
+export const LAND = typeof location !== 'undefined' && new URLSearchParams(location.search).get('land') === '1';

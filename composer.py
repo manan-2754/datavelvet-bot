@@ -4,6 +4,7 @@ a 3D layout, per-element entrance + idle animations, links, camera move and scen
 refuses any scene composition the channel has ever used before (permanent signature log in state.json).
 """
 import json
+import os
 import random
 import re
 
@@ -20,7 +21,7 @@ C_TRANS = ["cut", "flash", "zoom", "whip", "fade", "glitch", "iris", "morph"]
 C_CAMS = ["fly", "orbit", "crane", "dolly", "low", "top", "dutch", "spiral", "whip", "push"]
 C_TONES = ["holo", "alt", "accent", "ink", "ember"]
 
-PROMPT = """You are the director of "DataVelvet", a premium 3D motion-graphics explainer channel (vertical Shorts/Reels).
+PROMPT = """You are the director of "DataVelvet", a premium 3D motion-graphics explainer channel ({canvas}).
 There are NO templates: you DESIGN every scene's visual yourself from 3D hologram building blocks, so that each scene
 is a fresh, original visual metaphor for exactly what is being said.
 
@@ -34,7 +35,8 @@ BUILDING BLOCKS for "elements" (each appears exactly when its cue word is spoken
         ("values": a trend), matrix (grid of cells lighting up; "count" 3-7), network (node graph; "count" 5-14),
         gauge ("value" like "73%"), counter (a big number that counts up; "value"), text (a big word: "label"),
         orbit (satellites circling), stack (layers; "count" 2-5), tunnel (rings rushing into depth),
-        code (a terminal / code panel; "lines": 2-5 real commands or code lines, max 34 chars each),
+        code (a terminal / code panel; "lines": 2-5 real commands or code lines, max 34 chars each, syntactically
+        valid and correct - a fact-checker compiles them in its head),
         stream (a river of particles flowing from element "from" to element "to"), burst (particles exploding outward)
   anim (entrance): grow, pop, fly, drop, rise, unfold, draw, assemble, glitch, scan
   idle (after it appears): spin, pulse, orbit, float, none
@@ -44,8 +46,7 @@ SCENE fields: "layout" (how elements are arranged in 3D): {layouts}
               "camera" (move): {cams}       "transition" (how the scene enters): {trans}
 
 RULES
-- {n} scenes. Scene 1 is the hook (its lines are a curiosity headline shown huge). The last scene's lines end with
-  "Follow for more."
+- {n} scenes. {opening}
 - Every scene: "title" (max 26 chars), "lines" (1-2 short spoken sentences, max 32 words), "visual" {{"layout", "camera",
   "transition", "elements": [2-7 elements]}}. Use at least 2 different element types per scene.
 - Across the video use at least 9 different element types, never the same layout twice, never the same camera twice in
@@ -58,7 +59,7 @@ RULES
   index of the right option, "cue": the word where the answer is revealed}}. Its lines ask, pause, then reveal.
 - LEVEL: {level}.{series}
 - Give "titles": 3 different YouTube title options (max 60 chars each, curiosity-driven, no hashtags).
-- Total narration 140-200 words. Accurate, specific facts and real numbers only. Casual, clear, no emojis/markdown.
+- Total narration {words_min}-{words_max} words (tight: every sentence must earn its place). Accurate, specific facts and real numbers only. Casual, clear, no emojis/markdown.
 {avoid}- "youtube": {{"title": max 70 chars ending " #shorts", "description": 2 sentences + 5 hashtags, "tags": 6-8}},
   "instagram_caption": 2-3 short lines + "Save this for later." + 6-8 hashtags.
 Return ONLY JSON: {{"topic", "titles": [3], "scenes": [{{"title", "lines": [...], "emphasis": [...], "quiz"?: {{...}}, "visual": {{...}}}}],
@@ -66,15 +67,42 @@ Return ONLY JSON: {{"topic", "titles": [3], "scenes": [{{"title", "lines": [...]
 {feedback}"""
 
 
+OPEN_SHORT = """Scene 1 is the HOOK: ONE spoken sentence of at most {hook_words} words, shown huge - a surprising claim that is
+  strictly TRUE, or a question that opens a loop the video only closes at the end. Use a number in the hook only if it
+  appears in the REFERENCE FACTS - never invent or round up statistics; a sharp question beats a shaky number. Never "In this video", "Today",
+  "Let's talk about" or a greeting. Scene 2 must deliver value immediately (no setup). The last scene closes the loop,
+  asks viewers ONE short question to answer in the comments, and its lines end with 'Follow for more.'"""
+
+OPEN_CHAPTER = """This is CHAPTER {k} of {N} of ONE long-form landscape (16:9) YouTube video titled "{whole}".
+  This chapter is "{title}" and covers: {covers}
+  Scene 1 is the chapter card: ONE spoken sentence of at most {hook_words} words, shown huge - a question or a strictly
+  true surprising claim that pulls the viewer into this chapter (numbers only from the REFERENCE FACTS).{first} Never greet, never re-introduce the whole video{prev}.
+  {last}"""
+
+
+def opening(chapter, hook_words):
+    if not chapter:
+        return OPEN_SHORT.format(hook_words=hook_words)
+    k, N = chapter["k"], chapter["n"]
+    first = (" Because this is chapter 1, scene 1 is also the video's HOOK: a bold claim or question that makes people stay "
+             "for the full video.") if k == 1 else ""
+    prev = f' (the previous chapter was "{chapter["prev"]}" - continue naturally from it)' if chapter.get("prev") else ""
+    last = ('This is the FINAL chapter: its last scene sums up the whole video in one line, asks viewers ONE question to '
+            'answer in the comments, and its lines end with "Subscribe for more."') if k == N else (
+            f'The last scene bridges to the next chapter, "{chapter["next"]}", with one curiosity line. No sign-off.')
+    return OPEN_CHAPTER.format(k=k, N=N, whole=chapter["whole"], title=chapter["title"], covers=chapter["covers"],
+                               hook_words=hook_words, first=first, prev=prev, last=last)
+
+
 def signature(v):
     return v["layout"] + "|" + ",".join(sorted(f"{e['type']}:{e['anim']}" for e in v["elements"]))
 
 
-def validate(sc, banned=()):
+def validate(sc, banned=(), length=(140, 200), hook_max=16, outro="Follow for more."):
     sc = _unwrap(sc)
     scenes = sc.get("scenes") or []
-    if not 6 <= len(scenes) <= 10:
-        raise ValueError(f"need 6-10 scenes, got {len(scenes)}")
+    if not 5 <= len(scenes) <= 10:
+        raise ValueError(f"need 5-10 scenes, got {len(scenes)}")
     clean, bad, total, layouts, types_all, sigs = [], 0, 0, [], set(), []
     for i, s in enumerate(scenes):
         src = s.get("lines") or s.get("narration") or s.get("voiceover") or s.get("text") or s.get("script") or []
@@ -84,8 +112,18 @@ def validate(sc, banned=()):
         lines = [x for x in lines if len(x.split()) >= 2][:3]
         if not lines:
             raise ValueError(f"scene {i + 1} has no lines")
-        if i == len(scenes) - 1 and not re.search(r"follow for more", " ".join(lines), re.I):
-            lines[-1] = lines[-1].rstrip() + " Follow for more."
+        if len(" ".join(lines).split()) > 40:         # too long: keep whole sentences up to ~36 words instead of rejecting
+            keep = []
+            for snt in re.split(r"(?<=[.!?])\s+", " ".join(lines)):
+                if len(" ".join(keep + [snt]).split()) > 36:
+                    break
+                keep.append(snt)
+            if keep:
+                lines = [" ".join(keep)]
+        if outro and i == len(scenes) - 1 and not re.search(re.escape(outro.rstrip(".")), " ".join(lines), re.I):
+            lines[-1] = lines[-1].rstrip() + " " + outro
+        if not outro and i == len(scenes) - 1:
+            lines = [re.sub(r"\s*(follow|subscribe) for more\.?", "", x, flags=re.I).strip() or x for x in lines]
         text = " ".join(lines)
         if len(text.split()) > 40:
             raise ValueError(f"scene {i + 1} is too long ({len(text.split())} words, max 32)")
@@ -115,8 +153,9 @@ def validate(sc, banned=()):
                 o["values"] = [float(x) for x in (e.get("values") or []) if isinstance(x, (int, float))][:8]
             if t in ("gauge", "counter"):
                 o["value"] = _clip(e.get("value"), 12)
-                if not re.search(r"\d", o["value"]):
-                    raise ValueError(f"scene {i + 1}: {t} needs a numeric value")
+                if not re.search(r"\d", o["value"]):     # no number to show: becomes a ring instead of rejecting the draft
+                    o["type"] = t = "ring"
+                    o.pop("value", None)
             if t in ("particles", "matrix", "network", "stack"):
                 try:
                     o["count"] = int(e.get("count") or 0)
@@ -134,11 +173,15 @@ def validate(sc, banned=()):
                         o[f] = e[f]
                 o["count"] = 60
             if t == "text" and not o["label"]:
-                raise ValueError(f"scene {i + 1}: text element needs a label")
+                o["label"] = _clip(cue or text.split()[0], 20).upper()
             types_all.add(t)
             els.append(o)
-        if len({e["type"] for e in els}) < 2:
-            raise ValueError(f"scene {i + 1} uses one element type - use at least 2")
+        if len({e["type"] for e in els}) < 2:        # one element type: vary the last one instead of rejecting
+            alt = next(x for x in ("ring", "particles", "orbit", "sphere") if x != els[0]["type"])
+            els[-1] = {**els[-1], "type": alt}
+            if alt == "particles":
+                els[-1]["count"] = 80
+            types_all.add(alt)
         lay = v.get("layout")
         if lay not in C_LAYOUTS or lay in layouts:   # unknown or repeated layout: repair instead of rejecting the draft
             lay = random.choice([x for x in C_LAYOUTS if x not in layouts] or C_LAYOUTS)
@@ -148,7 +191,7 @@ def validate(sc, banned=()):
                "transition": v.get("transition") if v.get("transition") in C_TRANS else random.choice(C_TRANS)}
         if i == 0:
             vis["hook"] = True
-        if i == len(scenes) - 1:
+        if outro and i == len(scenes) - 1:
             vis["cta"] = True
         emph = [str(w) for w in (s.get("emphasis") or []) if isinstance(w, str) and _cue_ok(w, text)][:3]
         if emph:
@@ -180,8 +223,12 @@ def validate(sc, banned=()):
     if bad > max(4, total * 0.3):
         raise ValueError(f"{bad} of {total} cues are not exact words from their scene's lines")
     words = sum(len(" ".join(s["lines"]).split()) for s in clean)
-    if not 120 <= words <= 230:
-        raise ValueError(f"narration length {words} words (need 140-200)")
+    lo, hi = length
+    if not lo - 15 <= words <= hi + 20:
+        raise ValueError(f"narration length {words} words (need {lo}-{hi})")
+    hook = len(" ".join(clean[0]["lines"]).split())
+    if hook > hook_max + 6:
+        raise ValueError(f"the hook scene has {hook} words - make it ONE punchy sentence of at most {hook_max} words")
     yt = sc.get("youtube") or {}
     opts = [str(t).strip() for t in (sc.get("titles") or []) if str(t).strip()][:3]
     title = _clip(best_title(opts) if opts else (yt.get("title") or sc.get("topic", "Explained")), 95)
@@ -248,9 +295,24 @@ def best_title(opts):
     return max(opts, key=score)
 
 
-def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, hints="", level="engineer", series=None):
+LENGTHS = {"short": ((95, 130), [6, 6, 7], 12), "mid": ((130, 175), [7, 8], 14), "long": ((150, 200), [8, 9], 16),
+           "chapter": ((150, 195), [6, 7, 7, 8], 14)}
+
+
+def length_mode(state=None):
+    """Hook-first short videos (35-50 s) by default; the analytics loop can move it to mid when longer videos win."""
+    forced = os.getenv("VIDEO_LENGTH", "").strip().lower()
+    if forced in LENGTHS:
+        return forced
+    best = (((state or {}).get("insights") or {}).get("best") or {}).get("length") or []
+    return best[0] if best and best[0] in LENGTHS and best[0] != "long" else "short"
+
+
+def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, hints="", level="engineer", series=None, mode="short", chapter=None):
     rng = random.Random(seed)
-    n = rng.choice([7, 8, 8, 9])
+    length, counts, hook_max = LENGTHS.get("chapter" if chapter else mode, LENGTHS["short"])
+    outro = ("Subscribe for more." if chapter["k"] == chapter["n"] else None) if chapter else "Follow for more."
+    n = rng.choice(counts)
     avoid = hints or ""
     if angle:
         avoid += f"- STORY ANGLE ({angle[0]}): {angle[1]} Explain it in a way this channel has not used before.\n"
@@ -266,11 +328,23 @@ def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, 
         if series.get("next"):
             series_txt += f' End the last scene by teasing the next episode: "{series["next"]}" (one short line before "Follow for more.").'
     fmt = dict(topic=topic, objects="|".join(OBJECTS), layouts=", ".join(C_LAYOUTS), cams=", ".join(C_CAMS),
-               trans=", ".join(C_TRANS), n=n, avoid=avoid, facts=facts_txt, level=level, series=series_txt)
+               trans=", ".join(C_TRANS), n=n, avoid=avoid, facts=facts_txt, level=level, series=series_txt,
+               words_min=length[0], words_max=length[1], hook_words=hook_max, opening=opening(chapter, hook_max),
+               canvas="one chapter of a landscape 16:9 long-form YouTube video" if chapter else "vertical Shorts/Reels")
     feedback, err, cands = "", None, []
+    last = None                                   # the last reviewed draft: later tries EDIT it instead of starting over
     for i in range(tries):
         try:
-            sc = validate(json.loads(llm(PROMPT.format(**fmt, feedback=feedback), label="composed script")), banned)
+            if last is not None and last["review"]["score"] >= 4:
+                rvl = last["review"]
+                body = {"topic": last["topic"], "scenes": [{"title": s["title"], "lines": s["lines"], "visual": s["data"]} for s in last["scenes"]],
+                        "youtube": last["youtube"], "instagram_caption": last["instagram_caption"]}
+                raw = llm(REPAIR.format(script=json.dumps(body, ensure_ascii=False), errors="\n- ".join(
+                    rvl["critical"] + rvl["minor"] + [f"Keep the total narration between {length[0]} and {length[1]} words, each scene under 32 words, "
+                                                       "the same number of scenes, and every element's visual design."])), label="targeted fix")
+            else:
+                raw = llm(PROMPT.format(**fmt, feedback=feedback), label="composed chapter" if chapter else "composed script")
+            sc = validate(json.loads(raw), banned, length, hook_max, outro)
             sc["topic"] = sc.get("topic") or topic
         except Exception as e:
             err = e
@@ -287,20 +361,31 @@ def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, 
         if not rv["critical"] and rv["score"] >= 7:
             return sc
         cands.append(sc)
+        last = sc
         err = "; ".join(rv["critical"] + rv["minor"])[:500]
         feedback = "\nA senior reviewer REJECTED the previous draft. Fix every point:\n- " + "\n- ".join(rv["critical"] + rv["minor"]) + "\n"
     for sc in sorted(cands, key=lambda c: (c["review"]["score"], -len(c["review"]["critical"])), reverse=True)[:2]:
         rv = sc["review"]
-        if rv["score"] < 7:
+        if rv["score"] < 4:
             continue
         try:
             body = {"topic": sc["topic"], "scenes": [{"title": s["title"], "lines": s["lines"], "visual": s["data"]} for s in sc["scenes"]],
                     "youtube": sc["youtube"], "instagram_caption": sc["instagram_caption"]}
             fixed = json.loads(llm(REPAIR.format(script=json.dumps(body, ensure_ascii=False),
-                                                  errors="\n- ".join(rv["critical"] + rv["minor"])), label="repair"))
-            out = validate(fixed, banned)
+                                                  errors="\n- ".join(rv["critical"] + rv["minor"] + [f"Keep the total narration between {length[0]} and {length[1]} words and the same number of scenes."])), label="repair"))
+            out = validate(fixed, banned, length, hook_max, outro)
             out["topic"] = out.get("topic") or topic
             out["review"] = {**rv, "repaired": True}
+            if rv["score"] < 7 or rv["critical"]:   # a repaired weak draft must pass the reviewer itself
+                try:
+                    rv2 = review(out)
+                    print(f"  repaired draft re-checked: {rv2['score']}/10, {len(rv2['critical'])} real error(s)")
+                    if rv2["critical"] or rv2["score"] < 6:
+                        err = "; ".join(rv2["critical"] + rv2["minor"])[:500]
+                        continue
+                    out["review"] = {**rv2, "repaired": True}
+                except Exception as e:
+                    print(f"  re-check unavailable ({e})")
             print(f"  repaired the best draft ({rv['score']}/10) using the reviewer's corrections")
             return out
         except Exception as e:

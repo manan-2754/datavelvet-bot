@@ -91,7 +91,10 @@ SCRIPT:
 {script}
 
 Check: (1) any statement, number or label that is technically WRONG, (2) is it clear for a curious beginner.
-Simplifications are fine. Return ONLY JSON:
+Judge against the mainstream case a viewer would assume (common hardware, mainstream OSes, default settings).
+"critical_errors" = only statements that are actually false or misleading in that case. Missing caveats, rare
+platforms, edge cases, extra precision and stylistic points belong in "minor_issues". Simplifications are fine.
+Return ONLY JSON:
 {{"score": 1-10, "critical_errors": ["what is wrong + correct fact", ...], "minor_issues": ["...", ...]}}"""
 
 

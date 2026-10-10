@@ -1,6 +1,6 @@
 // Entry: preview player (default) or export mode (?export=1, driven by scripts/render.ts).
 import { Engine, type AdaptiveSampling } from './engine/engine';
-import { PW, PH, SCALE } from './engine/gl';
+import { PW, PH, SCALE, LAND } from './engine/gl';
 import { makeTimeline } from './timeline';
 
 const params = new URLSearchParams(location.search);
@@ -11,6 +11,7 @@ const FROM = params.get('t') ? parseFloat(params.get('t')!) : null;
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 // physical size: 1920x1080 times ?scale= (the page CSS keeps showing it at 1920x1080)
 canvas.width = PW;
+if (LAND) { canvas.style.aspectRatio = '16/9'; if (document.body.classList.contains('export') || location.search.includes('export=1')) { canvas.style.width = '1920px'; canvas.style.height = '1080px'; } }
 canvas.height = PH;
 
 const engine = new Engine(canvas, makeTimeline);

@@ -54,7 +54,7 @@ def channel_name(youtube):
     return items[0]["snippet"]["title"] if items else "(no channel)"
 
 
-def upload_video(video_path, meta, privacy=None):
+def upload_video(video_path, meta, privacy=None, thumbnail=None):
     youtube = build("youtube", "v3", credentials=get_credentials(), cache_discovery=False)
     body = {
         "snippet": {
@@ -86,7 +86,13 @@ def upload_video(video_path, meta, privacy=None):
                 continue
             raise
     vid = response["id"]
-    print(f"✅ YouTube: https://youtube.com/shorts/{vid}")
+    if thumbnail:                           # custom thumbnails need a verified channel - skipped quietly otherwise
+        try:
+            youtube.thumbnails().set(videoId=vid, media_body=MediaFileUpload(str(thumbnail), mimetype="image/jpeg")).execute()
+            print("  custom thumbnail set")
+        except Exception as e:
+            print(f"  custom thumbnail skipped ({str(e)[:120]})")
+    print(f"✅ YouTube: https://youtube.com/{'shorts/' if '#shorts' in meta['title'].lower() else 'watch?v='}{vid}")
     return vid
 
 

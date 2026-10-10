@@ -14,7 +14,7 @@ import requests
 
 BASE = Path(__file__).resolve().parent
 MODELS = ["gemini-3.5-flash", "gemini-flash-latest", "gemini-3.1-flash-lite"]
-RUBRIC = """You are a strict motion-design art director reviewing still frames from a vertical (9:16) explainer video,
+RUBRIC = """You are a strict motion-design art director reviewing still frames from a {aspect} explainer video,
 one frame from the middle of each scene, in order. Judge only what you SEE. For each frame list issues from exactly
 this set: "offscreen" (key elements cut off by the frame edge), "cramped" (overlapping / cluttered, labels colliding),
 "empty" (large empty areas, subject too small or missing), "unreadable" (text too small or low contrast), "dull" (static,
@@ -22,12 +22,12 @@ flat, nothing striking). Return ONLY JSON:
 {"overall": 1-10, "scenes": [{"scene": 1, "score": 1-10, "issues": ["..."]}]}"""
 
 
-def _frames(times, env, tool):
+def _frames(times, env, tool, land=False):
     out = BASE / "out" / "critic"
     out.mkdir(parents=True, exist_ok=True)
     for f in out.glob("*.png"):
         f.unlink()
-    subprocess.run([tool("bun"), "scripts/render.ts", "stills", "--t", ",".join(f"{t:.2f}" for t in times), "--out", str(out)],
+    subprocess.run([tool("bun"), "scripts/render.ts", "stills", "--t", ",".join(f"{t:.2f}" for t in times), "--out", str(out)] + (["--land"] if land else []),
                    cwd=BASE / "app", env=env, check=True, capture_output=True)
     return sorted(out.glob("*.png"), key=lambda p: float(p.stem.split("_")[1]))
 
@@ -35,15 +35,16 @@ def _frames(times, env, tool):
 def _jpeg_b64(path):
     from PIL import Image
     im = Image.open(path).convert("RGB")
-    im.thumbnail((360, 640))
+    im.thumbnail((640, 640))
     buf = io.BytesIO()
     im.save(buf, "JPEG", quality=80)
     return base64.b64encode(buf.getvalue()).decode()
 
 
-def _ask(images):
+def _ask(images, aspect="vertical (9:16)"):
     key = os.getenv("GEMINI_API_KEY", "").strip()
-    parts = [{"text": RUBRIC}] + [{"inline_data": {"mime_type": "image/jpeg", "data": b}} for b in images]
+    rubric = RUBRIC.replace("{aspect}", aspect)
+    parts = [{"text": rubric}] + [{"inline_data": {"mime_type": "image/jpeg", "data": b}} for b in images]
     last = RuntimeError("no GEMINI_API_KEY")
     for m in (MODELS if key else []):
         try:
@@ -59,7 +60,7 @@ def _ask(images):
             import anthropic
             from writer import CLAUDE_MODEL, _json_text
             content = [{"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b}} for b in images]
-            content.append({"type": "text", "text": RUBRIC})
+            content.append({"type": "text", "text": rubric})
             r = anthropic.Anthropic(timeout=180.0).messages.create(model=CLAUDE_MODEL, max_tokens=4000, output_config={"effort": "low"},
                                                                   messages=[{"role": "user", "content": content}])
             if r.stop_reason not in ("refusal", "max_tokens"):
@@ -70,7 +71,7 @@ def _ask(images):
     raise RuntimeError(f"vision models unavailable: {last}")
 
 
-def review(env, tool):
+def review(env, tool, land=False, max_frames=16):
     """Returns a short report string; edits data/lyrics.json in place when it fixes something."""
     ly_path = BASE / "data" / "lyrics.json"
     ly = json.loads(ly_path.read_text(encoding="utf-8"))
@@ -93,16 +94,19 @@ def review(env, tool):
                 cue_t.append(hit["start"])
         mid = (ls[0]["start"] + ls[-1]["end"]) / 2
         times.append(min(ls[-1]["end"] - 0.15, max(mid, (max(cue_t) + 1.0) if cue_t else mid)))
+    pick = list(range(len(times)))
+    if len(pick) > max_frames:                 # long videos: an even sample of scenes
+        pick = sorted({round(k * (len(times) - 1) / (max_frames - 1)) for k in range(max_frames)})
     try:
-        frames = _frames(times, env, tool)
-        verdict, model = _ask([_jpeg_b64(f) for f in frames])
+        frames = _frames([times[i] for i in pick], env, tool, land)
+        verdict, model = _ask([_jpeg_b64(f) for f in frames], "landscape (16:9)" if land else "vertical (9:16)")
     except Exception as e:
         return f"critic: skipped ({e})"
     fixes = []
     for row in verdict.get("scenes", []):
         try:
-            i = int(row.get("scene", 0)) - 1
-        except (TypeError, ValueError):
+            i = pick[int(row.get("scene", 0)) - 1]
+        except (TypeError, ValueError, IndexError):
             continue
         if not 0 <= i < len(scenes):
             continue

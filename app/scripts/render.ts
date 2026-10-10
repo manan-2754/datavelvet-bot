@@ -23,7 +23,8 @@ const opt = (k: string, d?: string) => { const i = argv.indexOf(`--${k}`); retur
 const flag = (k: string) => argv.includes(`--${k}`);
 const APP = path.resolve(import.meta.dir, '..');
 const SCALE = Math.max(1, Math.round(+opt('scale', '1')!));
-const BW = 1080, BH = 1920; // layout size (vertical, for Shorts / Reels)
+const LAND = flag('land');
+const BW = LAND ? 1920 : 1080, BH = LAND ? 1080 : 1920; // layout size: vertical Shorts / Reels, or --land 16:9 long-form
 const OW = BW * SCALE, OH = BH * SCALE; // output size
 // --samples N (fixed) or --samples auto [--min-samples 4] [--max-samples 324] [--tol 3] (adaptive, see Engine.render)
 const SAMPLES = opt('samples', '1') === 'auto'
@@ -58,7 +59,7 @@ async function openPage(url: string) {
   page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') logs.push(`[${m.type()}] ${m.text()}`); });
   page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
   const only = opt('only');
-  await page.goto(`${url}/?export=1${only ? `&only=${only}` : ''}${SCALE !== 1 ? `&scale=${SCALE}` : ''}`);
+  await page.goto(`${url}/?export=1${only ? `&only=${only}` : ''}${SCALE !== 1 ? `&scale=${SCALE}` : ''}${LAND ? '&land=1' : ''}`);
   await page.waitForFunction(() => (window as any).__pdoom?.ready || (window as any).__pdoom?.error, null, { timeout: 120000 });
   const err = await page.evaluate(() => (window as any).__pdoom.error);
   if (err) throw new Error(`app failed to boot:\n${err}\n${logs.join('\n')}`);

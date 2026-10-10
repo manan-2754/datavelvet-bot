@@ -1,0 +1,12 @@
+{
+  "bio": "https://your-link-in-bio-page.example",
+  "links": [
+    {"name": "Cloud hosting", "url": "https://example.com/your-hosting-affiliate-link", "pitch": "Deploy this yourself with free credits",
+     "keywords": ["load balanc", "server", "cloud", "docker", "container", "kubernetes", "serverless", "cdn", "dns", "database", "scal"]},
+    {"name": "System design course", "url": "https://example.com/your-course-affiliate-link", "pitch": "Go deeper with a full system design course",
+     "keywords": ["system design", "cach", "shard", "replica", "queue", "kafka", "redis", "microservice", "consensus", "cap theorem"]},
+    {"name": "VPN", "url": "https://example.com/your-vpn-affiliate-link", "pitch": "Protect your traffic",
+     "keywords": ["vpn", "encrypt", "tls", "https", "wifi", "security", "firewall", "privacy"]},
+    {"name": "My cheat sheet", "url": "https://example.com/your-own-product", "pitch": "Get the free tech cheat sheet", "always": true}
+  ]
+}
