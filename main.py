@@ -108,7 +108,7 @@ def features(script, meta):
             "cams": [(s.get("data") or {}).get("camera") for s in script["scenes"] if (s.get("data") or {}).get("camera")],
             "hue": (st.get("name") or "").split(" ")[0], "voice": meta.get("voice"), "music": (script.get("music") or "").split(" ")[0],
             "length": "short" if d < 50 else ("mid" if d < 75 else "long"), "level": script.get("level"),
-            "trend": bool(script.get("trend")), "series": (script.get("series") or {}).get("name")}
+            "trend": bool(script.get("trend")), "series": (script.get("series") or {}).get("name"), "cta": script.get("cta_kind")}
 
 
 def slugify(s):
@@ -221,7 +221,7 @@ def finish_video(script, ctx, raw, show=False):
             "duration": round(dur, 1), "voice": voice, "format": script.get("format"), "seed": script.get("seed"),
             "style_name": (script.get("style") or {}).get("name"), "angle": script.get("angle"),
             "review": script.get("review"), "music": script.get("music"), "sources": script.get("sources", []),
-            "cover_ms": cover_ms()}
+            "cover_ms": cover_ms(), "comment": script.get("comment"), "series_name": (script.get("series") or {}).get("name")}
     meta["features"] = features(script, meta)
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"✅ {video} ({video.stat().st_size / 1e6:.1f} MB, {dur:.0f}s)")
@@ -238,6 +238,13 @@ def upload(video, meta, state):
         try:
             from youtube_upload import upload_video
             rec["youtube_id"] = upload_video(video, meta)              # marked as AI / synthetic content
+            try:                                                       # first comment + series playlist
+                from youtube_upload import add_to_playlist, post_comment
+                post_comment(rec["youtube_id"], meta.get("comment"))
+                sn = meta.get("series_name") or "Tech Explained"
+                add_to_playlist(rec["youtube_id"], sn, f"DataVelvet 3D explainers - {sn}, one concept per Short.")
+            except Exception as e:
+                print(f"  YouTube comment/playlist skipped ({e})")
         except Exception as e:
             ok = False
             print(f"❌ YouTube upload failed: {e}")
@@ -245,6 +252,11 @@ def upload(video, meta, state):
         try:
             from instagram_upload import upload_reel
             rec["instagram_id"] = upload_reel(video, meta["instagram_caption"], meta.get("cover_ms"))   # AI-info label
+            try:
+                from instagram_upload import post_comment as ig_comment
+                ig_comment(rec["instagram_id"], meta.get("comment"))
+            except Exception as e:
+                print(f"  Instagram comment skipped ({e})")
         except Exception as e:
             ok = False
             print(f"❌ Instagram upload failed: {e}")
@@ -441,6 +453,14 @@ def publish(script, video, meta, state, topic, topic_override):
             print("AUTO_POST_YOUTUBE is off - not uploading")
             return 0
         vid = upload_video(video, meta, thumbnail=thumb if thumb.exists() else None)
+        try:
+            from youtube_upload import add_to_playlist, post_comment
+            ch = script.get("chapters") or []
+            post_comment(vid, script.get("comment") or (f"Which part surprised you most - {ch[1]} or {ch[-2]}? 👇" if len(ch) > 3 else
+                                                         "What should the next deep dive explain? 👇"))
+            add_to_playlist(vid, "Deep Dives: 8-10 Minute Explainers", "Full 3D deep dives, one big topic per video, with chapters.")
+        except Exception as e:
+            print(f"  YouTube comment/playlist skipped ({e})")
         ls = longform.load_long()
         longform.remember(ls, script, vid)
         longform.save_long(ls)

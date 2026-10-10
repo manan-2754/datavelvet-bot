@@ -62,6 +62,71 @@ def _consent():
     return creds
 
 
+def _api():
+    return build("youtube", "v3", credentials=get_credentials(), cache_discovery=False)
+
+
+def post_comment(video_id, text):
+    """The channel's first comment under a video (a question that starts the replies). Pin it in the app if you like."""
+    creds = get_credentials()
+    if not (text and has_scope(creds, "force-ssl")):
+        return None
+    yt = build("youtube", "v3", credentials=creds, cache_discovery=False)
+    r = yt.commentThreads().insert(part="snippet", body={"snippet": {"videoId": video_id,
+                                   "topLevelComment": {"snippet": {"textOriginal": text[:500]}}}}).execute()
+    print(f"  💬 YouTube comment posted: {text[:60]}")
+    return r.get("id")
+
+
+def add_to_playlist(video_id, title, description=""):
+    """Adds the video to the channel's playlist with this title, creating the playlist the first time."""
+    creds = get_credentials()
+    if not (title and has_scope(creds, "force-ssl")):
+        return None
+    yt = build("youtube", "v3", credentials=creds, cache_discovery=False)
+    pid, tok = None, None
+    while not pid:
+        res = yt.playlists().list(part="snippet", mine=True, maxResults=50, pageToken=tok).execute()
+        pid = next((p["id"] for p in res.get("items", []) if p["snippet"]["title"] == title), None)
+        tok = res.get("nextPageToken")
+        if not tok:
+            break
+    if not pid:
+        pid = yt.playlists().insert(part="snippet,status", body={"snippet": {"title": title, "description": description[:4900]},
+                                                                  "status": {"privacyStatus": "public"}}).execute()["id"]
+        print(f"  📂 created playlist: {title}")
+    for k in range(5):                           # a brand-new playlist needs a few seconds before it accepts videos
+        try:
+            yt.playlistItems().insert(part="snippet", body={"snippet": {"playlistId": pid,
+                                      "resourceId": {"kind": "youtube#video", "videoId": video_id}}}).execute()
+            break
+        except HttpError as e:
+            if e.resp.status != 409 or k == 4:
+                raise
+            time.sleep(4 * (k + 1))
+    print(f"  📂 added to playlist: {title}")
+    return pid
+
+
+def retention(video_ids, days=60):
+    """Average % viewed, average view duration, subscribers gained and shares per video (YouTube Analytics)."""
+    creds = get_credentials()
+    if not (video_ids and has_scope(creds, "yt-analytics")):
+        return {}
+    from datetime import date, timedelta
+    ya = build("youtubeAnalytics", "v2", credentials=creds, cache_discovery=False)
+    out = {}
+    for i in range(0, len(video_ids), 200):
+        ids = video_ids[i:i + 200]
+        r = ya.reports().query(ids="channel==MINE", startDate=(date.today() - timedelta(days=days)).isoformat(),
+                               endDate=date.today().isoformat(), dimensions="video", filters="video==" + ",".join(ids),
+                               metrics="averageViewPercentage,averageViewDuration,subscribersGained,shares").execute()
+        for row in r.get("rows", []):
+            out[row[0]] = {"yt_avp": round(float(row[1]), 1), "yt_avd": round(float(row[2]), 1),
+                           "yt_subs": int(row[3]), "yt_shares": int(row[4])}
+    return out
+
+
 def channel_name(youtube):
     items = youtube.channels().list(part="snippet", mine=True).execute().get("items", [])
     return items[0]["snippet"]["title"] if items else "(no channel)"

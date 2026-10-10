@@ -12,9 +12,9 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 
-WEIGHTS = {"yt_views": 1, "yt_likes": 25, "yt_comments": 60, "ig_views": 1, "ig_reach": 0.5, "ig_saved": 40, "ig_shares": 60,
+WEIGHTS = {"yt_views": 1, "yt_likes": 25, "yt_comments": 60, "yt_avp": 5, "yt_subs": 150, "yt_shares": 60, "ig_views": 1, "ig_reach": 0.5, "ig_saved": 40, "ig_shares": 60,
            "ig_likes": 25, "ig_comments": 60}
-FEATURES = ["angle", "layouts", "types", "cams", "hue", "voice", "music", "length", "level", "trend"]
+FEATURES = ["angle", "layouts", "types", "cams", "hue", "voice", "music", "length", "level", "trend", "cta"]
 
 
 def _now():
@@ -51,6 +51,12 @@ def collect(state, max_posts=40):
                                     "yt_comments": int(s.get("commentCount", 0))}
         except Exception as e:
             print(f"  analytics: YouTube stats unavailable ({e})")
+        try:                                     # retention: % of the video people actually watched (+ subs, shares)
+            from youtube_upload import retention
+            for vid, r in retention(yt_ids).items():
+                yt.setdefault(vid, {}).update(r)
+        except Exception as e:
+            print(f"  analytics: YouTube retention unavailable ({e})")
     tok = os.getenv("IG_ACCESS_TOKEN", "").strip()
     n = 0
     for p in todo:

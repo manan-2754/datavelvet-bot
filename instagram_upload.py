@@ -125,6 +125,18 @@ def upload_reel(video_path, caption, thumb_offset=None):
     return pub["id"]
 
 
+def post_comment(media_id, text):
+    """The account's first comment under a Reel (needs the instagram_business_manage_comments permission)."""
+    if not (media_id and text):
+        return None
+    r = requests.post(f"https://{HOST}/v21.0/{media_id}/comments", params={"message": text[:300], "access_token": _token()}, timeout=30)
+    if r.status_code != 200:
+        print(f"  Instagram comment skipped: {r.status_code} {r.text[:120]}")
+        return None
+    print(f"  💬 Instagram comment posted: {text[:60]}")
+    return r.json().get("id")
+
+
 REFRESH_AFTER_DAYS = 55   # use the same token for 55 days, then refresh once (Instagram tokens last 60)
 
 

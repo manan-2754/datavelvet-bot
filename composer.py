@@ -76,7 +76,9 @@ OPEN_SHORT = """Scene 1 is the HOOK: ONE spoken sentence of at most {hook_words}
   topic: "{cta}", (3) a final 3-7 word phrase that flows straight back into the hook's first words, so the video LOOPS
   seamlessly when it replays (e.g. hook "Your phone heats up because..." -> last line "...and that is exactly why your phone").
   Do NOT say "Follow for more". The last scene also gives "recap": 3 takeaways (max 24 chars each, no full stops) shown
-  as a cheat sheet, and "cta_text": the on-screen call to action (max 26 chars, e.g. "SEND THIS TO A FRIEND")."""
+  as a cheat sheet, and "cta_text": the on-screen call to action (max 26 chars, e.g. "SEND THIS TO A FRIEND").
+  At the TOP level also give "comment": the channel's first comment under the video - one short question viewers can
+  answer in a word or by picking A or B (max 110 chars, may end with 👇)."""
 
 CTAS = [  # rotating: Instagram ranks Reels by sends per reach and saves; YouTube by rewatches
     "Send this to the friend who [who needs this]",
@@ -258,7 +260,7 @@ def validate(sc, banned=(), length=(140, 200), hook_max=16, outro="Follow for mo
     return {"topic": sc.get("topic", ""), "scenes": clean, "format": " > ".join(layouts), "signatures": sigs,
             "youtube": {"title": title, "description": str(yt.get("description", ""))[:4500],
                         "tags": [str(t)[:30] for t in (yt.get("tags") or [])][:10]},
-            "instagram_caption": str(sc.get("instagram_caption", ""))[:2100]}
+            "instagram_caption": str(sc.get("instagram_caption", ""))[:2100], "comment": _clip(sc.get("comment"), 150)}
 
 
 LANG_VOICES = {"es": "es-ES-AlvaroNeural", "pt": "pt-BR-AntonioNeural", "fr": "fr-FR-HenriNeural", "de": "de-DE-ConradNeural",
@@ -350,7 +352,12 @@ def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, 
     length, counts, hook_max = LENGTHS.get("chapter" if chapter else mode, LENGTHS["short"])
     outro = ("Subscribe for more." if chapter["k"] == chapter["n"] else None) if chapter else None
     cta_last = (chapter["k"] == chapter["n"]) if chapter else True
-    cta = rng.choice(CTAS) + " (replace the [bracketed] part with something specific to this topic)"
+    pick = rng.choice(CTAS)
+    cta = pick + " (replace the [bracketed] part with something specific to this topic)"
+
+    def done(x):                                  # remember which call to action this video used (learning loop)
+        x["cta_kind"] = None if chapter else pick.split()[0].lower()
+        return x
     phrases = [] if chapter else search_phrases(topic)
     search = (chr(10) + "  Real YouTube searches for this topic: " + "; ".join(f'"{p}"' for p in phrases) +
               ". Use this exact wording: at least one title must contain one of these phrases naturally.") if phrases else ""
@@ -397,11 +404,11 @@ def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, 
             rv = review(sc)
         except Exception as e:
             print(f"  quality gate unavailable ({e}) - accepting the validated draft")
-            return sc
+            return done(sc)
         print(f"  quality gate: score {rv['score']}/10, {len(rv['critical'])} real error(s)")
         sc["review"] = rv
         if not rv["critical"] and rv["score"] >= 7:
-            return sc
+            return done(sc)
         cands.append(sc)
         last = sc
         err = "; ".join(rv["critical"] + rv["minor"])[:500]
@@ -429,7 +436,7 @@ def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, 
                 except Exception as e:
                     print(f"  re-check unavailable ({e})")
             print(f"  repaired the best draft ({rv['score']}/10) using the reviewer's corrections")
-            return out
+            return done(out)
         except Exception as e:
             print(f"  repair failed: {e}")
     raise RuntimeError(f"No usable composed script: {err}")
