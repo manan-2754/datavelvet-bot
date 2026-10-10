@@ -58,7 +58,7 @@ RULES
 - Optionally ONE middle scene is a quiz: "quiz": {{"question": max 50 chars, "options": [2-3 short answers], "answer":
   index of the right option, "cue": the word where the answer is revealed}}. Its lines ask, pause, then reveal.
 - LEVEL: {level}.{series}
-- Give "titles": 3 different YouTube title options (max 60 chars each, curiosity-driven, no hashtags).
+- Give "titles": 3 different YouTube title options (max 60 chars each, curiosity-driven, no hashtags).{search}
 - Total narration {words_min}-{words_max} words (tight: every sentence must earn its place). Accurate, specific facts and real numbers only. Casual, clear, no emojis/markdown.
 {avoid}- "youtube": {{"title": max 70 chars ending " #shorts", "description": 2 sentences + 5 hashtags, "tags": 6-8}},
   "instagram_caption": 2-3 short lines + "Save this for later." + 6-8 hashtags.
@@ -68,10 +68,23 @@ Return ONLY JSON: {{"topic", "titles": [3], "scenes": [{{"title", "lines": [...]
 
 
 OPEN_SHORT = """Scene 1 is the HOOK: ONE spoken sentence of at most {hook_words} words, shown huge - a surprising claim that is
-  strictly TRUE, or a question that opens a loop the video only closes at the end. Use a number in the hook only if it
-  appears in the REFERENCE FACTS - never invent or round up statistics; a sharp question beats a shaky number. Never "In this video", "Today",
-  "Let's talk about" or a greeting. Scene 2 must deliver value immediately (no setup). The last scene closes the loop,
-  asks viewers ONE short question to answer in the comments, and its lines end with 'Follow for more.'"""
+  strictly TRUE, or a question that opens a loop the video only closes at the end. Make it personal: start with "You" /
+  "Your", a number, or a sharp contrast ("X isn't Y"). Use a number only if it appears in the REFERENCE FACTS - never
+  invent or round up statistics; a sharp question beats a shaky number. Never "In this video", "Today", "Let's talk
+  about" or a greeting. Scene 2 must deliver value immediately (no setup).
+  The LAST scene has exactly 3 short lines: (1) the payoff that answers the hook, (2) this call to action adapted to the
+  topic: "{cta}", (3) a final 3-7 word phrase that flows straight back into the hook's first words, so the video LOOPS
+  seamlessly when it replays (e.g. hook "Your phone heats up because..." -> last line "...and that is exactly why your phone").
+  Do NOT say "Follow for more". The last scene also gives "recap": 3 takeaways (max 24 chars each, no full stops) shown
+  as a cheat sheet, and "cta_text": the on-screen call to action (max 26 chars, e.g. "SEND THIS TO A FRIEND")."""
+
+CTAS = [  # rotating: Instagram ranks Reels by sends per reach and saves; YouTube by rewatches
+    "Send this to the friend who [who needs this]",
+    "Send this to someone who still thinks [the common myth]",
+    "Save this - you will want it in your next interview",
+    "Save this for the next time [the situation comes up]",
+    "Tag the friend who [relatable habit]",
+]
 
 OPEN_CHAPTER = """This is CHAPTER {k} of {N} of ONE long-form landscape (16:9) YouTube video titled "{whole}".
   This chapter is "{title}" and covers: {covers}
@@ -80,9 +93,9 @@ OPEN_CHAPTER = """This is CHAPTER {k} of {N} of ONE long-form landscape (16:9) Y
   {last}"""
 
 
-def opening(chapter, hook_words):
+def opening(chapter, hook_words, cta=""):
     if not chapter:
-        return OPEN_SHORT.format(hook_words=hook_words)
+        return OPEN_SHORT.format(hook_words=hook_words, cta=cta)
     k, N = chapter["k"], chapter["n"]
     first = (" Because this is chapter 1, scene 1 is also the video's HOOK: a bold claim or question that makes people stay "
              "for the full video.") if k == 1 else ""
@@ -98,7 +111,7 @@ def signature(v):
     return v["layout"] + "|" + ",".join(sorted(f"{e['type']}:{e['anim']}" for e in v["elements"]))
 
 
-def validate(sc, banned=(), length=(140, 200), hook_max=16, outro="Follow for more."):
+def validate(sc, banned=(), length=(140, 200), hook_max=16, outro="Follow for more.", cta_last=None, phrases=()):
     sc = _unwrap(sc)
     scenes = sc.get("scenes") or []
     if not 5 <= len(scenes) <= 10:
@@ -191,8 +204,13 @@ def validate(sc, banned=(), length=(140, 200), hook_max=16, outro="Follow for mo
                "transition": v.get("transition") if v.get("transition") in C_TRANS else random.choice(C_TRANS)}
         if i == 0:
             vis["hook"] = True
-        if outro and i == len(scenes) - 1:
+        if (outro if cta_last is None else cta_last) and i == len(scenes) - 1:
             vis["cta"] = True
+            rc = [_clip(str(x).rstrip("."), 26) for x in (s.get("recap") or v.get("recap") or []) if str(x).strip()][:3]
+            if len(rc) >= 2:
+                vis["recap"] = rc
+            if s.get("cta_text") or v.get("ctaText"):
+                vis["ctaText"] = _clip(s.get("cta_text") or v.get("ctaText"), 30)
         emph = [str(w) for w in (s.get("emphasis") or []) if isinstance(w, str) and _cue_ok(w, text)][:3]
         if emph:
             vis["emphasis"] = emph
@@ -226,12 +244,15 @@ def validate(sc, banned=(), length=(140, 200), hook_max=16, outro="Follow for mo
     lo, hi = length
     if not lo - 15 <= words <= hi + 20:
         raise ValueError(f"narration length {words} words (need {lo}-{hi})")
-    hook = len(" ".join(clean[0]["lines"]).split())
+    htxt = " ".join(clean[0]["lines"])
+    if hook_max <= 12 and not re.search(r"\d|\b(you|your|you're|why|how|what|not|never|no|isn't|aren't|don't|stop|this)\b|\?", htxt, re.I):
+        raise ValueError("the hook needs a personal or surprising opener: You/Your, a number, a contrast or a question")
+    hook = len(htxt.split())
     if hook > hook_max + 6:
         raise ValueError(f"the hook scene has {hook} words - make it ONE punchy sentence of at most {hook_max} words")
     yt = sc.get("youtube") or {}
     opts = [str(t).strip() for t in (sc.get("titles") or []) if str(t).strip()][:3]
-    title = _clip(best_title(opts) if opts else (yt.get("title") or sc.get("topic", "Explained")), 95)
+    title = _clip(best_title(opts, phrases) if opts else (yt.get("title") or sc.get("topic", "Explained")), 95)
     if "#shorts" not in title.lower():
         title = title[:86] + " #shorts"
     return {"topic": sc.get("topic", ""), "scenes": clean, "format": " > ".join(layouts), "signatures": sigs,
@@ -282,10 +303,26 @@ def translate(sc, lang):
     return out
 
 
-def best_title(opts):
-    """Pick the strongest of the AI's title options (numbers, curiosity, Shorts-friendly length)."""
+def search_phrases(topic, n=6):
+    """What people actually type into YouTube search for this topic (free autocomplete endpoint)."""
+    import requests
+    seed = re.sub(r"[^a-z0-9 ]", " ", topic.lower())
+    seeds = [" ".join(seed.split()[:6]), " ".join(seed.split()[:3])]
+    out = []
+    for q in dict.fromkeys(x for x in seeds if x.strip()):
+        try:
+            r = requests.get("https://suggestqueries.google.com/complete/search", params={"client": "firefox", "ds": "yt", "q": q}, timeout=10)
+            out += [x for x in r.json()[1] if isinstance(x, str)]
+        except Exception:
+            pass
+    return list(dict.fromkeys(out))[:n]
+
+
+def best_title(opts, phrases=()):
+    """Pick the strongest of the AI's title options (real search wording, numbers, curiosity, Shorts-friendly length)."""
     def score(t):
         s = 0
+        s += 3 if any(p.lower() in t.lower() for p in phrases) else 0
         s += 2 if re.search(r"\d", t) else 0
         s += 2 if 30 <= len(t) <= 60 else 0
         s += 1 if re.search(r"\b(why|how|secret|actually|really|never|nobody|inside)\b", t, re.I) else 0
@@ -311,7 +348,12 @@ def length_mode(state=None):
 def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, hints="", level="engineer", series=None, mode="short", chapter=None):
     rng = random.Random(seed)
     length, counts, hook_max = LENGTHS.get("chapter" if chapter else mode, LENGTHS["short"])
-    outro = ("Subscribe for more." if chapter["k"] == chapter["n"] else None) if chapter else "Follow for more."
+    outro = ("Subscribe for more." if chapter["k"] == chapter["n"] else None) if chapter else None
+    cta_last = (chapter["k"] == chapter["n"]) if chapter else True
+    cta = rng.choice(CTAS) + " (replace the [bracketed] part with something specific to this topic)"
+    phrases = [] if chapter else search_phrases(topic)
+    search = (chr(10) + "  Real YouTube searches for this topic: " + "; ".join(f'"{p}"' for p in phrases) +
+              ". Use this exact wording: at least one title must contain one of these phrases naturally.") if phrases else ""
     n = rng.choice(counts)
     avoid = hints or ""
     if angle:
@@ -329,7 +371,7 @@ def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, 
             series_txt += f' End the last scene by teasing the next episode: "{series["next"]}" (one short line before "Follow for more.").'
     fmt = dict(topic=topic, objects="|".join(OBJECTS), layouts=", ".join(C_LAYOUTS), cams=", ".join(C_CAMS),
                trans=", ".join(C_TRANS), n=n, avoid=avoid, facts=facts_txt, level=level, series=series_txt,
-               words_min=length[0], words_max=length[1], hook_words=hook_max, opening=opening(chapter, hook_max),
+               words_min=length[0], words_max=length[1], hook_words=hook_max, opening=opening(chapter, hook_max, cta), search=search,
                canvas="one chapter of a landscape 16:9 long-form YouTube video" if chapter else "vertical Shorts/Reels")
     feedback, err, cands = "", None, []
     last = None                                   # the last reviewed draft: later tries EDIT it instead of starting over
@@ -344,7 +386,7 @@ def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, 
                                                        "the same number of scenes, and every element's visual design."])), label="targeted fix")
             else:
                 raw = llm(PROMPT.format(**fmt, feedback=feedback), label="composed chapter" if chapter else "composed script")
-            sc = validate(json.loads(raw), banned, length, hook_max, outro)
+            sc = validate(json.loads(raw), banned, length, hook_max, outro, cta_last, phrases)
             sc["topic"] = sc.get("topic") or topic
         except Exception as e:
             err = e
@@ -373,7 +415,7 @@ def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, 
                     "youtube": sc["youtube"], "instagram_caption": sc["instagram_caption"]}
             fixed = json.loads(llm(REPAIR.format(script=json.dumps(body, ensure_ascii=False),
                                                   errors="\n- ".join(rv["critical"] + rv["minor"] + [f"Keep the total narration between {length[0]} and {length[1]} words and the same number of scenes."])), label="repair"))
-            out = validate(fixed, banned, length, hook_max, outro)
+            out = validate(fixed, banned, length, hook_max, outro, cta_last, phrases)
             out["topic"] = out.get("topic") or topic
             out["review"] = {**rv, "repaired": True}
             if rv["score"] < 7 or rv["critical"]:   # a repaired weak draft must pass the reviewer itself

@@ -23,27 +23,40 @@ from googleapiclient.http import MediaFileUpload
 
 BASE = Path(__file__).parent
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload", "https://www.googleapis.com/auth/youtube.readonly"]
+# asked for at --auth: also comments + playlists (force-ssl) and retention analytics. Runs use whatever the token has.
+AUTH_SCOPES = SCOPES + ["https://www.googleapis.com/auth/youtube.force-ssl", "https://www.googleapis.com/auth/yt-analytics.readonly"]
 TOKEN_FILE = BASE / "token.json"
 CLIENT_SECRET = BASE / "client_secret.json"
 
 
-def get_credentials(interactive=False):
+def has_scope(creds, name):
+    """True when the saved token includes this permission (e.g. 'force-ssl', 'yt-analytics')."""
+    return any(name in s for s in (getattr(creds, "scopes", None) or []))
+
+
+def get_credentials(interactive=False, fresh=False):
     creds = None
+    if fresh:                                    # --auth: always ask again, with every permission the bot can use
+        return _consent()
     env = os.getenv("YT_TOKEN_JSON", "").strip()
     if env:
-        creds = Credentials.from_authorized_user_info(json.loads(env), SCOPES)
+        creds = Credentials.from_authorized_user_info(json.loads(env))
     elif TOKEN_FILE.exists():
-        creds = Credentials.from_authorized_user_file(str(TOKEN_FILE), SCOPES)
+        creds = Credentials.from_authorized_user_file(str(TOKEN_FILE))
     if creds and not creds.valid and creds.refresh_token:
         creds.refresh(Request())
     if creds and creds.valid:
         return creds
     if not interactive:
         raise RuntimeError("No valid YouTube credentials - run `python youtube_upload.py --auth` once on your PC")
+    return _consent()
+
+
+def _consent():
     if not CLIENT_SECRET.exists():
         raise RuntimeError("client_secret.json not found - see the setup steps at the top of this file")
     from google_auth_oauthlib.flow import InstalledAppFlow
-    flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRET), SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRET), AUTH_SCOPES)
     creds = flow.run_local_server(port=0, prompt="consent", access_type="offline")
     TOKEN_FILE.write_text(creds.to_json())
     return creds
@@ -98,7 +111,7 @@ def upload_video(video_path, meta, privacy=None, thumbnail=None):
 
 if __name__ == "__main__":
     if "--auth" in sys.argv:
-        creds = get_credentials(interactive=True)
+        creds = get_credentials(interactive=True, fresh=True)
         yt = build("youtube", "v3", credentials=creds, cache_discovery=False)
         print(f"✅ Authorised for channel: {channel_name(yt)}")
         print(f"token saved to {TOKEN_FILE} - paste its contents into the GitHub secret YT_TOKEN_JSON")

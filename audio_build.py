@@ -7,6 +7,7 @@ Audio for the Motion-as-Code bot.
 """
 import asyncio
 import json
+import os
 import random
 import re
 import shutil
@@ -92,8 +93,11 @@ def attach(tokens, bounds):
     return out
 
 
+CHANNEL_VOICE = os.getenv("CHANNEL_VOICE") or "en-US-AndrewMultilingualNeural"   # one signature voice = the brand
+
+
 def narrate(script, voice=None):
-    voice = voice or random.choice(VOICES)
+    voice = voice or CHANNEL_VOICE
     tmp = ROOT / "out" / "vo_tmp"
     shutil.rmtree(tmp, ignore_errors=True)
     tmp.mkdir(parents=True, exist_ok=True)
@@ -118,7 +122,7 @@ def narrate(script, voice=None):
                 w["end"] = round(max(w["start"], min(w["end"], t + dur)), 3)
             lines.append({"text": text, "start": words[0]["start"], "end": round(t + dur, 3), "scene": si, "words": words})
             last = li == len(sc["lines"]) - 1
-            pause = (TAIL if si == n - 1 else BETWEEN) if last else IN_SCENE
+            pause = ((TAIL if script.get("long") else 0.5) if si == n - 1 else BETWEEN) if last else IN_SCENE   # Shorts: tight tail so the replay loops
             track += [clip, np.zeros(int(pause * SR), np.float32)]
             t += dur + pause
     y = np.concatenate(track)

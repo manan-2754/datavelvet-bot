@@ -255,6 +255,8 @@ export class Compose extends GenPlate {
   exitMorph = false;
   ls = 1;
   quizT = 1e9;
+  recap: string[] = [];
+  recapT = 1e9;
   build() {
     const d = this.data, st = this.style, r = st.r;
     this.hookMode = !!d.hook; this.cta = !!d.cta;
@@ -268,6 +270,7 @@ export class Compose extends GenPlate {
       this.header = false; this.captionY = 'none';
       const r2 = LAND ? wrapKaraoke(this.ws, 0, this.cta ? -330 : -380, 1560, this.cta ? 92 : 86, ARCH(110, 850), 'q', { maxRows: 3, minSize: 48, lh: 1.08 })
         : wrapKaraoke(this.ws, 0, this.cta ? -560 : -680, 960, this.cta ? 104 : 96, ARCH(110, 850), 'q', { maxRows: 4, minSize: 54, lh: 1.08 });
+      if (this.hookMode) for (const k of r2.kws) { k.tAnt = this.t0; k.pre = true; }   // frame 0 already shows the whole hook
       this.kw.push(...r2.kws);
       this.viewCY = LAND ? H / 2 + 150 : 960 + 330;
       const last = this.ws[this.ws.length - 1]; this.tEnd = last ? last.end : this.t1 - 1;
@@ -276,7 +279,8 @@ export class Compose extends GenPlate {
     const n = Math.max(1, raw.length);
     raw.forEach((x, k) => {
       let w = this.cue(x.cue ?? x.label, k, n);
-      if (this.hookMode && k === 0) w = { ...w, start: Math.min(w.start, this.t0 + 0.2) };   // motion from the first second
+      if (this.hookMode && k === 0) w = { ...w, start: this.t0 };   // the first element is already moving on frame 0
+      else if (k === 0) w = { ...w, start: Math.min(w.start, (this.ws[0]?.start ?? this.t0) + 0.05) };   // no empty opening: first element on the first word
       this.els.push({
         type: (TYPES as readonly string[]).includes(x.type) ? x.type : 'box', label: String(x.label ?? '').slice(0, 22).toUpperCase(), sub: String(x.sub ?? '').slice(0, 30),
         value: String(x.value ?? '').slice(0, 12), values: (Array.isArray(x.values) ? x.values : []).map(Number).filter((v: number) => isFinite(v)).slice(0, 8),
@@ -308,6 +312,10 @@ export class Compose extends GenPlate {
     this.ctr = ctr;
     const cd = clamp(Number(d.camDist) || 1, 0.6, 2.2);
     plan(this, placed.map((e) => ({ t: e.word.start, p: v3.lerp(ctr, [e.p[0], e.p[1] + e.size * 0.6, e.p[2]], 0.7), d: (4.2 + 2.0 * e.size) * cd })), { tgt: ctr, dist: (Math.max(ext, maxY * 0.9) * 2.5 + 3) * cd });
+    if (this.cta && !LAND && Array.isArray(d.recap)) {      // Shorts end card: a 3-line cheat sheet worth saving
+      this.recap = d.recap.map((x: any) => String(x).slice(0, 26)).filter(Boolean).slice(0, 3);
+      this.recapT = this.sl[1]?.start ?? ((this.ws[0]?.start ?? this.t0) + 1.2);
+    }
     if (d.quiz) this.quizT = d.quiz.cue ? this.cue(d.quiz.cue, n, n + 1).start : this.t0 + (this.t1 - this.t0) * 0.7;
     this.floorR = Math.ceil(ext + 2);
     this.floorAt = ['stack', 'sphere', 'spiral', 'diagonal', 'wave', 'scatter'].includes(this.lay) ? null : [0, 0, zc];
@@ -423,7 +431,7 @@ export class Compose extends GenPlate {
         const fam = ARCH(118, 900), size = clamp((150 * e.size * v.s.dist) / q[2], 40, 230) * (1 + 0.25 * (1 - ease.outExpo(clamp(X.age / 0.18))));
         const s2 = Math.min(size * (LAND ? 0.75 : 1), ((LAND ? 1300 : 940) * 100) / Math.max(1, measure(txt, fam, 100)));
         const half = measure(txt, fam, s2) / 2;
-        ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = clamp(X.age / 0.15) * X.al;
+        ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = clamp(X.age / 0.15) * X.al * (this.recap.length ? 1 - prog(t, this.recapT, this.recapT + 0.3) : 1);   // big words give way to the cheat sheet
         ctx.font = font(fam, s2); ctx.textAlign = 'center';
         ctx.fillStyle = mixColor('signal', 'bone', prog(t, e.word.start + 0.9, e.word.start + 1.5));
         const tx = clamp(q[0], 30 + half, W - 30 - half);
@@ -479,11 +487,28 @@ export class Compose extends GenPlate {
       }
       ctx.globalAlpha = 1;
     }
+    if (this.recap.length) {
+      const a = prog(t, this.recapT, this.recapT + 0.35), e = ease.outCubic(a);
+      const x0 = 70, wd = 940, y0 = 1000 + 40 * (1 - e), h = 86 + this.recap.length * 82;
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = a; ctx.textAlign = 'left';
+      ctx.fillStyle = rgba('ink', 0.88); ctx.fillRect(x0, y0, wd, h);
+      ctx.strokeStyle = this.style.tintHex; ctx.lineWidth = 2; ctx.strokeRect(x0, y0, wd, h);
+      ctx.font = font(F.mono(500), 24); ctx.fillStyle = rgba('signal', 1);
+      ctx.fillText('CHEAT SHEET  ·  SAVE THIS', x0 + 30, y0 + 50);
+      this.recap.forEach((r, i) => {
+        ctx.globalAlpha = a * prog(t, this.recapT + 0.15 + 0.12 * i, this.recapT + 0.4 + 0.12 * i);
+        ctx.font = font(F.mono(500), 26); ctx.fillStyle = this.style.tintHex; ctx.fillText(String(i + 1).padStart(2, '0'), x0 + 30, y0 + 120 + i * 82);
+        const fam = ARCH(105, 800), sz = Math.min(46, (820 * 100) / Math.max(1, measure(r, fam, 100)));
+        ctx.font = font(fam, sz); ctx.fillStyle = rgba('bone', 1); ctx.fillText(r, x0 + 90, y0 + 122 + i * 82);
+      });
+      ctx.globalAlpha = 1;
+    }
     if (this.cta) {
       const a = prog(t, this.tEnd - 0.2, this.tEnd + 0.4), pos = (Number(this.sc.meta?.seed) || 0) % 3;
       ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = a;
-      const fam = ARCH(115, 900), txt = LAND ? 'SUBSCRIBE  ·  DATAVELVET' : 'FOLLOW @DATAVELVET', s = Math.min(64, (900 * 100) / measure(txt, fam, 100));
-      const y = LAND ? (pos === 0 ? 900 : pos === 1 ? 960 : 860) : pos === 0 ? 1450 : pos === 1 ? 1600 : 1350;
+      const ct = String(this.data.ctaText ?? '').toUpperCase().slice(0, 30);
+      const fam = ARCH(115, 900), txt = LAND ? 'SUBSCRIBE  ·  DATAVELVET' : (ct || 'FOLLOW @DATAVELVET'), s = Math.min(64, (900 * 100) / measure(txt, fam, 100));
+      const y = LAND ? (pos === 0 ? 900 : pos === 1 ? 960 : 860) : this.recap.length ? 1470 + 50 * pos : pos === 0 ? 1450 : pos === 1 ? 1600 : 1350;
       ctx.font = font(fam, s); ctx.textAlign = 'center'; ctx.fillStyle = rgba('bone', 1); ctx.fillText(txt, W / 2, y);
       ctx.fillStyle = this.style.tintHex; ctx.fillRect(W / 2 - 300 * ease.outCubic(a), y + 22, 600 * ease.outCubic(a), 4);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
@@ -492,7 +517,7 @@ export class Compose extends GenPlate {
   override postFX(t: number) {
     const k = 1 - prog(t, this.t0, this.t0 + 0.45), j = noise1(t * 40, this.idx);
     let o: any = {};
-    switch (this.trans) {
+    switch (this.idx === 0 ? 'cut' : this.trans) {   // frame 0 of the video is never zoomed, shaken or flashed
       case 'flash': o = { flash: 0.8 * k * k }; break;
       case 'zoom': o = { zoom: 1 + 0.3 * k * k }; break;
       case 'whip': o = { shake: [140 * k * k * (this.idx % 2 ? 1 : -1), 0], ca: 1.2 + 6 * k }; break;
@@ -501,8 +526,7 @@ export class Compose extends GenPlate {
       case 'iris': o = { vignette: 0.4 + 2.2 * k }; break;
       case 'morph': o = { zoom: 1 + 0.08 * k * k, ca: 1 + 3 * k }; break;
     }
-    if (this.idx === 0) o.fade = Math.max(o.fade ?? 0, 1 - prog(t, 0, 0.35));
-    if (this.cta) o.fade = Math.max(o.fade ?? 0, prog(t, this.t1 - 0.9, this.t1 - 0.05, ease.inCubic));
+    if (this.cta && LAND) o.fade = Math.max(o.fade ?? 0, prog(t, this.t1 - 0.9, this.t1 - 0.05, ease.inCubic));   // Shorts end without a fade so they loop
     return o;
   }
 }

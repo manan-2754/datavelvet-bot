@@ -437,6 +437,8 @@ export interface KWord {
   group: string; tAnt: number; tracking: number;
   /** Per-word style overrides. */
   hot?: string; done?: string; outline?: boolean; pop?: number;
+  /** Shown fully from tAnt (not typed in): the spoken word still lights up as it is said. */
+  pre?: boolean;
 }
 /** Lay out words as one row from (x, baseline y); returns the words and the row's width. */
 export function placeRow(words: Word[], x: number, y: number, size: number, fam: string, group: string, o: { texts?: string[]; ant?: number; tracking?: number; gap?: number; hot?: string; done?: string } = {}) {
@@ -506,7 +508,7 @@ export function drawKaraoke(ctx: CanvasRenderingContext2D, c: Cam, t: number, kw
         setWorld(ctx, c, cx + (gx - cx) * pop, cy + (gy - cy) * pop, (kw.size / 100) * pop, 0, j);
       } else setWorld(ctx, c, gx, gy, kw.size / 100, 0, j);
       const custom = o.progress ? o.progress(kw, g.i, t) : null;
-      const gp = custom ?? clamp(p * n - g.i);
+      const gp = custom ?? (kw.pre ? 1 : clamp(p * n - g.i));
       if (gp < 1 && (o.outline ?? true) && kw.outline !== false) {
         ctx.lineWidth = (1.1 * 100) / px;
         ctx.strokeStyle = o.paper ? rgba('ink', 0.3 * ant * ga) : rgba('ash', 0.45 * ant * ga);
@@ -517,7 +519,7 @@ export function drawKaraoke(ctx: CanvasRenderingContext2D, c: Cam, t: number, kw
         if (gp < 1) { ctx.beginPath(); ctx.rect(-20, -130, g.w * gp + 20, 190); ctx.clip(); }
         const hot = kw.hot ?? (o.paper ? 'signal' : 'signal');
         const fin = kw.done ?? (o.paper ? 'ink' : 'bone');
-        ctx.fillStyle = done < 1 ? mixCss(hot, fin, done) : rgba(fin, 1);
+        ctx.fillStyle = kw.pre && t < kw.w.start ? rgba(fin, 0.94) : done < 1 ? mixCss(hot, fin, done) : rgba(fin, 1);
         ctx.globalAlpha = ga;
         ctx.fillText(g.ch, 0, 0);
         ctx.restore();
