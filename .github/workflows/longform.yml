@@ -1,11 +1,12 @@
 name: Long-form 8-10 min YouTube video (landscape, split render)
 
-# Twice a week: one job plans the chapters, writes and composes every scene from scratch, narrates and critiques;
+# Every 3 days: one job plans the chapters, writes and composes every scene from scratch, narrates and critiques;
 # 20 free machines render frame-exact slices of the 1920x1080 video in parallel; a final job stitches, mixes, uploads.
 on:
   schedule:
-    # Wednesday and Saturday 15:37 UTC (between the Shorts slots). GitHub may start these a few minutes late.
-    - cron: '37 15 * * 3,6'
+    # Checked daily at 15:37 UTC (between the Shorts slots); a video is made only when the last one is 3+ days old
+    # (repo variable LONG_EVERY_DAYS changes the gap). Posting stops after RUN_UNTIL (2027-04-09).
+    - cron: '37 15 * * *'
   workflow_dispatch:
     inputs:
       post:
