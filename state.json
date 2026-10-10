@@ -5,7 +5,8 @@
     "How load balancers distribute traffic",
     "How Docker containers work under the hood",
     "How Paxos consensus works",
-    "What is serverless architecture?"
+    "What is serverless architecture?",
+    "How HTTPS/TLS encryption works"
   ],
   "used_bank": [
     "dns_explained"
@@ -92,7 +93,20 @@
       "topic": "How load balancers distribute traffic",
       "format": "hook:0|title:3|specimen:3|holo:3|flows:4|form:4|stats:3|compare:4|outro:0",
       "youtube_id": "pTc0yF47i1A",
-      "instagram_id": "18372281464244099"
+      "instagram_id": "18372281464244099",
+      "stats": {
+        "yt_views": 9,
+        "yt_likes": 0,
+        "yt_comments": 0,
+        "ig_reach": 453,
+        "ig_saved": 4,
+        "ig_shares": 1,
+        "ig_views": 505,
+        "ig_likes": 6,
+        "ig_comments": 0,
+        "score": 1110.5,
+        "fetched": "2026-10-10T21:35:47+00:00"
+      }
     },
     {
       "time": "2026-10-09T21:33:52+00:00",
@@ -100,7 +114,20 @@
       "format": "hook:0|compare:2|orbit:4|layers:4|tunnel:4|title:2|bars3d:2|scene3d:3|outro:0",
       "seed": 1180616472,
       "youtube_id": "55r1NyCoiSs",
-      "instagram_id": "18119557396949139"
+      "instagram_id": "18119557396949139",
+      "stats": {
+        "yt_views": 14,
+        "yt_likes": 0,
+        "yt_comments": 0,
+        "ig_reach": 196,
+        "ig_saved": 1,
+        "ig_shares": 1,
+        "ig_views": 221,
+        "ig_likes": 0,
+        "ig_comments": 0,
+        "score": 433.0,
+        "fetched": "2026-10-10T21:35:47+00:00"
+      }
     },
     {
       "time": "2026-10-10T01:29:12+00:00",
@@ -108,7 +135,20 @@
       "format": "hook:0|holo:2|specimen:3|scene3d:3|form:3|layers:3|outro:0",
       "seed": 519403097,
       "youtube_id": "ru0fE5sd0NM",
-      "instagram_id": "18076028366735422"
+      "instagram_id": "18076028366735422",
+      "stats": {
+        "yt_views": 20,
+        "yt_likes": 0,
+        "yt_comments": 0,
+        "ig_reach": 284,
+        "ig_saved": 5,
+        "ig_shares": 1,
+        "ig_views": 329,
+        "ig_likes": 7,
+        "ig_comments": 0,
+        "score": 926.0,
+        "fetched": "2026-10-10T21:35:48+00:00"
+      }
     },
     {
       "time": "2026-10-10T06:25:56+00:00",
@@ -117,6 +157,57 @@
       "seed": 1419082428,
       "youtube_id": "5U_rtc8oRHs",
       "instagram_id": "18114047927276016"
+    },
+    {
+      "time": "2026-10-10T21:57:08+00:00",
+      "topic": "How HTTPS/TLS encryption works",
+      "format": "scatter > row > wave > ring > pyramid > stack > depth",
+      "seed": 45172667,
+      "features": {
+        "angle": "failure-first",
+        "layouts": [
+          "scatter",
+          "row",
+          "wave",
+          "ring",
+          "pyramid",
+          "stack",
+          "depth"
+        ],
+        "types": [
+          "beam",
+          "burst",
+          "code",
+          "link",
+          "matrix",
+          "object",
+          "orbit",
+          "panel",
+          "particles",
+          "ring",
+          "stream",
+          "text",
+          "tunnel",
+          "wave"
+        ],
+        "cams": [
+          "dolly",
+          "orbit",
+          "push",
+          "crane",
+          "low",
+          "spiral",
+          "fly"
+        ],
+        "hue": "Ember",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "lydian",
+        "length": "mid",
+        "level": "beginner",
+        "trend": false,
+        "series": "How the Internet Works"
+      },
+      "youtube_id": "wAYl4q3sCwc"
     }
   ],
   "series_counts": {
@@ -127,7 +218,8 @@
     "hook:0|title:3|specimen:3|holo:3|flows:4|form:4|stats:3|compare:4|outro:0",
     "hook:0|compare:2|orbit:4|layers:4|tunnel:4|title:2|bars3d:2|scene3d:3|outro:0",
     "hook:0|holo:2|specimen:3|scene3d:3|form:3|layers:3|outro:0",
-    "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring"
+    "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
+    "scatter > row > wave > ring > pyramid > stack > depth"
   ],
   "used_palettes": [
     "0:0"
@@ -145,7 +237,129 @@
     "Why is Redis so fast?": 2
   },
   "queued_scripts": [],
-  "style_memory": [],
+  "style_memory": [
+    {
+      "posted_at": "2026-10-10T21:58:50+00:00",
+      "style": {
+        "name": "Ember Prism / Jade signal",
+        "created": "2026-10-10T21:44:12+00:00",
+        "hook": null,
+        "tag": "pill",
+        "reflect": false,
+        "glass": {
+          "on": true,
+          "roughness": 0.061,
+          "ior": 1.63,
+          "thickness": 1.0,
+          "dof": 8.8,
+          "key": 2.51,
+          "rim": "#FD4FD8"
+        },
+        "mascot": {
+          "on": false,
+          "side": 1,
+          "kind": "bot"
+        },
+        "_h": {
+          "bg": 7.6,
+          "signal": 95.8,
+          "holo": 0.1
+        },
+        "palette": {
+          "ink": "#0F0706",
+          "ink2": "#1E100E",
+          "graphite": "#705E5C",
+          "ash": "#AA9D9B",
+          "bone": "#EEDDDE",
+          "signal": "#70F217",
+          "ember": "#69FF4A",
+          "blood": "#6AC410"
+        },
+        "holo": [
+          "#F54E4E",
+          "#FD4FD8"
+        ],
+        "type": {
+          "wscale": 0.77,
+          "wtadd": 0,
+          "case": "lower"
+        },
+        "grid": {
+          "minor": 20,
+          "major": 100
+        },
+        "caption": {
+          "size": 49,
+          "dy": -5
+        },
+        "post": {
+          "bloom": 0.88,
+          "bloomThreshold": 0.83,
+          "vignette": 0.38,
+          "grain": 0.027,
+          "ca": 0.21,
+          "halation": 0.0
+        },
+        "cam2d": {
+          "zoom": 0.994,
+          "roll": 0.0014,
+          "hand": 1.38
+        },
+        "cam3d": {
+          "fov": -7.4,
+          "roll": -0.048,
+          "dist": 1.18,
+          "hand": 0.86
+        },
+        "scenes": [
+          {
+            "cam": "dolly",
+            "reveal": "glitch",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "top",
+            "reveal": "assemble",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "push",
+            "reveal": "glitch",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "assemble",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "orbit",
+            "reveal": "glitch",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "low",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "top",
+            "reveal": "scan",
+            "floor": "grid",
+            "spin": -1
+          }
+        ]
+      },
+      "format": "scatter > row > wave > ring > pyramid > stack > depth",
+      "angle": "failure-first"
+    }
+  ],
   "scene_signatures": [
     "depth|object:unfold,text:pop",
     "stack|object:drop,object:rise,wave:draw",
@@ -155,16 +369,35 @@
     "grid|bars:grow,line:draw",
     "pyramid|gauge:pop,object:assemble",
     "cluster|network:pop,object:rise",
-    "ring|object:unfold,panel:pop"
+    "ring|object:unfold,panel:pop",
+    "scatter|object:grow,particles:pop,stream:draw",
+    "row|object:rise,text:glitch,wave:draw",
+    "wave|object:assemble,text:pop,tunnel:unfold",
+    "ring|beam:draw,object:drop,object:drop",
+    "pyramid|object:assemble,orbit:scan,panel:unfold",
+    "stack|burst:grow,matrix:scan,ring:pop",
+    "depth|code:scan,link:draw,object:assemble,object:rise"
   ],
   "compose_formats": [
-    "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring"
+    "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
+    "scatter > row > wave > ring > pyramid > stack > depth"
   ],
   "insights": {
     "n": 0,
-    "updated": "2026-10-10T13:42:05+00:00",
+    "updated": "2026-10-10T21:35:48+00:00",
     "best": {},
     "worst": {},
     "lift": {}
+  },
+  "runs": [
+    {
+      "time": "2026-10-10T21:58:50+00:00",
+      "ok": false,
+      "error": "upload failed on a platform"
+    }
+  ],
+  "series": {
+    "name": "How the Internet Works",
+    "ep": 1
   }
 }
