@@ -14,6 +14,7 @@ One-time setup:
   The cloud job refreshes the token automatically (needs secret GH_PAT so it can save the new one).
 """
 import os
+from datetime import date, datetime, timedelta, timezone
 import subprocess
 import sys
 import tempfile
@@ -124,14 +125,29 @@ def upload_reel(video_path, caption, thumb_offset=None):
     return pub["id"]
 
 
+REFRESH_AFTER_DAYS = 55   # use the same token for 55 days, then refresh once (Instagram tokens last 60)
+
+
 def refresh_token():
-    """Extend the 60-day token. If it changed and GH_PAT is set, save it back to the repo secret."""
+    """Extend the 60-day token once it is 55+ days old (daily refresh calls get flagged by Instagram).
+    The last refresh date lives in the repo variable IG_TOKEN_REFRESHED; the new token goes back into the secret."""
+    last = os.getenv("IG_TOKEN_REFRESHED", "").strip()
+    if last:
+        try:
+            age = (datetime.now(timezone.utc).date() - date.fromisoformat(last[:10])).days
+        except ValueError:
+            age = REFRESH_AFTER_DAYS
+        if age < REFRESH_AFTER_DAYS:
+            print(f"Token is {age} days old - no Instagram call today; next refresh on day {REFRESH_AFTER_DAYS} "
+                  f"({date.fromisoformat(last[:10]) + timedelta(days=REFRESH_AFTER_DAYS)})")
+            return
+        print(f"Token is {age} days old - refreshing (it expires on day 60)")
     old = _token()
     r = requests.get(f"https://{HOST}/refresh_access_token",
                      params={"grant_type": "ig_refresh_token", "access_token": old}, timeout=30)
     if r.status_code != 200:
-        print(f"Token refresh skipped: {r.status_code} {r.text[:200]}")
-        return
+        print(f"Token refresh FAILED: {r.status_code} {r.text[:200]}")
+        sys.exit(1)                          # fail loudly: the workflow emails you, and retries tomorrow
     new = r.json()["access_token"]
     days = r.json().get("expires_in", 0) // 86400
     print(f"Instagram token refreshed - valid for {days} more days")
@@ -142,6 +158,10 @@ def refresh_token():
             r2 = subprocess.run(["gh", "secret", "set", "IG_ACCESS_TOKEN", "--repo", repo, "--body", new],
                                 env={**os.environ, "GH_TOKEN": os.environ["GH_PAT"]})
             print(f"Saved refreshed token to {repo}" if r2.returncode == 0 else f"Could not update {repo} (check GH_PAT repo access)")
+    if os.getenv("GH_PAT") and os.getenv("GITHUB_REPOSITORY"):   # start the next 55-day count
+        r3 = subprocess.run(["gh", "variable", "set", "IG_TOKEN_REFRESHED", "--repo", os.environ["GITHUB_REPOSITORY"],
+                             "--body", datetime.now(timezone.utc).date().isoformat()], env={**os.environ, "GH_TOKEN": os.environ["GH_PAT"]})
+        print("Saved the refresh date" if r3.returncode == 0 else "Could not save IG_TOKEN_REFRESHED (give GH_PAT 'Variables: write')")
 
 
 if __name__ == "__main__":
