@@ -1,6 +1,14 @@
 // Word-timed lyrics (data/lyrics.json) with queries for karaoke rendering.
 import { smart } from './type';
 
+import { HEX, LIN } from './palette';
+import { hexToLinear } from './util';
+/** Swap the house palette for a generated one (before any shader or scene is built). */
+export function applyPalette(p: Record<string, string> | undefined) {
+  if (!p) return;
+  for (const [k, v] of Object.entries(p)) if (k in HEX && /^#[0-9a-f]{6}$/i.test(v)) { (HEX as any)[k] = v; (LIN as any)[k] = hexToLinear(v); }
+}
+
 export interface Word {
   w: string; // display token (punctuation attached, typographic quotes: don’t, ’cause)
   start: number;
@@ -25,6 +33,8 @@ export class Lyrics {
   words: Word[];
   /** The generated script's scenes (plate + data), written next to the lines by the bot. */
   scenes: any[];
+  /** The video's generated style genome (palette, type, camera, post), see bot/art_director.py. */
+  style: any = {};
   constructor(j: { lines: Omit<Line, 'words'> & { words: Omit<Word, 'line' | 'index' | 'gi'>[] }[] | any[] }) {
     // display text gets curly apostrophes and quotes (the data keeps the typed ones); mono UI
     // text that wants them straight uses plain()
@@ -35,6 +45,8 @@ export class Lyrics {
       words: (l.words as any[]).map((w, wi) => ({ ...w, w: smart(w.w), line: li, index: wi, gi: 0 })),
     }));
     this.scenes = (j as any).scenes ?? [];
+    this.style = (j as any).style ?? {};
+    applyPalette(this.style.palette);
     this.words = this.lines.flatMap((l) => l.words);
     this.words.forEach((w, i) => (w.gi = i));
   }

@@ -336,12 +336,16 @@ def review(sc):
             "minor": [str(x) for x in data.get("minor_issues") or []]}
 
 
-def write_script(topic, used_formats=(), tries=6, seed=0):
+def write_script(topic, used_formats=(), tries=6, seed=0, angle=None, hook=None):
     rng = random.Random(seed)
     n = rng.choice([7, 8, 8, 9])
     recent = list(used_formats)[-8:]
     avoid = ("- These plate sequences were used recently - do NOT reproduce any of them:\n" +
              "\n".join(f"    {r}" for r in recent) + "\n") if recent else ""
+    if angle:
+        avoid += f"- STORY ANGLE for this video ({angle[0]}): {angle[1]} Explain it in a way this channel has not used before." + chr(10)
+    if hook:
+        avoid += f'- The hook scene must use motif "{hook}".' + chr(10)
     feedback, err, cands = "", None, []
     for i in range(tries):
         prompt = PROMPT.format(topic=topic, plates=PLATES, n=n, avoid=avoid, feedback=feedback)
@@ -382,3 +386,35 @@ def write_script(topic, used_formats=(), tries=6, seed=0):
         except Exception as e:
             print(f"  repair failed: {e}")
     raise RuntimeError(f"No usable script: {err}")
+
+
+def prepare_edits(script):
+    """Photo-tutorial videos: give every "edit" scene its photo + region metadata and the layer stack it starts
+    from (simulating the previous scenes' actions), so each plate renders independently."""
+    from pathlib import Path
+    pool = {p["file"]: p for p in json.loads((Path(__file__).parent / "app" / "public" / "photos" / "pool.json").read_text(encoding="utf-8"))}
+    photo = script.get("photo")
+    meta = pool.get(photo, {})
+    layers = []
+    for sc in script["scenes"]:
+        if sc["plate"] != "edit":
+            continue
+        d = sc.setdefault("data", {})
+        d.update(photo=photo, sky=meta.get("sky", 0.3), subject=meta.get("subject", [0.5, 0.55, 0.2, 0.25]),
+                 edits=json.loads(json.dumps(layers)))
+        for a in d.get("acts", []):
+            if a.get("do") == "slider":
+                if a.get("new") or not layers:
+                    layers.append({"kind": a.get("kind", "exposure"), "value": a.get("from", 0), "region": a.get("region", "all"), "mask": "full", "paint": 1})
+                    a["layer"] = len(layers) - 1
+                else:
+                    a.setdefault("layer", len(layers) - 1)
+                layers[a["layer"]]["value"] = a.get("to", 0)
+            elif a.get("do") == "invert" and layers:
+                a.setdefault("layer", len(layers) - 1)
+                L = layers[a["layer"]]
+                L["mask"] = "full" if L["mask"] == "none" else "none"
+            elif a.get("do") == "paint" and layers:
+                a.setdefault("layer", len(layers) - 1)
+                layers[a["layer"]].update(mask="region", region=a.get("region", "sky"), paint=1)
+    return script

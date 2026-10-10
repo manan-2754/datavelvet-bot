@@ -27,7 +27,9 @@ try:
 except ImportError:
     pass
 
+import art_director  # noqa: E402
 import audio_build  # noqa: E402
+import composer  # noqa: E402
 import writer  # noqa: E402
 
 OUT = BASE / "out"
@@ -81,10 +83,14 @@ def pick_seed(state):
 
 
 def make_video(script, show=False):
+    if any(sc["plate"] == "edit" for sc in script["scenes"]):
+        writer.prepare_edits(script)
     out_dir = OUT / f"{time.strftime('%Y%m%d-%H%M%S')}_{slugify(script['topic'])}"
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "script.json").write_text(json.dumps(script, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"🧩 Plates: {script.get('format') or ' > '.join(s['plate'] for s in script['scenes'])}  (visual seed {script.get('seed')})")
+    st_ = script.get("style") or {}
+    print(f"🎨 Style: {st_.get('name')}  |  angle: {script.get('angle')}  |  cameras: {' '.join(s['cam'] for s in st_.get('scenes', []))}")
     print("🔊 Narration")
     dur, voice = audio_build.narrate(script)
     print(f"  {voice}, {dur:.1f}s")
@@ -108,6 +114,7 @@ def make_video(script, show=False):
     raw.unlink(missing_ok=True)
     meta = {**script.get("youtube", {}), "instagram_caption": script.get("instagram_caption", ""), "topic": script["topic"],
             "duration": round(dur, 1), "voice": voice, "format": script.get("format"), "seed": script.get("seed"),
+            "style_name": (script.get("style") or {}).get("name"), "angle": script.get("angle"),
             "review": script.get("review")}
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"✅ {video} ({video.stat().st_size / 1e6:.1f} MB, {dur:.0f}s)")
@@ -149,7 +156,8 @@ def main():
         print(f"Posting window ended on {RUN_UNTIL}.")
         return 0
     state = load_state()
-    topic = None
+    art_director.prune(state)          # styles posted more than 3 hours ago are forgotten
+    topic, angle = None, None
     if args.script:
         script = json.loads(Path(args.script).read_text(encoding="utf-8"))
         script = writer.validate(script) if "format" not in script else script
@@ -164,7 +172,15 @@ def main():
         topic = args.topic or fresh[0]
         print(f"📌 Topic: {topic}")
         try:
-            script = writer.write_script(topic, state["used_formats"], seed=time.time_ns())
+            angle = art_director.pick_angle(state)
+            print(f"🎬 Angle: {angle[0]}  (every scene composed from scratch)")
+            try:
+                script = composer.write(topic, banned=state.get("scene_signatures", []), recent=state.get("compose_formats", []),
+                                        angle=angle, seed=time.time_ns())
+            except Exception as e:
+                print(f"  composer failed ({e}) - falling back to the template writer")
+                hook = art_director.pick_hook(state)
+                script = writer.write_script(topic, art_director.recent_formats(state), seed=time.time_ns(), angle=angle, hook=hook)
         except Exception:
             if args.post:                    # a topic that fails twice is skipped, so it can never block the queue
                 failed[topic] = failed.get(topic, 0) + 1
@@ -172,6 +188,9 @@ def main():
             raise
         script["topic"] = script.get("topic") or topic
     script["seed"] = script.get("seed") or pick_seed(state)
+    script["angle"] = script.get("angle") or (angle[0] if angle else None)
+    script["style"] = script.get("style") or art_director.new_genome(
+        state, len(script["scenes"]), hook=(script["scenes"][0].get("data") or {}).get("motif"))
     video, meta = make_video(script, args.show)
     if not args.post:
         print("(local run - nothing posted, state unchanged)")
@@ -180,6 +199,11 @@ def main():
         state["used_topics"].append(topic)
     state["used_formats"].append(script.get("format", ""))
     ok = upload(video, meta, state)
+    if state["posts"] and (state["posts"][-1].get("youtube_id") or state["posts"][-1].get("instagram_id")):
+        art_director.remember(state, script["style"], script.get("format"), script.get("angle"))
+        if script.get("signatures"):           # composed scenes are never reused, ever
+            state.setdefault("scene_signatures", []).extend(script["signatures"])
+            state.setdefault("compose_formats", []).append(script.get("format"))
     STATE.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
     return 0 if ok else 2
 

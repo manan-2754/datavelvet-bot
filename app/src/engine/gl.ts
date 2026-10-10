@@ -1,7 +1,7 @@
 // GL plumbing on top of three.js: HDR render targets, fullscreen shader passes,
 // a texture compositor and Canvas2D layers uploaded as textures.
 import * as THREE from 'three';
-import { GLSL_COMMON } from './glsl/common';
+import { glslCommon } from './glsl/common';
 import { SCALE } from './scale';
 
 export { SCALE };
@@ -80,7 +80,7 @@ export class FSPass {
     this.mat = new THREE.RawShaderMaterial({
       glslVersion: THREE.GLSL3,
       vertexShader: `precision highp float;\nin vec3 position;\n${FS_VERT}`,
-      fragmentShader: `precision highp float;\nprecision highp int;\nin vec2 vUv;\nout vec4 fragColor;\n${GLSL_COMMON}\n${frag}`,
+      fragmentShader: `precision highp float;\nprecision highp int;\nin vec2 vUv;\nout vec4 fragColor;\n${glslCommon()}\n${frag}`,
       uniforms,
       depthTest: false,
       depthWrite: false,

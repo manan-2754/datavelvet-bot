@@ -21,13 +21,24 @@ const sc = (c: RGB, s: number): RGB => [c[0] * s, c[1] * s, c[2] * s];
 export const TINTS = ['#3CE1FF', '#4DFFB8', '#9B8CFF', '#FFB23D', '#5CA8FF', '#FF6FD8'] as const;
 export type Floor = 'grid' | 'polar' | 'dots' | 'hex';
 export type Reveal = 'scan' | 'draw' | 'assemble' | 'glitch';
-export type CamMode = 'fly' | 'orbit' | 'crane' | 'dolly';
+export type CamMode = 'fly' | 'orbit' | 'crane' | 'dolly' | 'low' | 'top' | 'dutch' | 'spiral' | 'whip' | 'push';
+export const CAM_MODES: CamMode[] = ['fly', 'orbit', 'crane', 'dolly', 'low', 'top', 'dutch', 'spiral', 'whip', 'push'];
 export interface Style { tint: RGB; tintHex: string; floor: Floor; reveal: Reveal; cam: CamMode; spin: 1 | -1; hand: number; r: () => number }
 /** Tint is per video (all scenes share it); floor, reveal and camera language rotate per scene and per video. */
-export function styleFor(videoSeed: number, idx: number): Style {
-  const tintHex = TINTS[videoSeed % TINTS.length]!;
+export function styleFor(videoSeed: number, idx: number, G: any = {}): Style {
+  const gl = Array.isArray(G.holo) && G.holo.length ? G.holo : null;
+  const tintHex = gl ? String(gl[idx % gl.length]) : TINTS[videoSeed % TINTS.length]!;
   const r = mulberry32((videoSeed ^ Math.imul(idx + 1, 0x9e3779b1)) >>> 0);
   const rot = <T,>(xs: readonly T[], k: number) => xs[(k + (videoSeed >>> 3)) % xs.length]!;
+  const gs = Array.isArray(G.scenes) ? G.scenes[idx] ?? {} : {};
+  const pickOr = <T,>(v: any, ok: readonly T[], d: T): T => (ok as readonly any[]).includes(v) ? v : d;
+  if (G.scenes) return {
+    tint: hexToLinear(tintHex), tintHex,
+    floor: pickOr(gs.floor, ['grid', 'polar', 'dots', 'hex'] as const, 'grid'),
+    reveal: pickOr(gs.reveal, ['scan', 'assemble', 'draw', 'glitch'] as const, 'scan'),
+    cam: pickOr(gs.cam, CAM_MODES, 'orbit'),
+    spin: gs.spin === -1 ? -1 : 1, hand: Number(G.cam3d?.hand ?? 0.6 + r() * 0.8), r,
+  };
   return {
     tint: hexToLinear(tintHex), tintHex,
     floor: rot(['grid', 'polar', 'dots', 'hex'] as const, idx),

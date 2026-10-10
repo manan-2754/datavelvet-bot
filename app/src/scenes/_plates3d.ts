@@ -24,7 +24,7 @@ function counting(v: any, k: number) {
 }
 
 /** Camera language for a set of beats (time, focus point, close distance) and a wide framing. */
-function plan(pl: GenPlate, tg: { t: number; p: V3; d: number }[], wide: { tgt: V3; dist: number }) {
+export function plan(pl: GenPlate, tg: { t: number; p: V3; d: number }[], wide: { tgt: V3; dist: number }) {
   const st = pl.style, R = pl.rig, sp = st.spin, y0 = (0.3 + st.r() * 0.5) * sp, t0 = pl.t0, t1 = pl.t1, n = Math.max(1, tg.length);
   if (st.cam === 'fly') {
     R.key(t0, { tgt: wide.tgt, yaw: y0 - 0.6 * sp, pitch: 0.62, dist: wide.dist * 1.15, fov: 50 });
@@ -39,6 +39,32 @@ function plan(pl: GenPlate, tg: { t: number; p: V3; d: number }[], wide: { tgt: 
     R.key(t0, { tgt: wide.tgt, yaw: y0, pitch: 1.28, dist: wide.dist * 1.05, fov: 50 });
     tg.forEach((g, k) => R.key(g.t, { tgt: v3.lerp(wide.tgt, g.p, 0.6), yaw: y0 + k * 0.14 * sp, pitch: 1.12 - 0.9 * ((k + 1) / n), dist: wide.dist * 0.8 }));
     R.key(t1, { tgt: wide.tgt, yaw: y0 + 0.5 * sp, pitch: 0.24, dist: wide.dist * 0.96 });
+  } else if (st.cam === 'low') {          // worm's-eye: hugging the floor, wide lens, sweeping past each beat
+    R.key(t0, { tgt: wide.tgt, yaw: y0 - 0.9 * sp, pitch: 0.04, dist: wide.dist * 0.75, fov: 62 });
+    tg.forEach((g, k) => R.key(g.t, { tgt: [g.p[0], g.p[1] * 1.2, g.p[2]], yaw: y0 + (k - n / 2) * 0.5 * sp, pitch: 0.06, dist: g.d * 0.9, fov: 60 }));
+    R.key(t1, { tgt: wide.tgt, yaw: y0 + 0.9 * sp, pitch: 0.12, dist: wide.dist * 0.9, fov: 58 });
+  } else if (st.cam === 'top') {          // god's-eye: straight down, the frame rotating like a map
+    R.key(t0, { tgt: wide.tgt, yaw: y0, pitch: 1.42, dist: wide.dist * 1.1, fov: 46, roll: 0 });
+    tg.forEach((g, k) => R.key(g.t, { tgt: v3.lerp(wide.tgt, g.p, 0.7), yaw: y0 + (k + 1) * 0.5 * sp, pitch: 1.36, dist: wide.dist * 0.75 }));
+    R.key(t1, { tgt: wide.tgt, yaw: y0 + (n + 1.5) * 0.5 * sp, pitch: 0.9, dist: wide.dist });
+  } else if (st.cam === 'dutch') {        // tilted horizon, slow orbit
+    R.drift = 0.14 * sp;
+    R.key(t0, { tgt: wide.tgt, yaw: y0, pitch: 0.4, dist: wide.dist, fov: 44, roll: 0.16 * sp });
+    tg.forEach((g, k) => R.key(g.t, { tgt: v3.lerp(wide.tgt, g.p, 0.55), yaw: y0, pitch: 0.3, dist: wide.dist * 0.8, roll: (k % 2 ? -0.14 : 0.18) * sp }));
+    R.key(t1, { tgt: wide.tgt, yaw: y0, pitch: 0.45, dist: wide.dist * 0.95, roll: 0.1 * sp });
+  } else if (st.cam === 'spiral') {       // corkscrew in: yaw keeps turning while the camera rises and closes in
+    R.drift = 0.5 * sp;
+    R.key(t0, { tgt: wide.tgt, yaw: y0, pitch: 0.08, dist: wide.dist * 1.35, fov: 50 });
+    tg.forEach((g, k) => R.key(g.t, { tgt: v3.lerp(wide.tgt, g.p, 0.4), yaw: y0, pitch: 0.15 + 0.7 * ((k + 1) / n), dist: wide.dist * (1.1 - 0.4 * ((k + 1) / n)) }));
+    R.key(t1, { tgt: wide.tgt, yaw: y0, pitch: 1.0, dist: wide.dist * 0.7 });
+  } else if (st.cam === 'whip') {         // snap cuts between beats (fast exponential moves, big yaw jumps)
+    R.key(t0, { tgt: wide.tgt, yaw: y0, pitch: 0.35, dist: wide.dist, fov: 48 });
+    tg.forEach((g, k) => { R.key(g.t - 0.18, { tgt: g.p, yaw: y0 + (k % 2 ? -1 : 1) * (0.9 + k * 0.3) * sp, pitch: 0.25 + 0.15 * (k % 3), dist: g.d, fov: 46 }, ease.inOutExpo); });
+    R.key(t1, { tgt: wide.tgt, yaw: y0 + 2.2 * sp, pitch: 0.5, dist: wide.dist * 1.05 }, ease.outExpo);
+  } else if (st.cam === 'push') {         // one long, slow push-in on a long lens
+    R.key(t0, { tgt: wide.tgt, yaw: y0, pitch: 0.22, dist: wide.dist * 2.4, fov: 22 });
+    tg.forEach((g, k) => R.key(g.t, { tgt: v3.lerp(wide.tgt, g.p, 0.3), yaw: y0 + k * 0.05 * sp, pitch: 0.24, dist: wide.dist * (2.2 - 0.9 * ((k + 1) / n)), fov: 22 + 6 * ((k + 1) / n) }, ease.linear));
+    R.key(t1, { tgt: wide.tgt, yaw: y0 + 0.15 * sp, pitch: 0.3, dist: wide.dist * 1.1, fov: 32 }, ease.linear);
   } else {
     R.key(t0, { tgt: tg[0]?.p ?? wide.tgt, yaw: y0, pitch: 0.2, dist: wide.dist * 0.6, fov: 46 });
     tg.forEach((g) => R.key(g.t, { tgt: g.p, yaw: y0 + 0.08 * sp, pitch: 0.22, dist: wide.dist * 0.58 }));

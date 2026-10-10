@@ -9,7 +9,7 @@ import type { AudioData } from './engine/audio';
 // All plates live in scenes/_plates.ts; a scene's `plate` picks the class.
 const CLASSES: Record<string, string> = {
   hook: 'Hook', title: 'Title', specimen: 'Specimen', holo: 'Holo', flows: 'Flows', form: 'Form', stats: 'Stats', compare: 'Compare', outro: 'Outro',
-  scene3d: 'Scene3D', layers: 'Layers', orbit: 'Orbit', tunnel: 'Tunnel', bars3d: 'Bars3D',
+  scene3d: 'Scene3D', layers: 'Layers', orbit: 'Orbit', tunnel: 'Tunnel', bars3d: 'Bars3D', edit: 'Edit', compose: 'Compose',
 };
 const plates = import.meta.glob<Record<string, SceneClass>>('./scenes/_plates.ts');
 const scene = (name: string) => () =>

@@ -34,7 +34,10 @@ void main() {
   fragColor = vec4(col, 1.0);
 }`;
 
-export const ARCH = (wd: number, wt: number) => F.archivo(wd, wt);
+/** Per-video typography (set from the style genome before any plate builds). */
+export const TYPE = { wscale: 1, wtadd: 0, case: 'title' as 'title' | 'upper' | 'lower' };
+export const ARCH = (wd: number, wt: number) => F.archivo(clamp(wd * TYPE.wscale, 62, 125), clamp(wt + TYPE.wtadd, 300, 900));
+const caseOf = (s: string) => TYPE.case === 'upper' ? s.toUpperCase() : TYPE.case === 'lower' ? s.toLowerCase() : s;
 export const HALF_W = W / 2;          // 540
 export const HALF_H = H / 2;          // 960
 
@@ -152,6 +155,8 @@ export abstract class GenPlate extends Scene {
   floorR = 7;
   gridInk = 0.8;
   viewCY = H / 2 - 150;
+  /** The video's style genome (lyrics.json `style`). */
+  G: any = {};
   /** Bone paper (ink) instead of graph paper in the dark. */
   paperMode = false;
   /** Draw the default header (plate number · topic, plate title). Paper plates draw their own band. */
@@ -202,11 +207,16 @@ export abstract class GenPlate extends Scene {
     this.plot.paper = this.paperMode;
     this.lines = new LineBatch(60000, this.paperMode ? { blend: 'normal' } : {});
     const meta = this.sc.meta ?? {};
-    this.style = styleFor(Number(meta.seed) || seedOf(String(meta.topic ?? '')), this.idx);
+    const G = this.G = ly.style ?? {};
+    if (G.type) { TYPE.wscale = Number(G.type.wscale) || 1; TYPE.wtadd = Number(G.type.wtadd) || 0; TYPE.case = G.type.case ?? 'title'; }
+    if (G.grid) this.grid = gridPass(Number(G.grid.minor) || 24, Number(G.grid.major) || 96);
+    if (G.caption) { this.captionSize = Number(G.caption.size) || this.captionSize; }
+    this.style = styleFor(Number(meta.seed) || seedOf(String(meta.topic ?? '')), this.idx, G);
     this.rig.t0 = this.t0;
     this.build();
     if (this.has3D && !this.fx3) this.fx3 = new LineBatch(140000);
     if (this.captionY !== 'none' && this.ws.length) {
+      if (this.G.caption?.dy) this.captionY += Number(this.G.caption.dy);
       const r = wrapKaraoke(this.ws, 0, this.captionY, 960, this.captionSize, ARCH(100, 700), 'cap', { maxRows: 4, minSize: 34 });
       const over = this.captionY + r.height - 880;          // keep the whole caption block on screen
       if (over > 0) r.kws.forEach((k) => (k.y -= over));
@@ -242,7 +252,8 @@ export abstract class GenPlate extends Scene {
     const { renderer, comp } = this.ctx;
     const t = f.t;
     const c0 = this.cam.at(t);
-    const c: Cam = { cx: c0.cx + 5 * noise1(t * 0.5, this.idx + 1), cy: c0.cy + 4 * noise1(t * 0.4, this.idx + 2), z: c0.z, roll: c0.roll + (this.paperMode ? 0.004 * noise1(t * 0.5, 3) : 0) };
+    const g2 = this.G.cam2d ?? {}, hand = Number(g2.hand ?? 1);
+    const c: Cam = { cx: c0.cx + 5 * hand * noise1(t * 0.5, this.idx + 1), cy: c0.cy + 4 * hand * noise1(t * 0.4, this.idx + 2), z: c0.z * (Number(g2.zoom) || 1), roll: c0.roll + (Number(g2.roll) || 0) * (this.idx % 2 ? 1 : -1) + (this.paperMode ? 0.004 * noise1(t * 0.5, 3) : 0) };
     const pen = this.plot.penAt(t);
     const ps = pen && t > this.penFrom ? w2s(c, pen.x, pen.y) : null;
     if (this.paperMode) {
@@ -253,7 +264,8 @@ export abstract class GenPlate extends Scene {
       this.grid.render(renderer, out);
     }
     if (this.has3D && this.fx3) {
-      const v = new View(handheld(this.rig.at(t), t, this.style.hand));
+      const s0 = handheld(this.rig.at(t), t, this.style.hand), g3 = this.G.cam3d ?? {};
+      const v = new View({ ...s0, fov: clamp(s0.fov + (Number(g3.fov) || 0), 28, 75), roll: s0.roll + (Number(g3.roll) || 0) * (this.idx % 2 ? -1 : 1), dist: s0.dist * (Number(g3.dist) || 1) });
       v.cy = this.viewCY;
       this.view = v;
       const Z = this.fx3; Z.clear();
@@ -281,7 +293,8 @@ export abstract class GenPlate extends Scene {
     const base: PostOverrides = this.paperMode
       ? { bloom: 0.15, bloomThreshold: 1.4, vignette: 0.28, grain: 0.04, halation: 0.05, ca: 0.6, paper: 1 }
       : { bloom: 0.72, bloomThreshold: 0.84, vignette: 0.42, grain: 0.05 };
-    return { ...base, zoom: 1 + 0.016 * hit, shake: [5 * hit * noise1(t * 60, 1), 5 * hit * noise1(t * 60, 2)], ...this.postFX(t) };
+    const gp = this.G.post ?? {};
+    return { ...base, zoom: 1 + 0.016 * hit, shake: [5 * hit * noise1(t * 60, 1), 5 * hit * noise1(t * 60, 2)], ...this.postFX(t), ...(this.paperMode ? {} : gp) };
   }
 
   /** A label pinned to a 3D point: leader line + chip (screen space, kept clear of header and captions). */
@@ -301,8 +314,15 @@ export abstract class GenPlate extends Scene {
     ctx.strokeStyle = this.style.tintHex; ctx.lineWidth = 1.6;
     ctx.beginPath(); ctx.moveTo(q[0], q[1]); ctx.lineTo(x, y); ctx.stroke();
     ctx.fillStyle = this.style.tintHex; ctx.beginPath(); ctx.arc(q[0], q[1], 4, 0, 6.3); ctx.fill();
-    ctx.fillStyle = rgba('ink2', 0.82); ctx.fillRect(bx, y - bh, bw, bh);
-    ctx.fillStyle = this.style.tintHex; ctx.fillRect(bx, y - 3, bw * ease.outCubic(clamp(a * 1.5)), 3);
+    const ts = this.G.tag ?? 'chip', grow = ease.outCubic(clamp(a * 1.5));
+    if (ts === 'chip') { ctx.fillStyle = rgba('ink2', 0.82); ctx.fillRect(bx, y - bh, bw, bh); ctx.fillStyle = this.style.tintHex; ctx.fillRect(bx, y - 3, bw * grow, 3); }
+    else if (ts === 'bracket') {
+      ctx.strokeStyle = this.style.tintHex; ctx.lineWidth = 2.5; const k = 16;
+      for (const [cx, cy, sx, sy] of [[bx, y - bh, 1, 1], [bx + bw, y - bh, -1, 1], [bx, y, 1, -1], [bx + bw, y, -1, -1]] as const) { ctx.beginPath(); ctx.moveTo(cx + sx * k, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy + sy * k); ctx.stroke(); }
+      ctx.fillStyle = rgba('ink', 0.55); ctx.fillRect(bx, y - bh, bw, bh);
+    } else if (ts === 'underline') { ctx.fillStyle = this.style.tintHex; ctx.fillRect(bx, y + 4, bw * grow, 2); }
+    else if (ts === 'pill') { ctx.fillStyle = rgba('ink2', 0.9); ctx.beginPath(); (ctx as any).roundRect(bx, y - bh, bw, bh, bh / 2); ctx.fill(); ctx.strokeStyle = this.style.tintHex; ctx.lineWidth = 2; ctx.stroke(); }
+    else if (ts === 'side') { ctx.fillStyle = rgba('ink2', 0.7); ctx.fillRect(bx, y - bh, bw, bh); ctx.fillStyle = this.style.tintHex; ctx.fillRect(bx, y - bh, 6, bh * grow); }
     ctx.font = font(fam, size);
     ctx.fillStyle = (o.hot ?? 0) > 0 ? mixColor('signal', 'bone', 1 - (o.hot ?? 0)) : rgba('bone', 0.97);
     ctx.textAlign = 'left';
@@ -318,7 +338,7 @@ export abstract class GenPlate extends Scene {
     setWorld(ctx, c, -480, -830);
     label(ctx, `${String((meta.i ?? this.idx) + 1).padStart(2, '0')} / ${String(meta.n ?? '').padStart(2, '0')}`, 0, 0, { size: 18, col: rgba('signal', 0.95 * a), spacing: 4 });
     label(ctx, String(meta.topic ?? '').toUpperCase().slice(0, 44), 110, 0, { size: 16, col: rgba(this.paperMode ? 'graphite' : 'ash', 0.9 * a), spacing: 3 });
-    const title = String(this.sc.title ?? '');
+    const title = caseOf(String(this.sc.title ?? ''));
     if (title) {
       const fam = ARCH(112.5, 900);
       const s = fitSize(title, fam, 960, 76);

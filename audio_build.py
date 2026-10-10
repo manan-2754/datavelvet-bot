@@ -134,7 +134,7 @@ def narrate(script, voice=None):
     scenes = [{"plate": s["plate"], "title": s.get("title", ""), "data": s.get("data", {}),
                "meta": {"i": i, "n": n, "topic": script.get("topic", ""), "seed": script.get("seed", 0)}} for i, s in enumerate(script["scenes"])]
     (ROOT / "data" / "lyrics.json").write_text(json.dumps({"source": "audio_build.narrate (edge-tts)", "lines": lines,
-                                                           "scenes": scenes}, indent=1, ensure_ascii=False), encoding="utf-8")
+                                                           "scenes": scenes, "style": script.get("style") or {}}, indent=1, ensure_ascii=False), encoding="utf-8")
     return len(y) / SR, voice
 
 
@@ -320,6 +320,66 @@ def mix(script):
                 w2 = cue(_q(it.get("cue"), it.get("label")), k, len(its))
                 put("whoosh_fast", T(w2, 0.05), -9, take=1 + k % 2, align="peak")
                 put("impact_small", T(w2, 0.05), -12)
+        elif plate == "compose":
+            trans = d.get("transition")
+            if trans == "flash":
+                put("impact_small", t0, -9)
+            elif trans == "glitch":
+                put("zap_slash", t0, -11)
+            elif trans == "zoom":
+                put("whoosh_soft", t0, -10)
+            if d.get("hook"):
+                put("spark_ignite", t0 + 0.2, -12)
+            els = d.get("elements") or []
+            SND = {"grow": ("whoosh_soft", -13), "pop": ("ui_blip", -10), "fly": ("whoosh_fast", -11), "drop": ("impact_small", -9),
+                   "rise": ("whoosh_soft", -14), "unfold": ("paper_slide", -13), "draw": ("pen_line", -13), "assemble": ("falling_pieces", -14),
+                   "glitch": ("zap_slash", -13), "scan": ("scan_sweep", -11)}
+            hum = False
+            for k, e in enumerate(els):
+                w2 = cue(_q(e.get("cue"), e.get("label")), k, len(els))
+                if not w2:
+                    continue
+                typ = e.get("type")
+                if typ in ("link", "beam"):
+                    put("spark_zip", T(w2), -12)
+                    continue
+                name, db = SND.get(e.get("anim"), ("ui_blip", -12))
+                put(name, T(w2, -0.05), db, dur=0.9 if name == "pen_line" else None)
+                if typ in ("counter", "gauge", "bars", "line"):
+                    for i in range(8):
+                        put("ui_tick", T(w2, 0.1 + i * 0.1), -21)
+                if typ in ("counter", "text"):
+                    put("impact_slam", T(w2), -10)
+                if typ in ("particles", "tunnel", "surface", "network") and not hum:
+                    put("projector_run", T(w2), -26, dur=max(0.8, nxt - w2["start"]))
+                    hum = True
+            if d.get("cta"):
+                sw = [w for l in lines if l["scene"] == si for w in l["words"] if norm(w["w"])]
+                if sw:
+                    put("riser", sw[-1]["end"], -13, align="end")
+                    put("impact_slam", sw[-1]["end"], -7)
+                put("reverse_suck", N / SR - 0.4, -17, align="end")
+        elif plate == "edit":
+            acts = d.get("acts") or []
+            for k, a in enumerate(acts):
+                w2 = cue(a.get("cue"), k, len(acts))
+                do = a.get("do")
+                if do == "slider":
+                    dur = float(a.get("dur") or 1.4)
+                    for i in range(int(dur / 0.07)):
+                        put("ui_tick", T(w2, i * 0.07), -22)
+                    put("mouse_click", T(w2, -0.05), -12)
+                elif do in ("key", "invert"):
+                    for i, _ in enumerate(str(a.get("keys") or "Ctrl + I").split("+")):
+                        put("key_click", T(w2, i * 0.08), -9, take=1 + i % 2)
+                elif do == "paint":
+                    put("pen_line", T(w2), -14, dur=float(a.get("dur") or 2.8))
+                elif do == "compare":
+                    put("whoosh_soft", T(w2), -11)
+                elif do == "circle":
+                    put("marker_strike", T(w2), -12)
+                elif do == "note":
+                    put("ui_blip", T(w2), -12)
         elif plate == "bars3d":
             lastw = None
             for k, it in enumerate(its):
