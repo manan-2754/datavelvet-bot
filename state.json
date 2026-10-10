@@ -3,7 +3,8 @@
     "How virtual memory works",
     "How browsers render a webpage",
     "How load balancers distribute traffic",
-    "How Docker containers work under the hood"
+    "How Docker containers work under the hood",
+    "How Paxos consensus works"
   ],
   "used_bank": [
     "dns_explained"
@@ -65,6 +66,14 @@
       "seed": 1180616472,
       "youtube_id": "55r1NyCoiSs",
       "instagram_id": "18119557396949139"
+    },
+    {
+      "time": "2026-10-10T01:29:12+00:00",
+      "topic": "How Paxos consensus works",
+      "format": "hook:0|holo:2|specimen:3|scene3d:3|form:3|layers:3|outro:0",
+      "seed": 519403097,
+      "youtube_id": "ru0fE5sd0NM",
+      "instagram_id": "18076028366735422"
     }
   ],
   "series_counts": {
@@ -73,7 +82,8 @@
   "used_formats": [
     "holo_flow:3|holo_tree:4|definition:4|holo_pipeline:4|holo_layers:3|holo_chart:4|compare:3|steps:3",
     "hook:0|title:3|specimen:3|holo:3|flows:4|form:4|stats:3|compare:4|outro:0",
-    "hook:0|compare:2|orbit:4|layers:4|tunnel:4|title:2|bars3d:2|scene3d:3|outro:0"
+    "hook:0|compare:2|orbit:4|layers:4|tunnel:4|title:2|bars3d:2|scene3d:3|outro:0",
+    "hook:0|holo:2|specimen:3|scene3d:3|form:3|layers:3|outro:0"
   ],
   "used_palettes": [
     "0:0"
