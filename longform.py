@@ -83,8 +83,18 @@ def fix_chapter(c, errors):
     return c
 
 
+def queued(long_st):
+    """The next priority topic you queued in long_state.json "next_topics" (used before the AI picks one)."""
+    done = set(long_st.get("done_queue", []))
+    return next((t for t in long_st.get("next_topics", []) if t not in done), None)
+
+
 def write(state, long_st, topic=None, seed=None):
     rng = random.Random(seed or time.time_ns())
+    qt = None if topic else queued(long_st)
+    if qt:
+        topic = qt
+        print(f"📌 Queued long-form topic: {qt}")
     o = outline(state, long_st, topic, n=rng.choice([7, 8, 8, 9]))
     whole, chapters = o.get("title") or o["topic"], o["chapters"]
     print(f"📖 Long-form: {whole}  ({len(chapters)} chapters)")
@@ -132,7 +142,7 @@ def write(state, long_st, topic=None, seed=None):
             "youtube": {"title": title.replace("#shorts", "").strip()[:95], "description": str(o.get("description", ""))[:1500],
                         "tags": [str(t)[:30] for t in (o.get("tags") or [])][:14]},
             "instagram_caption": "", "sources": facts["sources"],
-            "review": {"chapter_scores": reviews}}
+            "review": {"chapter_scores": reviews}, "queue_topic": qt}
 
 
 def chapter_marks(script):
@@ -167,4 +177,6 @@ def remember(long_st, script, video_id):
                               "title": script["youtube"]["title"], "youtube_id": video_id,
                               "style": (script.get("style") or {}).get("name")})
     long_st["used_topics"].append(script["topic"])
+    if script.get("queue_topic"):
+        long_st.setdefault("done_queue", []).append(script["queue_topic"])
     long_st["scene_signatures"].extend(script.get("signatures", []))

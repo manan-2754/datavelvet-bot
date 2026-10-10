@@ -68,5 +68,11 @@
   ],
   "used_topics": [
     "How virtual memory works"
-  ]
+  ],
+  "next_topics": [
+    "Why your computer slows down: RAM, swap and CPU cache explained",
+    "What actually happens when you type google.com and press Enter",
+    "How your phone works: from tap to pixels"
+  ],
+  "done_queue": []
 }
