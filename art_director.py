@@ -72,10 +72,22 @@ def recent_formats(state):
     return [m.get("format") for m in prune(state) if m.get("format")]
 
 
+def _weighted(rng, items, w):
+    x = rng.uniform(0, sum(w))
+    for it, wi in zip(items, w):
+        x -= wi
+        if x <= 0:
+            return it
+    return items[-1]
+
+
 def pick_angle(state, rng=None):
+    """Unused angle, weighted toward the angles the audience responded to (analytics.learn)."""
+    import analytics
     rng = rng or random.SystemRandom()
     used = {m.get("angle") for m in prune(state)}
-    return rng.choice([a for a in ANGLES if a[0] not in used] or ANGLES)
+    pool = [a for a in ANGLES if a[0] not in used] or ANGLES
+    return _weighted(rng, pool, [analytics.weight(state, "angle", a[0]) for a in pool])
 
 
 def pick_hook(state, rng=None):
@@ -137,6 +149,11 @@ def new_genome(state, n_scenes, rng=None, tries=400, hook=None):
             "created": _now().isoformat(timespec="seconds"),
             "hook": hook,
             "tag": rng.choice(["chip", "bracket", "underline", "pill", "side"]),
+            "reflect": rng.random() < 0.55,
+            "glass": {"on": True, "roughness": round(rng.uniform(0.03, 0.22), 3), "ior": round(rng.uniform(1.3, 1.65), 2),
+                      "thickness": round(rng.uniform(0.4, 1.2), 2), "dof": round(rng.uniform(3, 9), 1), "key": round(rng.uniform(1.6, 2.8), 2),
+                      "rim": holo[1]},
+            "mascot": {"on": rng.random() < 0.5, "side": rng.choice([1, -1]), "kind": rng.choice(["bot", "bot", "user", "globe", "chip"])},
             "_h": {"bg": round(hb, 1), "signal": round(hs, 1), "holo": round(hh, 1)},
             "palette": palette, "holo": holo,
             "type": {"wscale": round(rng.uniform(0.62, 1.12), 2), "wtadd": rng.choice([0, 0, -100, -200]), "case": rng.choice(CASES)},

@@ -15,6 +15,8 @@ import {
   Plot, Cam2D, gridPass, setGrid, drawKaraoke, placeRow, drawPen, w2s, setWorld, label, rowWidth, type KWord, type Cam,
 } from './_vo';
 import { Rig, View, Pen3, styleFor, floor, handheld, type Style, type V3 } from './_holo3d';
+import { GlassLayer, type GlassItem } from './_glass';
+import { hexToLinear } from '../engine/util';
 
 export const PAPER_GLSL = /* glsl */ `
 uniform vec4 uCam; uniform vec2 uRes;
@@ -189,6 +191,8 @@ export abstract class GenPlate extends Scene {
   drawFX(_X: LineBatch, _t: number, _c: Cam): void {}
   /** 3D holo drawing (world units, see _holo3d.ts). */
   draw3D(_P: Pen3, _t: number): void {}
+  /** Premium glass bodies under the hologram lines (see _glass.ts). */
+  glassItems(_t: number): GlassItem[] { return []; }
   /** Over the karaoke (stamps). */
   drawOver(_ctx: CanvasRenderingContext2D, _t: number, _c: Cam): void {}
   /** Post overrides on top of the plate defaults. */
@@ -272,6 +276,17 @@ export abstract class GenPlate extends Scene {
       const P3 = new Pen3(Z, v, this.style.tint);
       if (this.floorAt) floor(P3, this.style.floor, this.floorAt, this.floorR, prog(t, this.t0 + 0.05, this.t0 + 1.1), this.style.tint, t);
       this.draw3D(P3, t);
+      if (this.G.reflect && this.floorAt) { P3.mirror = this.floorAt[1]; this.draw3D(P3, t); P3.mirror = null; }
+      const gs = this.G.glass;
+      if (gs && gs.on) {
+        const items = this.glassItems(t);
+        if (items.length) {
+          const GL = GlassLayer.get(renderer);
+          GL.setView(v, this.viewCY);
+          GL.render(renderer, out, items, { roughness: +gs.roughness || 0.1, ior: +gs.ior || 1.45, thickness: +gs.thickness || 0.7, dof: +gs.dof || 5,
+            rim: hexToLinear(String(gs.rim || this.style.tintHex)), key: +gs.key || 2.2 });
+        }
+      }
       Z.render(renderer, out);
     }
     const U = this.ui; U.clear();
@@ -337,7 +352,7 @@ export abstract class GenPlate extends Scene {
     const ink = this.paperMode ? 'ink' : 'bone';
     setWorld(ctx, c, -480, -830);
     label(ctx, `${String((meta.i ?? this.idx) + 1).padStart(2, '0')} / ${String(meta.n ?? '').padStart(2, '0')}`, 0, 0, { size: 18, col: rgba('signal', 0.95 * a), spacing: 4 });
-    label(ctx, String(meta.topic ?? '').toUpperCase().slice(0, 44), 110, 0, { size: 16, col: rgba(this.paperMode ? 'graphite' : 'ash', 0.9 * a), spacing: 3 });
+    label(ctx, (meta.series ? `${meta.series} · EP ${meta.ep ?? 1}${meta.level ? ' · ' + meta.level : ''}` : String(meta.topic ?? '')).toUpperCase().slice(0, 44), 110, 0, { size: 16, col: rgba(this.paperMode ? 'graphite' : 'ash', 0.9 * a), spacing: 3 });
     const title = caseOf(String(this.sc.title ?? ''));
     if (title) {
       const fam = ARCH(112.5, 900);

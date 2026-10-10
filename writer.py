@@ -133,6 +133,24 @@ def _gemini_call(model, prompt, key):
     return "".join(p.get("text", "") for p in parts if not p.get("thought"))
 
 
+CLAUDE_MODEL = "claude-haiku-5-5"   # paid backup: cheap, reliable at long structured briefs
+
+
+def _claude_call(prompt, model=CLAUDE_MODEL):
+    """Claude via the official Anthropic SDK (reads ANTHROPIC_API_KEY)."""
+    import anthropic
+    client = anthropic.Anthropic(timeout=300.0, max_retries=2)
+    r = client.messages.create(model=model, max_tokens=16000, output_config={"effort": "medium"},
+                               messages=[{"role": "user", "content": prompt}])
+    if r.stop_reason == "refusal":
+        raise RuntimeError(f"refused ({getattr(r.stop_details, 'category', None)})")
+    if r.stop_reason == "max_tokens":
+        raise RuntimeError("response cut off at max_tokens")
+    text = "".join(b.text for b in r.content if b.type == "text")
+    json.loads(_json_text(text))
+    return text
+
+
 def _openai_compatible(name, base, key, model, prompt):
     r = requests.post(f"{base}/chat/completions", headers={"Authorization": f"Bearer {key}"}, timeout=300, json={
         "model": model, "messages": [{"role": "user", "content": prompt}], "temperature": 0.8,
@@ -146,7 +164,7 @@ def _openai_compatible(name, base, key, model, prompt):
 
 
 def llm(prompt, label="script"):
-    """Gemini first; then OpenRouter -> Groq -> OpenCode; Gemini Lite as the very last resort."""
+    """Gemini first; then Claude Haiku (paid backup); then OpenRouter -> Groq -> OpenCode; Gemini Lite last."""
     key, last = os.getenv("GEMINI_API_KEY", "").strip(), None
     if key:
         for attempt in range(2):
@@ -161,6 +179,15 @@ def llm(prompt, label="script"):
             if attempt == 0:
                 time.sleep(15)
     print("  Gemini unavailable - trying fallback models")
+    if os.getenv("ANTHROPIC_API_KEY", "").strip():
+        for attempt in range(2):
+            try:
+                text = _claude_call(prompt)
+                print(f"  {label} by Claude / {CLAUDE_MODEL}")
+                return _json_text(text)
+            except Exception as e:
+                last = f"Claude/{CLAUDE_MODEL}: {e}"
+                print(f"  {last}")
     for name, base, env, models in FALLBACKS:
         fkey = os.getenv(env, "").strip()
         for model in (models if fkey else []):

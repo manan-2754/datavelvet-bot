@@ -102,8 +102,11 @@ export class View {
 /** Glowing hairline pen in 3D: near clipping, depth fog, perspective width. */
 export class Pen3 {
   fogNear: number; fogFar: number;
+  /** Floor height to mirror everything about (reflection pass), or null. */
+  mirror: number | null = null; mAlpha = 0.16;
   constructor(public X: LineBatch, public v: View, public tint: RGB) { this.fogNear = v.s.dist * 0.9; this.fogFar = v.s.dist * 3.2; }
   seg(a: V3, b: V3, w: number, col: RGB, alpha = 1, glow = 0.16) {
+    if (this.mirror !== null) { const m = this.mirror; a = [a[0], 2 * m - a[1], a[2]]; b = [b[0], 2 * m - b[1], b[2]]; alpha *= this.mAlpha; glow = 0; }
     let ca = this.v.cam(a), cb = this.v.cam(b);
     const n = this.v.near;
     if (ca[2] < n && cb[2] < n) return;
@@ -128,6 +131,7 @@ export class Pen3 {
     }
   }
   dot(p: V3, s: number, col: RGB, alpha = 1) {
+    if (this.mirror !== null) { p = [p[0], 2 * this.mirror - p[1], p[2]]; alpha *= this.mAlpha; }
     const q = this.v.P(p); if (!q) return;
     const k = clamp(this.v.s.dist / q[2], 0.5, 2);
     this.X.seg2(q[0] - s * k * 0.5, q[1], q[0] + s * k * 0.5, q[1], s * k, col, alpha);

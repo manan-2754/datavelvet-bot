@@ -85,13 +85,14 @@ def host_on_github(path):
     return asset["browser_download_url"], asset["url"]
 
 
-def upload_reel(video_path, caption):
+def upload_reel(video_path, caption, thumb_offset=None):
     token, uid = _token(), _user_id()
     small = to_1080(video_path)
     url, asset_api = host_on_github(small)
     print(f"  Instagram: video hosted at {url}")
     try:
         fields = {"media_type": "REELS", "video_url": url, "caption": caption, "share_to_feed": "true",
+                  **({"thumb_offset": str(int(thumb_offset))} if thumb_offset else {}),
                   "is_ai_generated": "true",   # Instagram's "AI info" self-disclosure label
                   "access_token": token}
         r = requests.post(f"https://{HOST}/{VERSION}/{uid}/media", data=fields, timeout=60)

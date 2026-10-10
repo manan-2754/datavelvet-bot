@@ -1,0 +1,23 @@
+name: Weekly report - email the bot's health and what it learned
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'      # Mondays 13:00 UTC
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Send the weekly report
+        env:
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          PYTHONIOENCODING: utf-8
+        run: python report.py

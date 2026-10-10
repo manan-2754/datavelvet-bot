@@ -77,6 +77,11 @@ def failed(log_path):
 def watchdog(hours=3.0):
     p = last_post()
     now = datetime.now(timezone.utc)
+    st = json.loads((BASE / "state.json").read_text(encoding="utf-8")) if (BASE / "state.json").exists() else {}
+    th = st.get("throttle")
+    if th and datetime.fromisoformat(th["until"]) > now:
+        print(f"Throttled on purpose until {th['until']} ({th.get('reason')}) - a skipped slot is expected.")
+        return
     if p:
         when = datetime.fromisoformat(p["time"])
         if now - when <= timedelta(hours=hours) and p.get("youtube_id") and p.get("instagram_id"):

@@ -1,12 +1,13 @@
-name: Motion-as-Code explainer - create + post
+name: Motion-as-Code explainer - create + post (split render)
 
+# 3 premium videos a day. Each video: one job writes the script, narration, style and music; 10 free machines render
+# frame-exact slices in parallel (premium glass + holograms, CPU rendering); a final job stitches, mixes and posts.
 on:
   schedule:
-    # 4 videos/day (UTC) = 8am, 12pm, 4pm and 8pm Eastern (EDT). GitHub may start these a few minutes late.
-    - cron: '7 12 * * *'
-    - cron: '7 16 * * *'
-    - cron: '7 20 * * *'
-    - cron: '7 0 * * *'
+    # 9am, 2pm and 7pm Eastern (EDT) = 13:07, 18:07, 23:07 UTC. GitHub may start these a few minutes late.
+    - cron: '7 13 * * *'
+    - cron: '7 18 * * *'
+    - cron: '7 23 * * *'
   workflow_dispatch:
     inputs:
       post:
@@ -21,37 +22,135 @@ concurrency:
 permissions:
   contents: write
 
+env:
+  RENDER_FPS: '30'
+  RENDER_SAMPLES: '2'
+  RENDER_CHUNKS: '10'
+  PYTHONIOENCODING: utf-8
+  POST_FLAG: ${{ (github.event_name != 'workflow_dispatch' || inputs.post) && '--post' || '' }}
+
 jobs:
-  create-and-post:
+  prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 90
+    outputs:
+      has_video: ${{ steps.prep.outputs.has_video }}
+      chunks: ${{ steps.prep.outputs.chunks }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: pip
-
       - uses: oven-sh/setup-bun@v2
-
-      - name: Install system deps (ffmpeg; Chrome is preinstalled on the runner)
+      - name: Install deps
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
-          google-chrome --version
-
-      - name: Install Python + engine deps
-        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
           pip install -r requirements.txt
           cd app && bun install --frozen-lockfile
-
-      - name: Create video and post
+      - name: Script, research, narration, style, critic
+        id: prep
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          RUN_UNTIL: ${{ vars.RUN_UNTIL }}
+        run: |
+          set -o pipefail
+          python -u main.py --stage prepare $POST_FLAG 2>&1 | tee run.log
+      - name: Hand the bundle to the render machines
+        if: steps.prep.outputs.has_video == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-${{ github.run_number }}
+          path: |
+            out/bundle.json
+            data/lyrics.json
+            data/audio.json
+            audio/voiceover.mp3
+            state.json
+          retention-days: 1
+      - name: Email me if the video was not prepared
+        if: failure() || cancelled()
+        env:
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: python notify.py --failed run.log
+      - name: Save state (skipped slot or failure)
+        if: failure() || steps.prep.outputs.has_video != 'true'
+        run: |
+          git config user.name "explainer-bot"
+          git config user.email "explainer-bot@users.noreply.github.com"
+          git add state.json || true
+          git commit -m "bot: state [skip ci]" || exit 0
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done
+
+  render:
+    needs: prepare
+    if: needs.prepare.outputs.has_video == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        chunk: ${{ fromJSON(needs.prepare.outputs.chunks) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: oven-sh/setup-bun@v2
+      - name: Install deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+          cd app && bun install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle-${{ github.run_number }}
+          path: .
+      - name: Render slice ${{ matrix.chunk }} (retried once)
+        run: python -u main.py --stage render --chunk ${{ matrix.chunk }} || python -u main.py --stage render --chunk ${{ matrix.chunk }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chunk-${{ github.run_number }}-${{ matrix.chunk }}
+          path: out/chunks/*.mp4
+          retention-days: 1
+
+  finish:
+    needs: [prepare, render]
+    if: needs.prepare.outputs.has_video == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle-${{ github.run_number }}
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: chunk-${{ github.run_number }}-*
+          path: out/chunks
+          merge-multiple: true
+      - name: Stitch, mix, post
+        env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
@@ -59,19 +158,10 @@ jobs:
           AUTO_POST_YOUTUBE: ${{ vars.AUTO_POST_YOUTUBE }}
           AUTO_POST_INSTAGRAM: ${{ vars.AUTO_POST_INSTAGRAM }}
           CHANNEL_HANDLE: ${{ vars.CHANNEL_HANDLE }}
-          RUN_UNTIL: ${{ vars.RUN_UNTIL }}
           YT_PRIVACY: ${{ vars.YT_PRIVACY }}
-          RENDER_FPS: '30'
-          RENDER_SAMPLES: '2'
-          PYTHONIOENCODING: utf-8
         run: |
           set -o pipefail
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.post }}" != "true" ]; then
-            python -u main.py 2>&1 | tee run.log
-          else
-            python -u main.py --post 2>&1 | tee run.log
-          fi
-
+          python -u main.py --stage finish $POST_FLAG 2>&1 | tee run.log
       - name: Email me if the video was not posted
         if: failure() || cancelled()
         env:
@@ -79,7 +169,6 @@ jobs:
           ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
         run: python notify.py --failed run.log
-
       - name: Save topic progress
         if: always()
         run: |
@@ -88,7 +177,6 @@ jobs:
           git add state.json || true
           git commit -m "bot: posted video [skip ci]" || exit 0
           for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done
-
       - name: Keep a copy of the video (3 days)
         if: always()
         uses: actions/upload-artifact@v4

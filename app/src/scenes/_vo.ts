@@ -436,7 +436,7 @@ export interface KWord {
   w: Word; text: string; x: number; y: number; size: number; fam: string; lay: TextLayout;
   group: string; tAnt: number; tracking: number;
   /** Per-word style overrides. */
-  hot?: string; done?: string; outline?: boolean;
+  hot?: string; done?: string; outline?: boolean; pop?: number;
 }
 /** Lay out words as one row from (x, baseline y); returns the words and the row's width. */
 export function placeRow(words: Word[], x: number, y: number, size: number, fam: string, group: string, o: { texts?: string[]; ant?: number; tracking?: number; gap?: number; hot?: string; done?: string } = {}) {
@@ -495,7 +495,8 @@ export function drawKaraoke(ctx: CanvasRenderingContext2D, c: Cam, t: number, kw
     const n = kw.lay.glyphs.length;
     ctx.font = font(kw.fam, 100);
     ctx.letterSpacing = `${kw.tracking * 100}px`;
-    const pop = o.pop ? 1 + o.pop * pulse(t, kw.w.start, 0.07) : 1;
+    const pk = kw.pop ?? o.pop ?? 0;
+    const pop = pk ? 1 + pk * pulse(t, kw.w.start, kw.pop ? 0.16 : 0.07) : 1;
     for (const g of kw.lay.glyphs) {
       if (g.ch === ' ') continue;
       const j = o.jitter ? o.jitter(kw, g.i) : [0, 0] as [number, number];

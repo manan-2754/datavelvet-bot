@@ -19,7 +19,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parent
 SR = 48000
-VOICES = ["en-US-AndrewMultilingualNeural", "en-US-BrianMultilingualNeural"]
+VOICES = ["en-US-AndrewMultilingualNeural", "en-US-BrianMultilingualNeural", "en-US-ChristopherNeural", "en-US-EricNeural",
+          "en-US-GuyNeural", "en-US-SteffanNeural", "en-GB-RyanNeural"]
 LEAD, IN_SCENE, BETWEEN, TAIL = 0.35, 0.28, 0.7, 1.8
 
 
@@ -44,9 +45,9 @@ def decode(path):
     return np.frombuffer(raw, dtype=np.float32).copy()
 
 
-async def _synth(text, path, voice):
+async def _synth(text, path, voice, rate="+2%"):
     words = []
-    comm = edge_tts.Communicate(text, voice, rate="+2%", boundary="WordBoundary")
+    comm = edge_tts.Communicate(text, voice, rate=rate, boundary="WordBoundary")
     with open(path, "wb") as f:
         async for ch in comm.stream():
             if ch["type"] == "audio":
@@ -57,10 +58,10 @@ async def _synth(text, path, voice):
     return words
 
 
-def synth(text, path, voice):
+def synth(text, path, voice, rate="+2%"):
     for attempt in range(4):
         try:
-            words = asyncio.run(_synth(text, path, voice))
+            words = asyncio.run(_synth(text, path, voice, rate))
             if Path(path).stat().st_size > 1000:
                 return words
         except Exception as e:
@@ -102,7 +103,8 @@ def narrate(script, voice=None):
         for li, text in enumerate(sc["lines"]):
             mp3 = tmp / f"l{k:03d}.mp3"
             k += 1
-            bounds = synth(text, mp3, voice)
+            rate = "+8%" if si == 0 else ("-3%" if si == n - 1 else "+3%")   # punchy hook, calm landing
+            bounds = synth(text, mp3, voice, rate)
             audio = decode(mp3)
             nz = np.nonzero(np.abs(audio) > 0.004)[0]
             a0 = max(0, nz[0] - int(0.02 * SR)) if len(nz) else 0
@@ -132,7 +134,8 @@ def narrate(script, voice=None):
     subprocess.run([ffmpeg(), "-v", "error", "-y", "-i", str(wav), "-c:a", "libmp3lame", "-b:a", "256k",
                     str(ROOT / "audio" / "voiceover.mp3")], check=True)
     scenes = [{"plate": s["plate"], "title": s.get("title", ""), "data": s.get("data", {}),
-               "meta": {"i": i, "n": n, "topic": script.get("topic", ""), "seed": script.get("seed", 0)}} for i, s in enumerate(script["scenes"])]
+               "meta": {"i": i, "n": n, "topic": script.get("topic", ""), "seed": script.get("seed", 0),
+                        "series": (script.get("series") or {}).get("name"), "ep": (script.get("series") or {}).get("ep"), "level": script.get("level")}} for i, s in enumerate(script["scenes"])]
     (ROOT / "data" / "lyrics.json").write_text(json.dumps({"source": "audio_build.narrate (edge-tts)", "lines": lines,
                                                            "scenes": scenes, "style": script.get("style") or {}}, indent=1, ensure_ascii=False), encoding="utf-8")
     return len(y) / SR, voice
@@ -353,6 +356,13 @@ def mix(script):
                 if typ in ("particles", "tunnel", "surface", "network") and not hum:
                     put("projector_run", T(w2), -26, dur=max(0.8, nxt - w2["start"]))
                     hum = True
+            qz = d.get("quiz")
+            if isinstance(qz, dict):
+                wq = cue(qz.get("cue"), len(els), len(els) + 1)
+                if wq:
+                    for i in range(3):
+                        put("ui_tick", T(wq, -1.5 + i * 0.5), -12)
+                    put("confirm_chime", T(wq), -7)
             if d.get("cta"):
                 sw = [w for l in lines if l["scene"] == si for w in l["words"] if norm(w["w"])]
                 if sw:
@@ -450,7 +460,19 @@ def mix(script):
     win = int(0.08 * SR)
     env = np.convolve(np.abs(voice), np.ones(win, np.float32) / win, mode="same")
     duck = 10 ** (-7 * np.clip(env / (np.percentile(env, 90) + 1e-9), 0, 1) / 20)
-    out = voice + fx * duck * 0.9
+    try:                                   # soundtrack cut to the edit, ducked hard under the words
+        import music
+        st_ = [s for s in starts if s is not None]
+        mus, desc = music.render(st_, N / SR, SR, int(script.get("seed") or 1), hook_end=st_[1] if len(st_) > 1 else None,
+                                 outro_start=st_[-1] if len(st_) > 2 else None)
+        mus = mus[:N] if len(mus) >= N else np.pad(mus, (0, N - len(mus)))
+        duck_m = 10 ** (-13 * np.clip(env / (np.percentile(env, 90) + 1e-9), 0, 1) / 20)
+        script["music"] = desc
+        print(f"  music: {desc}")
+    except Exception as e:
+        mus, duck_m = np.zeros(N, np.float32), 1.0
+        print(f"  music skipped ({e})")
+    out = voice + fx * duck * 0.9 + mus * duck_m * 0.3
     active = out[np.abs(voice) > 0.02]
     rms = np.sqrt(np.mean(active ** 2)) if len(active) else 0.1
     out *= 0.17 / (rms + 1e-9)
