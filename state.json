@@ -6,7 +6,8 @@
     "How Docker containers work under the hood",
     "How Paxos consensus works",
     "What is serverless architecture?",
-    "How HTTPS/TLS encryption works"
+    "How HTTPS/TLS encryption works",
+    "Why your phone gets hot while charging"
   ],
   "used_bank": [
     "dns_explained"
@@ -17,11 +18,15 @@
       "topic": "How does DNS actually work?",
       "youtube_id": "VwpULb63iSg",
       "stats": {
-        "yt_views": 92,
+        "yt_views": 95,
         "yt_likes": 1,
         "yt_comments": 0,
-        "score": 117,
-        "fetched": "2026-10-10T13:42:04+00:00"
+        "yt_avp": 44.8,
+        "yt_avd": 43.0,
+        "yt_subs": 1,
+        "yt_shares": 0,
+        "score": 494.0,
+        "fetched": "2026-10-11T01:48:56+00:00"
       }
     },
     {
@@ -30,17 +35,21 @@
       "youtube_id": "9P7QiMeIP9U",
       "instagram_id": "18126836476852213",
       "stats": {
-        "yt_views": 1260,
+        "yt_views": 1306,
         "yt_likes": 30,
         "yt_comments": 0,
+        "yt_avp": 71.1,
+        "yt_avd": 70.0,
+        "yt_subs": 1,
+        "yt_shares": 0,
         "ig_reach": 199,
         "ig_saved": 3,
         "ig_shares": 1,
         "ig_views": 231,
         "ig_likes": 4,
         "ig_comments": 2,
-        "score": 2740.5,
-        "fetched": "2026-10-10T13:42:04+00:00"
+        "score": 3292.0,
+        "fetched": "2026-10-11T01:48:56+00:00"
       }
     },
     {
@@ -54,17 +63,17 @@
       "youtube_id": "lSAY6wbyT_A",
       "instagram_id": "18076383422549123",
       "stats": {
-        "yt_views": 218,
+        "yt_views": 275,
         "yt_likes": 2,
         "yt_comments": 0,
-        "ig_reach": 445,
+        "ig_reach": 455,
         "ig_saved": 3,
         "ig_shares": 1,
-        "ig_views": 506,
+        "ig_views": 516,
         "ig_likes": 5,
         "ig_comments": 0,
-        "score": 1301.5,
-        "fetched": "2026-10-10T13:42:05+00:00"
+        "score": 1373.5,
+        "fetched": "2026-10-11T01:48:56+00:00"
       }
     },
     {
@@ -75,17 +84,17 @@
       "youtube_id": "sM8pNlXKfok",
       "instagram_id": "18117438377093748",
       "stats": {
-        "yt_views": 160,
-        "yt_likes": 3,
-        "yt_comments": 0,
-        "ig_reach": 337,
-        "ig_saved": 0,
+        "yt_views": 275,
+        "yt_likes": 5,
+        "yt_comments": 1,
+        "ig_reach": 357,
+        "ig_saved": 1,
         "ig_shares": 1,
-        "ig_views": 374,
+        "ig_views": 402,
         "ig_likes": 1,
         "ig_comments": 0,
-        "score": 862.5,
-        "fetched": "2026-10-10T13:42:05+00:00"
+        "score": 1165.5,
+        "fetched": "2026-10-11T01:48:56+00:00"
       }
     },
     {
@@ -208,6 +217,60 @@
         "series": "How the Internet Works"
       },
       "youtube_id": "wAYl4q3sCwc"
+    },
+    {
+      "time": "2026-10-11T02:04:19+00:00",
+      "topic": "Why your phone gets hot while charging",
+      "format": "ring > tree > spiral > diagonal > cluster > row",
+      "seed": 133850125,
+      "features": {
+        "angle": "analogy",
+        "layouts": [
+          "ring",
+          "tree",
+          "spiral",
+          "diagonal",
+          "cluster",
+          "row"
+        ],
+        "types": [
+          "bars",
+          "beam",
+          "burst",
+          "counter",
+          "cylinder",
+          "gauge",
+          "matrix",
+          "network",
+          "object",
+          "panel",
+          "particles",
+          "ring",
+          "stack",
+          "stream",
+          "text",
+          "torus",
+          "wave"
+        ],
+        "cams": [
+          "dutch",
+          "push",
+          "orbit",
+          "fly",
+          "crane",
+          "dolly"
+        ],
+        "hue": "Cyan",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "dorian",
+        "length": "mid",
+        "level": "engineer",
+        "trend": false,
+        "series": "Tech Explained",
+        "cta": "save"
+      },
+      "youtube_id": "4aZ5dipKfvI",
+      "instagram_id": "18025092821863422"
     }
   ],
   "series_counts": {
@@ -219,7 +282,8 @@
     "hook:0|compare:2|orbit:4|layers:4|tunnel:4|title:2|bars3d:2|scene3d:3|outro:0",
     "hook:0|holo:2|specimen:3|scene3d:3|form:3|layers:3|outro:0",
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
-    "scatter > row > wave > ring > pyramid > stack > depth"
+    "scatter > row > wave > ring > pyramid > stack > depth",
+    "ring > tree > spiral > diagonal > cluster > row"
   ],
   "used_palettes": [
     "0:0"
@@ -239,125 +303,119 @@
   "queued_scripts": [],
   "style_memory": [
     {
-      "posted_at": "2026-10-10T21:58:50+00:00",
+      "posted_at": "2026-10-11T02:06:12+00:00",
       "style": {
-        "name": "Ember Prism / Jade signal",
-        "created": "2026-10-10T21:44:12+00:00",
+        "name": "Cyan Drift / Lime signal",
+        "created": "2026-10-11T01:54:54+00:00",
         "hook": null,
-        "tag": "pill",
-        "reflect": false,
+        "tag": "side",
+        "reflect": true,
         "glass": {
           "on": true,
-          "roughness": 0.061,
-          "ior": 1.63,
-          "thickness": 1.0,
-          "dof": 8.8,
-          "key": 2.51,
-          "rim": "#FD4FD8"
+          "roughness": 0.205,
+          "ior": 1.33,
+          "thickness": 0.87,
+          "dof": 3.1,
+          "key": 1.73,
+          "rim": "#77E9BF"
         },
         "mascot": {
-          "on": false,
+          "on": true,
           "side": 1,
           "kind": "bot"
         },
         "_h": {
-          "bg": 7.6,
-          "signal": 95.8,
-          "holo": 0.1
+          "bg": 179.3,
+          "signal": 68.2,
+          "holo": 197.0
         },
         "palette": {
-          "ink": "#0F0706",
-          "ink2": "#1E100E",
-          "graphite": "#705E5C",
-          "ash": "#AA9D9B",
-          "bone": "#EEDDDE",
-          "signal": "#70F217",
-          "ember": "#69FF4A",
-          "blood": "#6AC410"
+          "ink": "#091111",
+          "ink2": "#12201F",
+          "graphite": "#5A6E6E",
+          "ash": "#99A8A8",
+          "bone": "#EDF3F3",
+          "signal": "#DCF637",
+          "ember": "#C0FF55",
+          "blood": "#BBC110"
         },
         "holo": [
-          "#F54E4E",
-          "#FD4FD8"
+          "#3CC2F6",
+          "#77E9BF"
         ],
         "type": {
-          "wscale": 0.77,
+          "wscale": 1.08,
           "wtadd": 0,
-          "case": "lower"
+          "case": "title"
         },
         "grid": {
-          "minor": 20,
-          "major": 100
+          "minor": 24,
+          "major": 72
         },
         "caption": {
-          "size": 49,
-          "dy": -5
+          "size": 54,
+          "dy": -31
         },
         "post": {
-          "bloom": 0.88,
-          "bloomThreshold": 0.83,
-          "vignette": 0.38,
-          "grain": 0.027,
-          "ca": 0.21,
-          "halation": 0.0
+          "bloom": 0.82,
+          "bloomThreshold": 0.9,
+          "vignette": 0.26,
+          "grain": 0.045,
+          "ca": 0.57,
+          "halation": 0.27
         },
         "cam2d": {
-          "zoom": 0.994,
-          "roll": 0.0014,
-          "hand": 1.38
+          "zoom": 0.97,
+          "roll": 0.012,
+          "hand": 0.5
         },
         "cam3d": {
-          "fov": -7.4,
-          "roll": -0.048,
-          "dist": 1.18,
-          "hand": 0.86
+          "fov": -1.3,
+          "roll": 0.015,
+          "dist": 1.06,
+          "hand": 0.88
         },
         "scenes": [
           {
-            "cam": "dolly",
-            "reveal": "glitch",
+            "cam": "spiral",
+            "reveal": "draw",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "assemble",
             "floor": "polar",
             "spin": -1
           },
           {
-            "cam": "top",
-            "reveal": "assemble",
+            "cam": "fly",
+            "reveal": "glitch",
             "floor": "dots",
-            "spin": 1
+            "spin": -1
           },
           {
             "cam": "push",
-            "reveal": "glitch",
-            "floor": "grid",
+            "reveal": "scan",
+            "floor": "hex",
             "spin": -1
           },
           {
-            "cam": "spiral",
+            "cam": "top",
             "reveal": "assemble",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "orbit",
-            "reveal": "glitch",
-            "floor": "grid",
+            "floor": "polar",
             "spin": 1
           },
           {
             "cam": "low",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "top",
-            "reveal": "scan",
+            "reveal": "glitch",
             "floor": "grid",
             "spin": -1
           }
         ]
       },
-      "format": "scatter > row > wave > ring > pyramid > stack > depth",
-      "angle": "failure-first"
+      "format": "ring > tree > spiral > diagonal > cluster > row",
+      "angle": "analogy"
     }
   ],
   "scene_signatures": [
@@ -376,15 +434,22 @@
     "ring|beam:draw,object:drop,object:drop",
     "pyramid|object:assemble,orbit:scan,panel:unfold",
     "stack|burst:grow,matrix:scan,ring:pop",
-    "depth|code:scan,link:draw,object:assemble,object:rise"
+    "depth|code:scan,link:draw,object:assemble,object:rise",
+    "ring|object:pop,particles:fly,ring:draw",
+    "tree|cylinder:grow,matrix:scan,stream:grow",
+    "spiral|burst:pop,text:glitch,wave:draw",
+    "diagonal|bars:rise,beam:draw,gauge:grow",
+    "cluster|network:assemble,object:drop,torus:scan",
+    "row|counter:pop,panel:fly,stack:unfold"
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
-    "scatter > row > wave > ring > pyramid > stack > depth"
+    "scatter > row > wave > ring > pyramid > stack > depth",
+    "ring > tree > spiral > diagonal > cluster > row"
   ],
   "insights": {
     "n": 0,
-    "updated": "2026-10-10T21:35:48+00:00",
+    "updated": "2026-10-11T01:48:56+00:00",
     "best": {},
     "worst": {},
     "lift": {}
@@ -394,10 +459,14 @@
       "time": "2026-10-10T21:58:50+00:00",
       "ok": false,
       "error": "upload failed on a platform"
+    },
+    {
+      "time": "2026-10-11T02:06:12+00:00",
+      "ok": true
     }
   ],
   "series": {
-    "name": "How the Internet Works",
+    "name": "Tech Explained",
     "ep": 1
   }
 }
