@@ -9,7 +9,8 @@
     "How HTTPS/TLS encryption works",
     "Why your phone gets hot while charging",
     "How compiler register allocation works",
-    "What actually happens when you type google.com"
+    "What actually happens when you type google.com",
+    "Why Chrome eats all your RAM"
   ],
   "used_bank": [
     "dns_explained"
@@ -403,6 +404,54 @@
       },
       "youtube_id": "8hYtOJwJJxE",
       "instagram_id": "18178100578445939"
+    },
+    {
+      "time": "2026-10-11T22:05:54+00:00",
+      "topic": "Why Chrome eats all your RAM",
+      "format": "row > depth > grid > spiral > stack > cluster",
+      "seed": 1260489847,
+      "features": {
+        "angle": "myth-busting",
+        "layouts": [
+          "row",
+          "depth",
+          "grid",
+          "spiral",
+          "stack",
+          "cluster"
+        ],
+        "types": [
+          "box",
+          "burst",
+          "code",
+          "link",
+          "network",
+          "panel",
+          "ring",
+          "sphere",
+          "stack",
+          "stream",
+          "text"
+        ],
+        "cams": [
+          "fly",
+          "orbit",
+          "crane",
+          "dolly",
+          "low",
+          "push"
+        ],
+        "hue": "Saffron",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "dorian",
+        "length": "short",
+        "level": "beginner",
+        "trend": false,
+        "series": "Tech Explained",
+        "cta": "send"
+      },
+      "youtube_id": "S0YLDkabNOM",
+      "instagram_id": "17948011797304068"
     }
   ],
   "series_counts": {
@@ -417,7 +466,8 @@
     "scatter > row > wave > ring > pyramid > stack > depth",
     "ring > tree > spiral > diagonal > cluster > row",
     "timeline > diagonal > cluster > tree > grid > radial",
-    "depth > tree > radial > stack > timeline > diagonal > cluster"
+    "depth > tree > radial > stack > timeline > diagonal > cluster",
+    "row > depth > grid > spiral > stack > cluster"
   ],
   "used_palettes": [
     "0:0"
@@ -437,125 +487,119 @@
   "queued_scripts": [],
   "style_memory": [
     {
-      "posted_at": "2026-10-11T18:24:13+00:00",
+      "posted_at": "2026-10-11T22:08:16+00:00",
       "style": {
-        "name": "Indigo Neon / Saffron signal",
-        "created": "2026-10-11T18:09:24+00:00",
+        "name": "Saffron Pulse / Indigo signal",
+        "created": "2026-10-11T21:55:13+00:00",
         "hook": null,
-        "tag": "side",
+        "tag": "underline",
         "reflect": false,
         "glass": {
           "on": true,
-          "roughness": 0.154,
-          "ior": 1.62,
-          "thickness": 0.88,
-          "dof": 3.9,
-          "key": 2.42,
-          "rim": "#6DCBEF"
+          "roughness": 0.153,
+          "ior": 1.48,
+          "thickness": 0.63,
+          "dof": 4.0,
+          "key": 2.37,
+          "rim": "#C3ED61"
         },
         "mascot": {
-          "on": false,
-          "side": -1,
-          "kind": "globe"
+          "on": true,
+          "side": 1,
+          "kind": "user"
         },
         "_h": {
-          "bg": 230.4,
-          "signal": 40.5,
-          "holo": 221.5
+          "bg": 54.5,
+          "signal": 216.1,
+          "holo": 34.4
         },
         "palette": {
-          "ink": "#070811",
-          "ink2": "#0F1120",
-          "graphite": "#5E6173",
-          "ash": "#8F92A0",
-          "bone": "#E9E8F0",
-          "signal": "#F7B01E",
-          "ember": "#FFF163",
-          "blood": "#B46E0F"
+          "ink": "#13120A",
+          "ink2": "#212013",
+          "graphite": "#626050",
+          "ash": "#ADAC9F",
+          "bone": "#F2F2EA",
+          "signal": "#1C6FEE",
+          "ember": "#637DFF",
+          "blood": "#106BC6"
         },
         "holo": [
-          "#628DEF",
-          "#6DCBEF"
+          "#F0B361",
+          "#C3ED61"
         ],
         "type": {
-          "wscale": 0.68,
-          "wtadd": -100,
-          "case": "lower"
+          "wscale": 0.87,
+          "wtadd": 0,
+          "case": "title"
         },
         "grid": {
           "minor": 18,
-          "major": 72
+          "major": 90
         },
         "caption": {
-          "size": 53,
-          "dy": -4
+          "size": 50,
+          "dy": -7
         },
         "post": {
-          "bloom": 1.01,
-          "bloomThreshold": 0.71,
-          "vignette": 0.52,
-          "grain": 0.08,
-          "ca": 0.29,
-          "halation": 0.1
+          "bloom": 0.74,
+          "bloomThreshold": 0.74,
+          "vignette": 0.29,
+          "grain": 0.07,
+          "ca": 0.16,
+          "halation": 0.22
         },
         "cam2d": {
-          "zoom": 1.048,
-          "roll": 0.0096,
-          "hand": 0.7
+          "zoom": 1.047,
+          "roll": 0.0008,
+          "hand": 1.76
         },
         "cam3d": {
-          "fov": 8.8,
-          "roll": 0.018,
-          "dist": 1.18,
-          "hand": 0.38
+          "fov": -4.5,
+          "roll": -0.037,
+          "dist": 1.02,
+          "hand": 0.69
         },
         "scenes": [
-          {
-            "cam": "orbit",
-            "reveal": "glitch",
-            "floor": "grid",
-            "spin": 1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "scan",
-            "floor": "polar",
-            "spin": 1
-          },
           {
             "cam": "crane",
             "reveal": "draw",
             "floor": "dots",
-            "spin": 1
+            "spin": -1
           },
           {
             "cam": "spiral",
             "reveal": "scan",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "dolly",
-            "reveal": "assemble",
             "floor": "polar",
-            "spin": -1
-          },
-          {
-            "cam": "low",
-            "reveal": "scan",
-            "floor": "dots",
             "spin": 1
           },
           {
-            "cam": "push",
+            "cam": "dutch",
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "fly",
             "reveal": "glitch",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "crane",
+            "reveal": "draw",
             "floor": "polar",
             "spin": -1
+          },
+          {
+            "cam": "push",
+            "reveal": "assemble",
+            "floor": "grid",
+            "spin": 1
           }
         ]
       },
-      "format": "depth > tree > radial > stack > timeline > diagonal > cluster",
-      "angle": "versus"
+      "format": "row > depth > grid > spiral > stack > cluster",
+      "angle": "myth-busting"
     }
   ],
   "scene_signatures": [
@@ -593,18 +637,25 @@
     "stack|code:scan,panel:drop,particles:fly,text:grow",
     "timeline|link:draw,object:grow,object:pop,stream:fly",
     "diagonal|matrix:rise,object:scan,panel:unfold,stream:fly",
-    "cluster|object:grow,object:pop,orbit:assemble,ring:draw"
+    "cluster|object:grow,object:pop,orbit:assemble,ring:draw",
+    "row|sphere:grow,stack:unfold,text:pop",
+    "depth|link:draw,panel:scan,panel:scan,sphere:assemble",
+    "grid|box:glitch,burst:pop,panel:pop,sphere:drop",
+    "spiral|code:rise,sphere:pop,text:pop",
+    "stack|ring:draw,sphere:assemble,stack:grow,stream:fly",
+    "cluster|network:rise,sphere:pop,sphere:unfold"
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
     "scatter > row > wave > ring > pyramid > stack > depth",
     "ring > tree > spiral > diagonal > cluster > row",
     "timeline > diagonal > cluster > tree > grid > radial",
-    "depth > tree > radial > stack > timeline > diagonal > cluster"
+    "depth > tree > radial > stack > timeline > diagonal > cluster",
+    "row > depth > grid > spiral > stack > cluster"
   ],
   "insights": {
     "n": 1,
-    "updated": "2026-10-11T18:00:14+00:00",
+    "updated": "2026-10-11T21:51:58+00:00",
     "best": {},
     "worst": {},
     "lift": {}
@@ -626,10 +677,14 @@
     {
       "time": "2026-10-11T18:24:13+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-11T22:08:16+00:00",
+      "ok": true
     }
   ],
   "series": {
     "name": "Tech Explained",
-    "ep": 2
+    "ep": 3
   }
 }
