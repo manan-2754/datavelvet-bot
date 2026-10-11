@@ -8,7 +8,8 @@
     "What is serverless architecture?",
     "How HTTPS/TLS encryption works",
     "Why your phone gets hot while charging",
-    "How compiler register allocation works"
+    "How compiler register allocation works",
+    "What actually happens when you type google.com"
   ],
   "used_bank": [
     "dns_explained"
@@ -230,7 +231,14 @@
         "trend": false,
         "series": "How the Internet Works"
       },
-      "youtube_id": "wAYl4q3sCwc"
+      "youtube_id": "wAYl4q3sCwc",
+      "stats": {
+        "yt_views": 5,
+        "yt_likes": 0,
+        "yt_comments": 0,
+        "score": 5,
+        "fetched": "2026-10-11T18:00:14+00:00"
+      }
     },
     {
       "time": "2026-10-11T02:04:19+00:00",
@@ -341,6 +349,60 @@
       },
       "youtube_id": "sZQlLUJu54U",
       "instagram_id": "17907826107668662"
+    },
+    {
+      "time": "2026-10-11T18:21:22+00:00",
+      "topic": "What actually happens when you type google.com",
+      "format": "depth > tree > radial > stack > timeline > diagonal > cluster",
+      "seed": 1679522745,
+      "features": {
+        "angle": "versus",
+        "layouts": [
+          "depth",
+          "tree",
+          "radial",
+          "stack",
+          "timeline",
+          "diagonal",
+          "cluster"
+        ],
+        "types": [
+          "beam",
+          "burst",
+          "code",
+          "cylinder",
+          "link",
+          "matrix",
+          "network",
+          "object",
+          "orbit",
+          "panel",
+          "particles",
+          "ring",
+          "stream",
+          "text",
+          "tunnel"
+        ],
+        "cams": [
+          "dolly",
+          "orbit",
+          "push",
+          "crane",
+          "spiral",
+          "dutch",
+          "fly"
+        ],
+        "hue": "Indigo",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "minor",
+        "length": "mid",
+        "level": "deep dive",
+        "trend": false,
+        "series": "Tech Explained",
+        "cta": "save"
+      },
+      "youtube_id": "8hYtOJwJJxE",
+      "instagram_id": "18178100578445939"
     }
   ],
   "series_counts": {
@@ -354,7 +416,8 @@
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
     "scatter > row > wave > ring > pyramid > stack > depth",
     "ring > tree > spiral > diagonal > cluster > row",
-    "timeline > diagonal > cluster > tree > grid > radial"
+    "timeline > diagonal > cluster > tree > grid > radial",
+    "depth > tree > radial > stack > timeline > diagonal > cluster"
   ],
   "used_palettes": [
     "0:0"
@@ -374,119 +437,125 @@
   "queued_scripts": [],
   "style_memory": [
     {
-      "posted_at": "2026-10-11T14:41:08+00:00",
+      "posted_at": "2026-10-11T18:24:13+00:00",
       "style": {
-        "name": "Jade Tide / Crimson signal",
-        "created": "2026-10-11T14:27:58+00:00",
+        "name": "Indigo Neon / Saffron signal",
+        "created": "2026-10-11T18:09:24+00:00",
         "hook": null,
-        "tag": "pill",
+        "tag": "side",
         "reflect": false,
         "glass": {
           "on": true,
-          "roughness": 0.117,
-          "ior": 1.65,
-          "thickness": 0.81,
-          "dof": 7.1,
-          "key": 1.8,
-          "rim": "#7195EE"
+          "roughness": 0.154,
+          "ior": 1.62,
+          "thickness": 0.88,
+          "dof": 3.9,
+          "key": 2.42,
+          "rim": "#6DCBEF"
         },
         "mascot": {
           "on": false,
           "side": -1,
-          "kind": "bot"
+          "kind": "globe"
         },
         "_h": {
-          "bg": 114.8,
-          "signal": 332.8,
-          "holo": 192.1
+          "bg": 230.4,
+          "signal": 40.5,
+          "holo": 221.5
         },
         "palette": {
-          "ink": "#070C06",
-          "ink2": "#101A0F",
-          "graphite": "#5C6E5A",
-          "ash": "#92A191",
-          "bone": "#EEF2ED",
-          "signal": "#F9368E",
-          "ember": "#FF557A",
-          "blood": "#B50F6B"
+          "ink": "#070811",
+          "ink2": "#0F1120",
+          "graphite": "#5E6173",
+          "ash": "#8F92A0",
+          "bone": "#E9E8F0",
+          "signal": "#F7B01E",
+          "ember": "#FFF163",
+          "blood": "#B46E0F"
         },
         "holo": [
-          "#4BD6F9",
-          "#7195EE"
+          "#628DEF",
+          "#6DCBEF"
         ],
         "type": {
-          "wscale": 1.1,
-          "wtadd": -200,
-          "case": "title"
+          "wscale": 0.68,
+          "wtadd": -100,
+          "case": "lower"
         },
         "grid": {
-          "minor": 40,
-          "major": 200
+          "minor": 18,
+          "major": 72
         },
         "caption": {
-          "size": 56,
-          "dy": -21
+          "size": 53,
+          "dy": -4
         },
         "post": {
-          "bloom": 0.6,
-          "bloomThreshold": 0.72,
-          "vignette": 0.3,
-          "grain": 0.068,
-          "ca": 0.66,
-          "halation": 0.33
+          "bloom": 1.01,
+          "bloomThreshold": 0.71,
+          "vignette": 0.52,
+          "grain": 0.08,
+          "ca": 0.29,
+          "halation": 0.1
         },
         "cam2d": {
-          "zoom": 1.026,
-          "roll": 0.0106,
-          "hand": 1.63
+          "zoom": 1.048,
+          "roll": 0.0096,
+          "hand": 0.7
         },
         "cam3d": {
-          "fov": -1.4,
-          "roll": 0.038,
-          "dist": 1.02,
-          "hand": 0.71
+          "fov": 8.8,
+          "roll": 0.018,
+          "dist": 1.18,
+          "hand": 0.38
         },
         "scenes": [
           {
-            "cam": "fly",
-            "reveal": "draw",
-            "floor": "grid",
-            "spin": 1
-          },
-          {
-            "cam": "whip",
+            "cam": "orbit",
             "reveal": "glitch",
-            "floor": "dots",
+            "floor": "grid",
             "spin": 1
           },
           {
-            "cam": "low",
-            "reveal": "assemble",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "spiral",
-            "reveal": "draw",
-            "floor": "grid",
-            "spin": -1
-          },
-          {
-            "cam": "crane",
+            "cam": "dutch",
             "reveal": "scan",
             "floor": "polar",
             "spin": 1
           },
           {
-            "cam": "dutch",
+            "cam": "crane",
             "reveal": "draw",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "scan",
             "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "dolly",
+            "reveal": "assemble",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "low",
+            "reveal": "scan",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "push",
+            "reveal": "glitch",
+            "floor": "polar",
             "spin": -1
           }
         ]
       },
-      "format": "timeline > diagonal > cluster > tree > grid > radial",
-      "angle": "journey"
+      "format": "depth > tree > radial > stack > timeline > diagonal > cluster",
+      "angle": "versus"
     }
   ],
   "scene_signatures": [
@@ -517,17 +586,25 @@
     "cluster|beam:draw,gauge:grow,network:assemble",
     "tree|link:draw,matrix:scan,ring:pop,text:rise",
     "grid|burst:pop,counter:grow,object:drop",
-    "radial|object:pop,stack:unfold,wave:grow"
+    "radial|object:pop,stack:unfold,wave:grow",
+    "depth|object:grow,text:pop,tunnel:draw",
+    "tree|beam:draw,network:assemble,ring:rise",
+    "radial|burst:glitch,cylinder:pop,object:unfold",
+    "stack|code:scan,panel:drop,particles:fly,text:grow",
+    "timeline|link:draw,object:grow,object:pop,stream:fly",
+    "diagonal|matrix:rise,object:scan,panel:unfold,stream:fly",
+    "cluster|object:grow,object:pop,orbit:assemble,ring:draw"
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
     "scatter > row > wave > ring > pyramid > stack > depth",
     "ring > tree > spiral > diagonal > cluster > row",
-    "timeline > diagonal > cluster > tree > grid > radial"
+    "timeline > diagonal > cluster > tree > grid > radial",
+    "depth > tree > radial > stack > timeline > diagonal > cluster"
   ],
   "insights": {
-    "n": 0,
-    "updated": "2026-10-11T14:24:05+00:00",
+    "n": 1,
+    "updated": "2026-10-11T18:00:14+00:00",
     "best": {},
     "worst": {},
     "lift": {}
@@ -545,10 +622,14 @@
     {
       "time": "2026-10-11T14:41:08+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-11T18:24:13+00:00",
+      "ok": true
     }
   ],
   "series": {
-    "name": "Under the Hood",
-    "ep": 1
+    "name": "Tech Explained",
+    "ep": 2
   }
 }
