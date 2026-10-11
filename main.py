@@ -221,7 +221,7 @@ def finish_video(script, ctx, raw, show=False):
             "duration": round(dur, 1), "voice": voice, "format": script.get("format"), "seed": script.get("seed"),
             "style_name": (script.get("style") or {}).get("name"), "angle": script.get("angle"),
             "review": script.get("review"), "music": script.get("music"), "sources": script.get("sources", []),
-            "cover_ms": cover_ms(), "comment": script.get("comment"), "series_name": (script.get("series") or {}).get("name")}
+            "cover_ms": cover_ms(), "comment": script.get("comment") or "Did you know this before watching? Yes or no 👇", "series_name": (script.get("series") or {}).get("name")}
     meta["features"] = features(script, meta)
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"✅ {video} ({video.stat().st_size / 1e6:.1f} MB, {dur:.0f}s)")
@@ -280,6 +280,12 @@ def main():
         return stage_render(args.chunk)
     if args.stage == "finish":
         return stage_finish(args.post)
+    if args.post and not args.long and os.getenv("GITHUB_EVENT_NAME") == "schedule":   # a late scheduled run right after a manual post
+        last = next((p.get("time") for p in reversed(load_state().get("posts", [])) if p.get("time")), None)
+        if last and (datetime.now(timezone.utc) - datetime.fromisoformat(last)).total_seconds() < 2.5 * 3600:
+            print("⏭️ A video was posted less than 2.5 h ago (manual run) - skipping this delayed slot to avoid a double post")
+            gh_output(has_video="false", chunks="[]")
+            return 0
     if args.post and date.today().isoformat() > RUN_UNTIL:
         print(f"Posting window ended on {RUN_UNTIL}.")
         gh_output(has_video="false", chunks="[]")
