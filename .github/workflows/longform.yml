@@ -86,7 +86,7 @@ jobs:
     timeout-minutes: 180
     strategy:
       fail-fast: false
-      max-parallel: 20
+      max-parallel: 14   # leaves 6 of the 20 free job slots for a Short rendering at the same time
       matrix:
         chunk: ${{ fromJSON(needs.prepare.outputs.chunks) }}
     steps:
