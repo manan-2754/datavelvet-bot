@@ -213,6 +213,7 @@ class World {
     this.imgs = imgs;
     this.painter = Object.create(Story.prototype);
     this.painter.style = { tintHex };
+    this.look = ly.scenes?.[0]?.data?.look ?? {};
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     const pm = new THREE.PMREMGenerator(renderer);
     this.scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
@@ -222,13 +223,15 @@ class World {
     this.sun.castShadow = true; this.sun.shadow.mapSize.set(2048, 2048); this.sun.shadow.radius = 6; this.sun.shadow.bias = -0.0004;
     Object.assign(this.sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 1, far: 60 });
     this.ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshStandardMaterial({ color: LIGHT_BG, roughness: 1 }));
-    const dots = textCanvas(64, 64, (c) => { c.fillStyle = '#000'; c.fillRect(0, 0, 64, 64); c.fillStyle = '#2A3140'; c.beginPath(); c.arc(32, 32, 3.2, 0, 6.3); c.fill(); });
+    const dots = textCanvas(64, 64, (c) => { c.fillStyle = '#000'; c.fillRect(0, 0, 64, 64); c.fillStyle = '#2A3140'; const fl = String(this.look.floor ?? 'dots'); if (fl === 'lines') { c.fillRect(0, 31, 64, 2); c.fillRect(31, 0, 2, 64); } else if (fl === 'cross') { c.fillRect(26, 31, 12, 2); c.fillRect(31, 26, 2, 12); } else { c.beginPath(); c.arc(32, 32, 3.2, 0, 6.3); c.fill(); } });
     dots.wrapS = dots.wrapT = THREE.RepeatWrapping; dots.repeat.set(500, 500);
     Object.assign(this.ground.material as THREE.MeshStandardMaterial, { emissive: new THREE.Color('#ffffff'), emissiveMap: dots, emissiveIntensity: 1 });
     this.ground.rotation.x = -Math.PI / 2; this.ground.receiveShadow = true; this.scene.add(this.ground);
     this.scene.fog = new THREE.Fog(LIGHT_BG, 20, 70);
 
     const scenes: any[] = (this.scenes = ly.scenes ?? []);
+    this.look = scenes[0]?.data?.look ?? {};
+    this.cam.fov = Number(this.look.fov) || 36; this.cam.updateProjectionMatrix();
     scenes.forEach((s: any, i: number) => {
       const first = ly.lines.find((l: any) => l.scene === i);
       this.beatT0[i] = i === 0 ? 0 : first ? first.start - 0.12 : (this.beatT0[i - 1] ?? 0) + 2;
@@ -237,7 +240,7 @@ class World {
     });
     const nStage = Math.max(1, ...this.beatStage.map((x) => x + 1));
     for (let st = 0; st < nStage; st++) {
-      this.hubs.push(v3(st * 17, 0, Math.sin(st * 1.7) * 5));
+      this.hubs.push(this.hubAt(st));
       const bi = this.beatStage.indexOf(st);
       this.stageT0[st] = bi >= 0 ? this.beatT0[bi]! : 1e9;
       const h = hero(String(scenes[bi]?.data?.object ?? 'cube'), this.tint, String(scenes[0]?.data?.example ?? ''));
@@ -273,6 +276,7 @@ class World {
     });
     this.token.add(new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.51), new THREE.MeshBasicMaterial({ map: tt, transparent: true, toneMapped: false })));
     this.scene.add(this.token);
+    this.buildAmbient();
     this.token.visible = false;                                         // the metric card carries the running example now
     this.packet = new THREE.Group();                                    // glowing packet: hero -> screen on every beat
     this.packet.add(new THREE.Mesh(new THREE.SphereGeometry(0.11, 20, 14), glow(this.tint, 4)));
@@ -282,10 +286,10 @@ class World {
     }), color: this.tint, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })));
     (this.packet.children[1] as THREE.Sprite).scale.setScalar(0.9);
     this.packet.visible = false; this.scene.add(this.packet);
-    const N = 1100, sw = new THREE.InstancedMesh(new RoundedBoxGeometry(0.3, 0.1, 0.03, 2, 0.02), new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0.1 }), N);
+    const N = 600, sw = new THREE.InstancedMesh(new RoundedBoxGeometry(0.3, 0.1, 0.03, 2, 0.02), new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0.1 }), N);
     const col = new THREE.Color();
     for (let k = 0; k < N; k++) {                                     // the swarm: thousands of "data chips" for big numbers
-      const y = 1 - (2 * (k + 0.5)) / N, r = Math.sqrt(1 - y * y), a = k * 2.39996, R = 1.1 + (((k * 7919) % 100) / 100) * 1.2;
+      const y = 1 - (2 * (k + 0.5)) / N, r = Math.sqrt(1 - y * y), a = k * 2.39996, R = 0.9 + (((k * 7919) % 100) / 100) * 0.9;
       this.swarmT.push({ p: v3(Math.cos(a) * r * R, 1.9 + y * R * 0.55, Math.sin(a) * r * R - 1.0), r: new THREE.Euler(0, -a + Math.PI / 2, (((k * 31) % 20) - 10) * 0.03), ph: (k % 97) / 97 });
       sw.setColorAt(k, col.set(k % 5 === 0 ? tintHex : k % 7 === 0 ? '#9AA3B2' : '#F5F7FA'));
     }
@@ -359,7 +363,7 @@ class World {
   pose(i: number, t: number) {
     const hub = this.hubs[this.beatStage[i]!]!, a = this.beatAng[i]!, age = Math.max(0, t - this.beatT0[i]!);
     const dur = Math.max(1, (this.beatT0[i + 1] ?? this.beatT0[i]! + 4) - this.beatT0[i]!), k = clamp(age / dur);
-    return { hub, ang: a + 0.015 * k * (i % 2 ? 1 : -1), r: RC - 1.1 * ease.inOutQuad(k), lift: 0 };
+    return { hub, ang: a + 0.015 * k * (i % 2 ? 1 : -1), r: (Number(this.look.camR) || RC) - (Number(this.look.push) || 1.1) * ease.inOutQuad(k), lift: 0 };
   }
 
   camAt(t: number) {
@@ -402,7 +406,49 @@ class World {
     return (this.panels[i] = { mesh, slab, g, canvas, ctx: canvas.getContext('2d')!, tex, ph, drawnFinal: false });
   }
 
+  look: any = {};
+  ambient: THREE.Object3D[] = [];
+  /** Per-video world genome (seeded): stage layout, camera, floor and the ever-moving background. */
+  hubAt(st: number) {
+    const L = String(this.look.layout ?? 'zigzag'), g = 15 + (Number(this.look.gap) || 0) * 6;
+    if (L === 'line') return v3(st * g, 0, 0);
+    if (L === 'arc') return v3(Math.sin(st * 0.55) * g * 1.6, 0, -Math.cos(st * 0.55) * g * 1.6 + g * 1.6);
+    if (L === 'spiral') { const an = st * 1.1, r = 10 + st * 5; return v3(Math.cos(an) * r, 0, Math.sin(an) * r); }
+    if (L === 'stairs') return v3(st * g * 0.8, 0, (st % 2 ? -1 : 1) * 7 - st * 3);
+    return v3(st * 17, 0, Math.sin(st * 1.7) * 5);
+  }
+  buildAmbient() {
+    const kind = String(this.look.ambient ?? 'rings'), c = this.tint;
+    this.hubs.forEach((h, i) => {
+      if (kind === 'rings') for (let j = 0; j < 3; j++) {
+        const r = new THREE.Mesh(new THREE.TorusGeometry(7 + j * 2.6, 0.025, 6, 160), glow(c, 0.9 - j * 0.2));
+        r.position.set(h.x, 0.6 + j * 0.9, h.z); r.rotation.x = Math.PI / 2 + (j - 1) * 0.12; r.userData.spin = (j % 2 ? -1 : 1) * (0.08 + j * 0.04);
+        this.scene.add(r); this.ambient.push(r);
+      }
+      if (kind === 'beams') for (let j = 0; j < 6; j++) {
+        const b = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 30, 6), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, depthWrite: false }));
+        const an = (j / 6) * 6.283 + i; b.position.set(h.x + Math.cos(an) * 11, 15, h.z + Math.sin(an) * 11); b.userData.beam = j + i * 6;
+        this.scene.add(b); this.ambient.push(b);
+      }
+    });
+    if (kind === 'particles') {
+      const n = 1400, g = new THREE.BufferGeometry(), pos = new Float32Array(n * 3), span = Math.max(40, this.hubs.length * 20);
+      for (let k = 0; k < n; k++) { pos[k * 3] = ((k * 7919) % 1000) / 1000 * span - 10; pos[k * 3 + 1] = ((k * 104729) % 1000) / 1000 * 14; pos[k * 3 + 2] = ((k * 15485863) % 1000) / 1000 * 40 - 20; }
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const pts = new THREE.Points(g, new THREE.PointsMaterial({ color: c, size: 0.06, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false }));
+      pts.userData.drift = true; this.scene.add(pts); this.ambient.push(pts);
+    }
+  }
+  tickAmbient(t: number) {
+    for (const o of this.ambient) {
+      if (o.userData.spin) o.rotation.z = t * o.userData.spin;
+      if (o.userData.beam !== undefined) ((o as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = 0.12 + 0.18 * (0.5 + 0.5 * Math.sin(t * 1.3 + o.userData.beam));
+      if (o.userData.drift) { o.position.y = Math.sin(t * 0.2) * 0.6; o.rotation.y = t * 0.01; }
+    }
+  }
+
   update(t: number) {
+    this.tickAmbient(t);
     const bg = this.bg(t);
     for (let i = 0; i <= this.beatAt(t); i++) this.paint(i, t);
     this.updateSwarm(t);
@@ -433,7 +479,7 @@ class World {
     }
     this.flow.instanceMatrix.needsUpdate = true;
     const c = this.camAt(t), hub = c.hub;
-    this.cam.position.set(hub.x + Math.sin(c.ang) * c.r, 3.6 + c.lift, hub.z + Math.cos(c.ang) * c.r);
+    this.cam.position.set(hub.x + Math.sin(c.ang) * c.r, (Number(this.look.camH) || 3.6) + c.lift, hub.z + Math.cos(c.ang) * c.r);
     this.cam.position.x += Math.sin(t * 0.7) * 0.06; this.cam.position.y += Math.sin(t * 0.9 + 1) * 0.05;   // handheld breath
     this.cam.lookAt(hub.x, 2.6 + c.lift * 0.3, hub.z);
     this.cam.updateMatrixWorld();

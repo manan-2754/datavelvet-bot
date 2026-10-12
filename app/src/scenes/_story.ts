@@ -43,6 +43,20 @@ function rgbaHex(hex: string, a: number) {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 }
 
+
+/** Snappy spring 0 -> 1 (damping 12, stiffness 150, mass 1): fast with a small overshoot. */
+export function spring(t: number) {
+  if (t <= 0) return 0;
+  const w0 = Math.sqrt(150), z = 12 / (2 * w0), wd = w0 * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w0 * t) * (Math.cos(wd * t) + ((z * w0) / wd) * Math.sin(wd * t));
+}
+const PAL: Record<string, string> = { emerald: '#10B981', blue: '#2563EB', amber: '#F59E0B', cyan: '#00F0FF', violet: '#8B5CF6', rose: '#F43F5E', white: '#E5E7EB' };
+const GLYPH = '01<>{}[]#$%&*+=?/\\ABCDEFXYZ';
+function hexA(hex: string, a: number) {
+  const h = hex.replace('#', ''), n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
 export class Story extends GenPlate {
   override has3D = true;
   d: any = {};
@@ -57,7 +71,7 @@ export class Story extends GenPlate {
     const h: Record<string, number> = {
       terminal: 200 + L * 56, code: 200 + L * 56, browser: 240 + Math.min(4, L) * 92, table: 150 + (wd.query ? 78 : 0) + Math.min(6, n('rows')) * 72,
       chat: 130 + Math.min(6, n('messages')) * 100, metric: 640, compare: 150 + Math.min(5, n('items')) * 112,
-      flow: 80 + Math.min(5, n('nodes') || L) * 156, shot: 720, phone: 780, stack: 780, request: 360 + Math.min(5, L) * 46, checklist: 150 + L * 84, summary: 150 + L * 84,
+      flow: 80 + Math.min(5, n('nodes') || L) * 156, shot: 720, phone: 780, stack: 780, scene: 780, request: 360 + Math.min(5, L) * 46, checklist: 150 + L * 84, summary: 150 + L * 84,
     };
     return clamp(h[wd.kind] ?? 720, 330, 780);
   }
@@ -368,6 +382,59 @@ export class Story extends GenPlate {
         }
         break;
       }
+      case 'scene': {                                                   // a composition designed for THIS beat only
+        const els: any[] = (wd.elements ?? []).filter((e: any) => e && typeof e === 'object').slice(0, 7);
+        const pos = new Map<string, { x: number; y: number; r: number; k: number }>();
+        const colOf = (c: any) => PAL[String(c ?? '')] ?? (String(c ?? '').startsWith('#') ? String(c) : sig);
+        const SZ: Record<string, number> = { S: 0.7, M: 1, L: 1.35 };
+        ctx.save(); ctx.globalAlpha = a * 0.5; ctx.strokeStyle = hexA(sig, 0.18); ctx.lineWidth = 2; ctx.setLineDash([6, 14]);   // ambient ring
+        ctx.lineDashOffset = -age * 30; ctx.beginPath(); ctx.ellipse(X + CW / 2, Y + CH / 2, CW * 0.44, CH * 0.36, Math.sin(age * 0.3) * 0.1, 0, 6.3); ctx.stroke();
+        ctx.setLineDash([]); ctx.restore();
+        els.forEach((e, i) => {
+          const at = clamp(Number(e.at ?? i * 0.12), 0, 0.85) * Math.min(dur, 6), k = spring(age - 0.08 - at);
+          const sz = SZ[String(e.size ?? 'M')] ?? 1, x = X + clamp(Number(e.x ?? 50), 6, 94) / 100 * CW, y = Y + clamp(Number(e.y ?? 50), 8, 92) / 100 * CH;
+          pos.set(String(e.id ?? i), { x, y, r: 92 * sz, k });
+        });
+        const links: any[] = (wd.links ?? []).filter((l: any) => l && pos.has(String(l.from)) && pos.has(String(l.to))).slice(0, 8);
+        links.forEach((l, i) => {                                      // self-drawing connection + dash flow + glowing packets
+          const A = pos.get(String(l.from))!, B = pos.get(String(l.to))!, k = clamp((age - 0.45 - i * 0.12) / 0.45);
+          if (k <= 0 || A.k < 0.5 || B.k < 0.5) return;
+          const dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
+          const x0 = A.x + ux * A.r * 0.9, y0 = A.y + uy * A.r * 0.9, x1 = B.x - ux * B.r * 0.9, y1 = B.y - uy * B.r * 0.9;
+          const col = colOf(l.color);
+          ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = hexA(col, 0.45); ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + (x1 - x0) * ease.outCubic(k), y0 + (y1 - y0) * ease.outCubic(k)); ctx.stroke();
+          if (k >= 1) {
+            ctx.strokeStyle = col; ctx.setLineDash([10, 18]); ctx.lineDashOffset = -age * 90; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.setLineDash([]);
+            for (let q = 0; q < 2; q++) {
+              const f = (age * 0.9 + q * 0.5 + i * 0.17) % 1, px = x0 + (x1 - x0) * f, py = y0 + (y1 - y0) * f;
+              ctx.shadowColor = col; ctx.shadowBlur = 22; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(px, py, 9, 0, 6.3); ctx.fill();
+              ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(px, py, 3.5, 0, 6.3); ctx.fill();
+            }
+            if (l.label) {
+              const mx = (x0 + x1) / 2, my = (y0 + y1) / 2, fam = F.mono(700), lt = String(l.label).slice(0, 18), tw = measure(lt, fam, 24) + 28;
+              ctx.fillStyle = '#0B0F19'; ctx.strokeStyle = hexA(col, 0.6); ctx.lineWidth = 2;
+              ctx.beginPath(); (ctx as any).roundRect(mx - tw / 2, my - 18, tw, 36, 18); ctx.fill(); ctx.stroke();
+              ctx.font = font(fam, 24); ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.fillText(lt, mx, my + 8); ctx.textAlign = 'left';
+            }
+          }
+          ctx.restore();
+        });
+        els.forEach((e, i) => {
+          const P = pos.get(String(e.id ?? i))!; if (P.k <= 0) return;
+          const col = colOf(e.color), sz = SZ[String(e.size ?? 'M')] ?? 1, mo = String(e.motion ?? 'float'), en = String(e.enter ?? 'pop');
+          const fl = mo === 'float' ? Math.sin(age * 1.6 + i) * 6 : 0, pu = mo === 'pulse' ? 1 + 0.04 * Math.sin(age * 4 + i) : 1;
+          const k = P.k, sc = (en === 'zoom' ? 0.2 + 0.8 * k : 0.5 + 0.5 * k) * pu;
+          const oy = en === 'drop' ? (1 - k) * -160 : 0, ox = en === 'slide' ? (1 - k) * (i % 2 ? 220 : -220) : 0;
+          ctx.save(); ctx.globalAlpha = a * clamp(k * 1.6); ctx.translate(P.x + ox, P.y + oy + fl);
+          if (en === 'unfold') ctx.scale(clamp(k, 0.01, 1.2), 1); else ctx.scale(sc, sc);
+          if (mo === 'spin') ctx.rotate(Math.sin(age * 0.8 + i) * 0.06);
+          drawBlock(ctx, String(e.type ?? 'node'), e, col, sz, age - clamp(Number(e.at ?? i * 0.12), 0, 0.85) * Math.min(dur, 6));
+          ctx.restore();
+        });
+        break;
+      }
       case 'chat': {
         title(wd.app ?? 'Messages');
         (wd.messages ?? []).filter((m: any) => m && typeof m === 'object').slice(0, 6).forEach((m: any, i: number) => {
@@ -448,5 +515,174 @@ export class Story extends GenPlate {
   override postFX(t: number) {
     const k = 1 - prog(t, this.t0, this.t0 + 0.3);
     return { zoom: 1 + 0.05 * k * k };
+  }
+}
+
+
+/** One building block, drawn centred at (0,0). */
+function drawBlock(ctx: CanvasRenderingContext2D, type: string, e: any, col: string, sz: number, age: number) {
+  const R = 92 * sz, lab = String(e.label ?? '').slice(0, 22), sub = String(e.sub ?? '').slice(0, 26), ink = '#E5E7EB';
+  const label = (yy: number) => {
+    if (lab) { ctx.font = font(ARCH(110, 800), 32 * Math.min(1.15, sz)); ctx.fillStyle = ink; ctx.textAlign = 'center'; ctx.fillText(lab, 0, yy); }
+    if (sub) { ctx.font = font(F.mono(500), 22); ctx.fillStyle = '#94A3B8'; ctx.textAlign = 'center'; ctx.fillText(sub, 0, yy + 30); }
+    ctx.textAlign = 'left';
+  };
+  const glowStroke = (w = 3) => { ctx.save(); ctx.shadowColor = col; ctx.shadowBlur = 16; ctx.strokeStyle = col; ctx.lineWidth = w; ctx.stroke(); ctx.restore(); };
+  const items: string[] = (Array.isArray(e.items) ? e.items : []).map(String);
+  switch (type) {
+    case 'cylinder': {                                                  // isometric database cylinder with a scan sweep
+      const w = R * 1.1, h = R * 1.3, ry = w * 0.32, n = Math.max(2, Math.min(4, Number(e.count) || 3));
+      for (let j = n - 1; j >= 0; j--) {
+        const y0 = -h / 2 + (j * h) / n, y1 = y0 + h / n - 6;
+        ctx.fillStyle = '#0F172A'; ctx.beginPath(); ctx.moveTo(-w, y0); ctx.lineTo(-w, y1); ctx.ellipse(0, y1, w, ry, 0, Math.PI, 0, true); ctx.lineTo(w, y0); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(0, y1, w, ry, 0, 0, Math.PI); glowStroke(2.5);
+      }
+      ctx.fillStyle = hexA(col, 0.25); ctx.beginPath(); ctx.ellipse(0, -h / 2, w, ry, 0, 0, 6.3); ctx.fill(); glowStroke(3);
+      const sweep = (age * 0.8) % 1; ctx.fillStyle = hexA(col, 0.3); ctx.beginPath(); ctx.ellipse(0, -h / 2 + sweep * h, w * 0.98, ry * 0.96, 0, 0, Math.PI); ctx.fill();
+      label(h / 2 + ry + 34);
+      break;
+    }
+    case 'stack': {                                                     // isometric layers dropping into place
+      const n = Math.max(2, Math.min(4, Number(e.count) || items.length || 3)), W2 = R * 1.25;
+      for (let j = 0; j < n; j++) {
+        const kk = spring(age - j * 0.12); if (kk <= 0) continue;
+        const yy = R * 0.6 - j * R * 0.55 - (1 - Math.min(1, kk)) * 60;
+        const dia = (oy: number) => { ctx.beginPath(); ctx.moveTo(0, yy - W2 / 2 + oy); ctx.lineTo(W2, yy + oy); ctx.lineTo(0, yy + W2 / 2 + oy); ctx.lineTo(-W2, yy + oy); ctx.closePath(); };
+        ctx.fillStyle = '#05070B'; dia(16); ctx.fill(); ctx.fillStyle = j === n - 1 ? hexA(col, 0.22) : '#111827'; dia(0); ctx.fill(); dia(0); glowStroke(2.5);
+        if (items[j]) { ctx.font = font(F.mono(700), 18); ctx.fillStyle = j === n - 1 ? '#fff' : '#94A3B8'; ctx.textAlign = 'center'; ctx.fillText(items[j]!.slice(0, 16), 0, yy + 6); ctx.textAlign = 'left'; }
+      }
+      label(R * 0.6 + W2 / 2 + 50);
+      break;
+    }
+    case 'tower': {                                                     // server / console tower with blinking slits
+      const w = R * 0.9, h = R * 1.8;
+      ctx.fillStyle = '#0B1220'; ctx.beginPath(); (ctx as any).roundRect(-w / 2, -h / 2, w, h, 14); ctx.fill(); glowStroke(2);
+      for (let j = 0; j < 6; j++) {
+        const yy = -h / 2 + 18 + (j * (h - 30)) / 6;
+        ctx.fillStyle = '#1E293B'; ctx.fillRect(-w / 2 + 12, yy, w - 24, (h - 30) / 6 - 8);
+        ctx.fillStyle = Math.sin(age * 8 + j * 1.7) > 0 ? col : hexA(col, 0.25); ctx.beginPath(); ctx.arc(w / 2 - 22, yy + 9, 4, 0, 6.3); ctx.fill();
+      }
+      label(h / 2 + 36);
+      break;
+    }
+    case 'orbit': {                                                     // satellites circling a core in a tilted 3D ring
+      const n = Math.max(3, Math.min(14, Number(e.count) || items.length || 8)), Rr = R * 1.6;
+      const sat = (j: number) => { const an = (j / n) * 6.283 + age * 0.9; return { x: Math.cos(an) * Rr, y: Math.sin(an) * Rr * 0.34, d: Math.sin(an) }; };
+      ctx.strokeStyle = hexA(col, 0.3); ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(0, 0, Rr, Rr * 0.34, 0, 0, 6.3); ctx.stroke();
+      const draw = (j: number) => {
+        const q = sat(j), r = 20 * (0.8 + 0.3 * q.d), hue = (j * 67 + 20) % 360;
+        ctx.fillStyle = `hsl(${hue},55%,${45 + 10 * q.d}%)`; ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, 6.3); ctx.fill();
+        ctx.font = font(ARCH(110, 800), r); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText((items[j] ?? String.fromCharCode(65 + (j % 26)))[0]!, q.x, q.y + r * 0.35); ctx.textAlign = 'left';
+      };
+      for (let j = 0; j < n; j++) if (sat(j).d < 0) draw(j);
+      ctx.fillStyle = '#0F172A'; ctx.beginPath(); ctx.arc(0, 0, R * 0.62, 0, 6.3); ctx.fill(); glowStroke(3);
+      ctx.font = font(ARCH(110, 800), 22); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(lab.slice(0, 10), 0, 8); ctx.textAlign = 'left';
+      for (let j = 0; j < n; j++) if (sat(j).d >= 0) draw(j);
+      if (sub) { ctx.font = font(F.mono(500), 18); ctx.fillStyle = '#94A3B8'; ctx.textAlign = 'center'; ctx.fillText(sub, 0, Rr * 0.34 + 44); ctx.textAlign = 'left'; }
+      break;
+    }
+    case 'code': {                                                      // code window; with `translate` it morphs language A -> B
+      const w = R * 3.4, tr = e.translate && typeof e.translate === 'object' ? e.translate : null;
+      const A: string[] = ((tr ? tr.from : e.items) ?? []).map(String).slice(0, 5), B: string[] = (tr ? tr.to ?? [] : []).map(String).slice(0, 5);
+      const h = 86 + Math.max(A.length, B.length, 2) * 38;
+      ctx.fillStyle = '#0D1117'; ctx.beginPath(); (ctx as any).roundRect(-w / 2, -h / 2, w, h, 14); ctx.fill(); glowStroke(2);
+      ['#FF5F57', '#FEBC2E', '#28C840'].forEach((c, j) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(-w / 2 + 24 + j * 22, -h / 2 + 24, 7, 0, 6.3); ctx.fill(); });
+      const m = tr ? clamp((age - 0.9) / 1.0) : 0;
+      ctx.font = font(F.mono(600), 18); ctx.fillStyle = '#94A3B8';
+      ctx.fillText(tr ? `${tr.from_lang ?? 'A'}  →  ${tr.to_lang ?? 'B'}` : lab, -w / 2 + 96, -h / 2 + 30);
+      ctx.font = font(F.mono(500), 22);
+      const rows = Math.max(A.length, B.length);
+      for (let j = 0; j < rows; j++) {
+        const a0 = A[j] ?? '', b0 = B[j] ?? '', yy = -h / 2 + 76 + j * 38, mm = clamp(m * 1.4 - j * 0.1);
+        let out = '';
+        if (!tr) out = a0.slice(0, Math.floor(clamp((age - 0.2 - j * 0.25) * 30, 0, a0.length)));
+        else { const L = Math.max(a0.length, b0.length), cut = Math.floor(mm * L); for (let c = 0; c < L; c++) out += c < cut ? (b0[c] ?? '') : c < cut + 3 && mm > 0 && mm < 1 ? GLYPH[(c * 7 + Math.floor(age * 30)) % GLYPH.length] : (a0[c] ?? ''); }
+        let x = -w / 2 + 24;
+        for (const [tok, c2] of tokens(out, false)) { ctx.fillStyle = c2; ctx.fillText(tok, x, yy); x += ctx.measureText(tok).width; }
+      }
+      break;
+    }
+    case 'metric': {
+      const raw = String(e.value ?? lab ?? '0'), mm = raw.match(/[\d,.]+/), num = mm ? parseFloat(mm[0].replace(/,/g, '')) : NaN, kk = ease.outCubic(clamp((age - 0.1) / 1.0));
+      const shown = mm && isFinite(num) ? raw.replace(mm[0], Number.isInteger(num) ? Math.round(num * kk).toLocaleString('en-US') : (num * kk).toFixed(1)) : raw;
+      ctx.save(); ctx.shadowColor = col; ctx.shadowBlur = 26; ctx.font = font(F.mono(800), 72 * sz); ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.fillText(shown.slice(0, 12), 0, 10); ctx.restore();
+      if (e.value !== undefined && lab) { ctx.font = font(F.mono(700), 20); ctx.fillStyle = '#94A3B8'; ctx.textAlign = 'center'; ctx.fillText(lab.toUpperCase(), 0, 52); ctx.textAlign = 'left'; }
+      break;
+    }
+    case 'avatars': {
+      const names = (items.length ? items : ['Ana', 'Ben', 'Cy', 'Dee']).slice(0, 6), n = names.length, gap = 64;
+      names.forEach((nm, j) => {
+        const kk = spring(age - 0.05 - j * 0.08), xx = (j - (n - 1) / 2) * gap, hue = (nm.charCodeAt(0) * 47) % 360;
+        if (kk <= 0) return;
+        ctx.save(); ctx.translate(xx, 0); ctx.scale(kk, kk);
+        ctx.fillStyle = `hsl(${hue},55%,55%)`; ctx.beginPath(); ctx.arc(0, 0, 28, 0, 6.3); ctx.fill(); ctx.strokeStyle = '#0B0F19'; ctx.lineWidth = 4; ctx.stroke();
+        ctx.font = font(ARCH(110, 800), 24); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(nm[0]!, 0, 8); ctx.restore();
+      });
+      ctx.textAlign = 'left'; label(66);
+      break;
+    }
+    case 'globe': {
+      const r = R * 1.05;
+      ctx.fillStyle = '#0B1220'; ctx.beginPath(); ctx.arc(0, 0, r, 0, 6.3); ctx.fill(); glowStroke(2.5);
+      ctx.save(); ctx.beginPath(); ctx.arc(0, 0, r, 0, 6.3); ctx.clip(); ctx.strokeStyle = hexA(col, 0.4); ctx.lineWidth = 1.5;
+      for (let j = 0; j < 6; j++) { const ph = ((j / 6 + age * 0.08) % 1) * Math.PI; ctx.beginPath(); ctx.ellipse(0, 0, Math.abs(Math.cos(ph)) * r, r, 0, 0, 6.3); ctx.stroke(); }
+      for (let j = 1; j < 4; j++) { ctx.beginPath(); ctx.moveTo(-r, (j - 2) * r * 0.45); ctx.lineTo(r, (j - 2) * r * 0.45); ctx.stroke(); }
+      ctx.restore(); label(r + 38);
+      break;
+    }
+    case 'gauge': {
+      const v = clamp(Number(e.value ?? 0.7)), r = R, kk = ease.outCubic(clamp((age - 0.1) / 0.9));
+      ctx.lineWidth = 16; ctx.lineCap = 'round'; ctx.strokeStyle = '#1E293B'; ctx.beginPath(); ctx.arc(0, 10, r, Math.PI * 0.8, Math.PI * 2.2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 10, r, Math.PI * 0.8, Math.PI * (0.8 + 1.4 * v * kk)); glowStroke(16); ctx.lineCap = 'butt';
+      ctx.font = font(F.mono(800), 40); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(`${Math.round(v * kk * 100)}%`, 0, 24); ctx.textAlign = 'left';
+      label(r + 40);
+      break;
+    }
+    case 'queue': {                                                     // items sliding along a conveyor
+      const its = (items.length ? items : ['req', 'req', 'req', 'req']).slice(0, 6), w = R * 3.2, bw = 90;
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 2; ctx.strokeRect(-w / 2, -32, w, 64);
+      ctx.save(); ctx.beginPath(); ctx.rect(-w / 2, -32, w, 64); ctx.clip();
+      its.forEach((it, j) => {
+        const xx = -w / 2 + ((j * (bw + 18) + age * 120) % (w + bw)) - bw;
+        ctx.fillStyle = j % 2 ? '#1E293B' : hexA(col, 0.3); ctx.beginPath(); (ctx as any).roundRect(xx, -22, bw, 44, 8); ctx.fill();
+        ctx.font = font(F.mono(600), 16); ctx.fillStyle = '#E5E7EB'; ctx.fillText(it.slice(0, 8), xx + 10, 6);
+      });
+      ctx.restore(); label(66);
+      break;
+    }
+    case 'bars': {
+      const vals = (items.length ? items : ['3', '5', '2', '7', '4']).map((v) => Number(v) || 1).slice(0, 7), mx = Math.max(...vals), w = R * 2.8;
+      vals.forEach((v, j) => {
+        const kk = spring(age - 0.1 - j * 0.07), bh = (v / mx) * R * 1.4 * clamp(kk, 0, 1.1), bw = w / vals.length - 10, xx = -w / 2 + j * (bw + 10);
+        ctx.fillStyle = j === vals.length - 1 ? col : hexA(col, 0.35); ctx.fillRect(xx, R * 0.7 - bh, bw, bh);
+      });
+      label(R * 0.7 + 40);
+      break;
+    }
+    case 'lock': case 'cloud': case 'file': case 'user': case 'chip': case 'phone': {
+      ctx.lineWidth = 3;
+      if (type === 'lock') { ctx.fillStyle = hexA(col, 0.2); ctx.beginPath(); (ctx as any).roundRect(-R * 0.6, -R * 0.15, R * 1.2, R * 0.95, 12); ctx.fill(); glowStroke(3); ctx.beginPath(); ctx.arc(0, -R * 0.15, R * 0.38, Math.PI, 0); glowStroke(5); }
+      if (type === 'cloud') { ctx.fillStyle = hexA(col, 0.16); ctx.beginPath(); ctx.arc(-R * 0.45, 0, R * 0.45, 0, 6.3); ctx.arc(R * 0.1, -R * 0.25, R * 0.6, 0, 6.3); ctx.arc(R * 0.6, 0.05 * R, R * 0.42, 0, 6.3); ctx.fill(); ctx.beginPath(); ctx.ellipse(0, R * 0.05, R * 1.05, R * 0.5, 0, 0, 6.3); glowStroke(2); }
+      if (type === 'file') { ctx.fillStyle = '#111827'; ctx.beginPath(); (ctx as any).roundRect(-R * 0.55, -R * 0.75, R * 1.1, R * 1.5, 10); ctx.fill(); glowStroke(2); for (let j = 0; j < 4; j++) { ctx.fillStyle = hexA(col, 0.5); ctx.fillRect(-R * 0.35, -R * 0.4 + j * R * 0.28, R * (0.7 - (j % 2) * 0.2), 8); } }
+      if (type === 'user') { ctx.fillStyle = hexA(col, 0.25); ctx.beginPath(); ctx.arc(0, -R * 0.35, R * 0.35, 0, 6.3); ctx.fill(); glowStroke(3); ctx.beginPath(); ctx.ellipse(0, R * 0.45, R * 0.6, R * 0.38, 0, Math.PI, 0); ctx.fill(); glowStroke(3); }
+      if (type === 'chip') { ctx.fillStyle = '#111827'; ctx.beginPath(); (ctx as any).roundRect(-R * 0.6, -R * 0.6, R * 1.2, R * 1.2, 10); ctx.fill(); glowStroke(3); ctx.fillStyle = hexA(col, 0.35 + 0.25 * Math.sin(age * 5)); ctx.fillRect(-R * 0.3, -R * 0.3, R * 0.6, R * 0.6); for (let j = 0; j < 5; j++) for (const sx of [-1, 1]) { ctx.fillStyle = '#94A3B8'; ctx.fillRect(sx * R * 0.6 + (sx > 0 ? 0 : -12), -R * 0.5 + j * R * 0.24, 12, 6); } }
+      if (type === 'phone') { ctx.fillStyle = '#0B0F19'; ctx.beginPath(); (ctx as any).roundRect(-R * 0.5, -R, R, R * 2, 18); ctx.fill(); glowStroke(3); for (let j = 0; j < 3; j++) { if (age < 0.2 + j * 0.3) continue; ctx.fillStyle = j % 2 ? '#1E293B' : col; ctx.beginPath(); (ctx as any).roundRect(j % 2 ? -R * 0.4 : -R * 0.1, -R * 0.65 + j * R * 0.42, R * 0.5, R * 0.28, 10); ctx.fill(); } }
+      label(type === 'phone' ? R + 38 : R * 0.95 + 34);
+      break;
+    }
+    case 'badge': {
+      const fam = F.mono(800), t = (lab || sub).toUpperCase(), tw = measure(t, fam, 28) + 48;
+      ctx.fillStyle = hexA(col, 0.18); ctx.beginPath(); (ctx as any).roundRect(-tw / 2, -30, tw, 60, 30); ctx.fill(); glowStroke(2.5);
+      ctx.font = font(fam, 28); ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.fillText(t, 0, 10); ctx.textAlign = 'left';
+      break;
+    }
+    default: {                                                          // node: a floating service/UI card
+      const w = Math.max(R * 2.2, Math.min(R * 3.4, measure(lab, ARCH(110, 800), 26) + 70)), h = sub ? 104 : 80;
+      ctx.fillStyle = '#0F172A'; ctx.beginPath(); (ctx as any).roundRect(-w / 2, -h / 2, w, h, 16); ctx.fill(); glowStroke(2.5);
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(-w / 2 + 28, -h / 2 + 28, 7, 0, 6.3); ctx.fill();
+      ctx.font = font(ARCH(110, 800), 26); ctx.fillStyle = '#F8FAFC'; ctx.textAlign = 'center'; ctx.fillText(lab, 0, sub ? -2 : 9);
+      if (sub) { ctx.font = font(F.mono(500), 18); ctx.fillStyle = '#94A3B8'; ctx.fillText(sub, 0, 30); }
+      ctx.textAlign = 'left';
+    }
   }
 }

@@ -31,7 +31,7 @@ import writer  # noqa: E402
 
 MAX_SECONDS = 90                      # 1:30 cap
 MAX_WORDS = 190                       # ~140 words a minute (the live bot's pace) + pauses = under 90 s
-KINDS = ["terminal", "code", "browser", "table", "chat", "phone", "request", "stack", "metric", "compare", "flow", "checklist", "summary"]
+KINDS = ["scene", "terminal", "code", "browser", "table", "chat", "phone", "request", "stack", "metric", "compare", "flow", "checklist", "summary"]
 VLC = r"C:\Program Files\VideoLAN\VLC\vlc.exe"
 MAX_SECONDS = 90                      # 1:30 cap
 MAX_WORDS = 190                       # ~140 words a minute (the live bot's pace) + pauses = under 90 s
@@ -44,27 +44,29 @@ Style (what the best tech explainers do):
 - 13-16 BEATS, 170-190 words in total (the video must stay under 90 seconds). Each beat = ONE spoken sentence of 8-14 words, plain everyday words, specific and surprising, with
   real numbers where known (ms, km, how many, how big). Beat 1 is a scroll-stopping hook. The last beat recaps the
   whole journey and ask viewers one question to comment on.
-- Each beat shows ONE realistic UI mockup ("widget") that matches exactly what is said, one of:
-  terminal {{"lines": 3-6 lines, commands start with "$ ", output lines plain}} (typed live, real commands like dig/curl/ping/git),
-  code {{"title": real file name, "lang", "lines": 3-7 short REAL code lines (JS/Python/SQL), "highlight": index}} (typed live),
-  browser {{"url", "title", "lines": 2-4 short page items}},
-  table {{"query": optional real SQL e.g. "SELECT body FROM messages WHERE room_id = 42", "columns": 2-4, "rows": 3-5 rows of
-  realistic values (ids like 1042, first names, times like 09:41), "marks": optional [true/false per row] for allowed/blocked}},
-  phone {{"app": app name, "messages": 2-4 {{"from": "me"|"them", "text"}}}} (a real phone; the last "me" message is typed live and sent),
-  stack {{"layers": 2-3 {{"title": e.g. "AWS EC2 BARE METAL", "items": 2-6 short labels}}}} (isometric architecture layers, bottom first),
-  request {{"method": "GET"|"POST", "url": real-looking path, "status": 200, "ms": 42, "lines": 2-4 JSON reply lines}},
-  chat {{"app", "messages": 2-4 {{"from": "me"|"them", "text"}}}}, metric {{"value": "800 ms", "label", "sub"}},
-  compare {{"title", "items": 2-4 {{"label", "value": number, "unit"}}}}, flow {{"nodes": 3-5 short labels, "active": index}},
-  checklist {{"items": 3-5}}, summary {{"items": the stages in order}} (use summary for the final recap beat).
-  Vary the widget kinds - never the same kind 3 beats in a row; use phone, code/terminal (live typing), table and request
-  often - they look like the real thing. Keep the SAME running example's data everywhere (same names, ids, messages).
-  Keep every text short so it fits a phone screen.
-- LIVE INTERNET: on 3-5 beats add "site": a real, public https page that shows exactly what the beat says
-  (prefer en.wikipedia.org articles, official docs/blogs/help centres, github.com repos; no login walls, no news paywalls).
-  The bot opens it live and shows the real page on screen for that beat, so only use URLs you are sure exist.
-- REAL PHOTOS: on 2-3 other beats add "photo": a short Wikimedia Commons search query for a real photo of the physical
-  thing being discussed (e.g. "data center server racks", "submarine communications cable", "iPhone 15").
-- "key": 1-2 words copied EXACTLY from the beat's sentence to highlight.
+- Each beat gets ITS OWN VISUAL, designed from scratch for exactly what that sentence says. Mostly use
+  "scene" (a free composition you design): {{"kind": "scene", "elements": 2-6 {{"id", "type", "x": 0-100, "y": 0-100,
+  "size": "S"|"M"|"L", "label": max 18 chars, "sub": max 22 chars, "color": "emerald"|"blue"|"amber"|"cyan"|"violet"|"rose"|"white",
+  "count", "items": [...], "value", "translate", "enter": "pop"|"drop"|"slide"|"zoom"|"unfold", "motion": "float"|"pulse"|"spin"|"none",
+  "at": 0-0.8 (when it pops in, as a fraction of the beat)}}, "links": 0-5 {{"from": id, "to": id, "label": max 14 chars, "color"}}}}.
+  Element types: cylinder (database, "count" = rings), stack (isometric layers, "items" = layer names bottom first),
+  tower (server/console), orbit (a core with "count" avatars/icons orbiting it in 3D, "items" = their names), node (service/UI card),
+  code ("items" = 2-5 code lines typed live, OR "translate": {{"from_lang", "to_lang", "from": [lines], "to": [lines]}} morphing
+  one language into another), metric ("value": e.g. "4.2 ms", label = what it is), avatars ("items" = first names), globe,
+  gauge ("value": 0-1), queue ("items" = what is waiting), bars ("items" = numbers), lock, cloud, file, user, chip, phone, badge.
+  Links draw themselves and carry glowing packets - use them for anything that FLOWS (requests, data, replication, keys).
+  Lay elements out so they never overlap (spread x/y), stagger "at" so something new appears every ~1-2 seconds,
+  and make EVERY beat's composition different (different types, positions, links) - never reuse a layout.
+  Occasionally (at most 3 beats) you may instead use a realistic mockup when it IS the point: phone {{"app", "messages"}},
+  table {{"query", "columns", "rows", "marks"}}, request {{"method", "url", "status", "ms", "lines"}}, terminal {{"lines"}} or
+  code {{"title", "lang", "lines"}} (terminal + code together at most 2 beats per video), checklist, compare, metric.
+  The final recap beat: summary {{"items": the stages in order}}.
+  Keep the SAME running example's data everywhere (same names, ids, numbers).
+- LIVE INTERNET: at most ONE beat may add "site": a real public https page, and only if showing that real page is the point
+  of the sentence (e.g. the actual RFC or official doc). Most videos should have none.
+- REAL PHOTO: at most ONE beat may add "photo": a short Wikimedia Commons query for a real photo of a physical thing
+  (e.g. "submarine communications cable"). Most beats should be designed scenes instead.
+{banned}- "key": 1-2 words copied EXACTLY from the beat's sentence to highlight.
 - "object": a 3D object for the beat's stage, one of {objects}.
 - A running "counter" that grows along the journey (e.g. elapsed ms, km travelled, bytes) - give its value per beat.
 Accurate facts only; never invent statistics; no emojis; no "in this video".
@@ -74,6 +76,22 @@ Return ONLY JSON:
  "widget": {{"kind": "...", ...}}}}], "youtube": {{"title": max 70 chars ending " #shorts", "description": 2 sentences + 5
  hashtags, "tags": [6-8]}}, "instagram_caption": 2 lines + "Save this for later." + 6 hashtags, "comment": one question}}
 {feedback}"""
+
+
+def signature(w):
+    """Layout fingerprint of one beat's visual (types + coarse positions + links) - never reused across videos."""
+    w = w if isinstance(w, dict) else {}
+    if w.get("kind") != "scene":
+        return f"{w.get('kind')}:{len(w.get('lines') or w.get('rows') or w.get('messages') or w.get('items') or [])}"
+    els = [e for e in (w.get("elements") or []) if isinstance(e, dict)]
+    def cell(v):
+        try:
+            return min(2, int(float(v) // 34))
+        except (TypeError, ValueError):
+            return 1
+    parts = sorted(f"{e.get('type')}@{cell(e.get('x', 50))},{cell(e.get('y', 50))}" for e in els)
+    return "|".join(parts) + f"/L{len(w.get('links') or [])}"
+
 
 
 STORY_MODEL = "claude-sonnet-5-5"   # the premium story is written by a stronger model than the old Shorts
@@ -90,17 +108,29 @@ def _story_llm(prompt):
         return writer.llm(prompt, label="pro story")
 
 
-def write_story(topic, facts=None):
+def write_story(topic, facts=None, banned=()):
     facts = facts or research.gather(topic, llm=writer.llm)
     ftxt = (f"REFERENCE FACTS (from {', '.join(facts['sources'][:3])}) - use their numbers:\n{facts['facts'][:3500]}") if facts.get("facts") else ""
     fb = ""
     for attempt in range(4):
-        st = json.loads(_story_llm(PROMPT.format(topic=topic, facts=ftxt, objects=", ".join(writer.OBJECTS), feedback=fb)))
+        ban = ("- These scene layouts were already used in earlier videos - do NOT reproduce any of them:\n  " + "\n  ".join(list(banned)[-60:])) if banned else ""
+        st = json.loads(_story_llm(PROMPT.format(topic=topic, facts=ftxt, objects=", ".join(writer.OBJECTS), feedback=fb, banned=ban)))
         beats = [b for b in (st.get("beats") or []) if isinstance(b, dict) and len(str(b.get("line", "")).split()) >= 4]
         stages = [str(s)[:12] for s in (st.get("stages") or [])][:7]
         words = sum(len(str(b['line']).split()) for b in beats)
         if len(beats) < 11 or len(stages) < 4 or words > MAX_WORDS:
             fb = f"\nThe previous draft had {len(beats)} beats, {words} words and {len(stages)} stages - give 13-16 beats, at most {MAX_WORDS} words in total, and 5-7 stages." + ("\nPREVIOUS DRAFT (shorten it, keep the best beats):\n" + json.dumps(st, ensure_ascii=False)[:9000] if words > MAX_WORDS else "")
+            continue
+        sigs = [signature(b.get("widget")) for b in beats]
+        seen, clash = set(banned), []
+        for i, g in enumerate(sigs):
+            if "@" in g and g in seen:
+                clash.append(i + 1)
+            seen.add(g)
+        n_scene = sum(1 for b in beats if (b.get("widget") or {}).get("kind") == "scene")
+        if (clash or n_scene < len(beats) * 0.6) and attempt < 3:
+            fb = (f"\nRedesign: beats {clash} reuse a layout that already exists" if clash else "\nRedesign:") + (f"; only {n_scene} of {len(beats)} beats are designed scenes - make at least 70% of beats 'scene' compositions" if n_scene < len(beats) * 0.6 else "") + ". Keep the same lines.\nPREVIOUS DRAFT:\n" + json.dumps(st, ensure_ascii=False)[:9000]
+            print(f"  redesign asked (clashes {clash}, {n_scene}/{len(beats)} scenes)")
             continue
         sc = {"topic": topic, "scenes": [{"plate": "story", "title": stages[min(len(stages) - 1, int(b.get("stage") or 0))],
                                           "lines": [b["line"]], "data": {"widget": b.get("widget")}} for b in beats]}
@@ -146,7 +176,7 @@ def gesture(i, n, line, kind):
     return ["explain", "point", "idle", "explain", "think"][i % 5]
 
 
-def capture_photos(st, most=3):
+def capture_photos(st, most=1):
     """Real, freely-licensed photos from Wikimedia Commons (with credit) for beats that ask for one."""
     shots = BASE / "app" / "public" / "shots"
     shots.mkdir(parents=True, exist_ok=True)
@@ -209,8 +239,11 @@ def to_script(st):
     scenes, prev = [], 0
     ctr = st.get("counter") or {}
     swarms = pick_swarms(st["beats"])
-    look = random.Random(st.get("title", ""))                  # one palette per video: accent + presenter hoodie
-    tint = look.choice(["#00F0FF", "#10B981", "#F59E0B", "#3B82F6"])              # neon accents on the dark stage
+    look = random.Random(f"{st.get('title', '')}|{time.time_ns()}")                  # one palette per video: accent + presenter hoodie
+    tint = look.choice(["#00F0FF", "#10B981", "#F59E0B", "#3B82F6", "#8B5CF6", "#F43F5E"])  # neon accents on the dark stage
+    world = {"layout": look.choice(["line", "zigzag", "arc", "spiral", "stairs"]), "gap": look.random(), "camR": round(look.uniform(8.6, 10.6), 2),
+             "camH": round(look.uniform(2.9, 4.6), 2), "fov": look.choice([32, 34, 36, 38, 40]), "push": round(look.uniform(0.7, 1.6), 2),
+             "ambient": look.choice(["rings", "particles", "beams"]), "floor": look.choice(["dots", "lines", "cross"])}
     outfit = look.choice(["#5B3FD6", "#1F7A5C", "#C2410C", "#1E40AF", "#9D174D", "#334155"])
     for i, b in enumerate(st["beats"]):
         stage = max(0, min(len(st["stages"]) - 1, int(b.get("stage") or 0)))
@@ -231,9 +264,9 @@ def to_script(st):
             data["widget"] = {"kind": "browser", "url": b["site"], "img": b["shot"]}
         elif b.get("pic"):
             data["widget"] = {"kind": "photo", "img": b["pic"], "credit": b.get("credit", "")}
-        data["tint"], data["outfit"] = tint, outfit
+        data["tint"], data["outfit"], data["look"] = tint, outfit, world
         data["gesture"] = gesture(i, len(st["beats"]), str(b["line"]), wd.get("kind"))
-        data["swarm"] = i in swarms
+        data["swarm"] = False                                   # swarms are off (owner preference)
         if data["swarm"]:
             data["gesture"] = "wow"
         nxt = st["beats"][i + 1] if i + 1 < len(st["beats"]) else None      # the live bot's rhythm: short pause inside a stage, longer between stages
@@ -256,7 +289,7 @@ def _capture_sites(st):
     shots = BASE / "app" / "public" / "shots"
     shutil.rmtree(shots, ignore_errors=True)
     shots.mkdir(parents=True, exist_ok=True)
-    todo = [(i, b) for i, b in enumerate(st["beats"]) if re.match(r"^https://[\w.-]+\.[a-z]{2,}(/\S*)?$", str(b.get("site") or ""))][:6]
+    todo = [(i, b) for i, b in enumerate(st["beats"]) if re.match(r"^https://[\w.-]+\.[a-z]{2,}(/\S*)?$", str(b.get("site") or ""))][:1]
     if not todo:
         return 0
     from playwright.sync_api import sync_playwright
@@ -346,14 +379,15 @@ if __name__ == "__main__":
     make(a.topic, a.show)
 
 
-def script_for(topic, facts=None):
+def script_for(topic, facts=None, banned=()):
     """For the main bot: fact-checked story -> live pages + photos -> engine script (plates 'world')."""
-    st = write_story(topic, facts)
+    st = write_story(topic, facts, banned)
     print(f"  {len(st['beats'])} beats · stages: {' > '.join(st['stages'])} · example: {st.get('example')}")
     capture_sites(st)
     capture_photos(st)
     sc = to_script(st)
     sc["format"] = "world: " + " > ".join(st["stages"])
+    sc["signatures"] = [g for g in (signature(b.get("widget")) for b in st["beats"]) if "@" in g]
     return sc
 
 

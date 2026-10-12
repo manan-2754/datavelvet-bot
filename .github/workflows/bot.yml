@@ -28,7 +28,7 @@ permissions:
   contents: write
 
 env:
-  RENDER_FPS: '30'
+  RENDER_FPS: '60'
   RENDER_SAMPLES: '2'
   RENDER_CHUNKS: '10'
   PYTHONIOENCODING: utf-8

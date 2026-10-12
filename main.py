@@ -374,7 +374,7 @@ def main():
             if os.getenv("PRO_STYLE", "1") != "0":     # pro story: one running example, real UI objects, live pages, 3D world
                 try:
                     import pro
-                    script = pro.script_for(topic, facts)
+                    script = pro.script_for(topic, facts, banned=state.get("scene_signatures", []))
                     script.update(series=series, level=level, trend=trend, viewer_q=vq)
                     add_sources(script, facts["sources"] + ((trend or {}).get("sources") or []))
                 except Exception as e:
