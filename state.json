@@ -10,7 +10,8 @@
     "Why your phone gets hot while charging",
     "How compiler register allocation works",
     "What actually happens when you type google.com",
-    "Why Chrome eats all your RAM"
+    "Why Chrome eats all your RAM",
+    "How browser fingerprinting tracks you without cookies"
   ],
   "used_bank": [
     "dns_explained"
@@ -21,15 +22,15 @@
       "topic": "How does DNS actually work?",
       "youtube_id": "VwpULb63iSg",
       "stats": {
-        "yt_views": 96,
+        "yt_views": 100,
         "yt_likes": 1,
         "yt_comments": 0,
-        "yt_avp": 44.8,
-        "yt_avd": 43.0,
+        "yt_avp": 49.8,
+        "yt_avd": 48.0,
         "yt_subs": 1,
         "yt_shares": 0,
-        "score": 495.0,
-        "fetched": "2026-10-11T14:24:02+00:00"
+        "score": 524.0,
+        "fetched": "2026-10-12T14:09:32+00:00"
       }
     },
     {
@@ -38,21 +39,21 @@
       "youtube_id": "9P7QiMeIP9U",
       "instagram_id": "18126836476852213",
       "stats": {
-        "yt_views": 1309,
+        "yt_views": 1326,
         "yt_likes": 30,
         "yt_comments": 0,
-        "yt_avp": 71.1,
-        "yt_avd": 70.0,
+        "yt_avp": 61.2,
+        "yt_avd": 60.0,
         "yt_subs": 1,
-        "yt_shares": 0,
-        "ig_reach": 200,
+        "yt_shares": 1,
+        "ig_reach": 202,
         "ig_saved": 3,
         "ig_shares": 1,
-        "ig_views": 232,
-        "ig_likes": 4,
+        "ig_views": 236,
+        "ig_likes": 5,
         "ig_comments": 2,
-        "score": 3296.5,
-        "fetched": "2026-10-11T14:24:03+00:00"
+        "score": 3354.0,
+        "fetched": "2026-10-12T14:09:32+00:00"
       }
     },
     {
@@ -66,17 +67,21 @@
       "youtube_id": "lSAY6wbyT_A",
       "instagram_id": "18076383422549123",
       "stats": {
-        "yt_views": 275,
-        "yt_likes": 2,
+        "yt_views": 282,
+        "yt_likes": 3,
         "yt_comments": 0,
-        "ig_reach": 456,
+        "yt_avp": 25.5,
+        "yt_avd": 27.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 458,
         "ig_saved": 3,
         "ig_shares": 1,
-        "ig_views": 518,
+        "ig_views": 520,
         "ig_likes": 5,
         "ig_comments": 0,
-        "score": 1376.0,
-        "fetched": "2026-10-11T14:24:03+00:00"
+        "score": 1538.5,
+        "fetched": "2026-10-12T14:09:33+00:00"
       }
     },
     {
@@ -87,17 +92,21 @@
       "youtube_id": "sM8pNlXKfok",
       "instagram_id": "18117438377093748",
       "stats": {
-        "yt_views": 287,
-        "yt_likes": 5,
-        "yt_comments": 1,
-        "ig_reach": 358,
+        "yt_views": 290,
+        "yt_likes": 6,
+        "yt_comments": 2,
+        "yt_avp": 29.4,
+        "yt_avd": 25.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 361,
         "ig_saved": 1,
         "ig_shares": 1,
-        "ig_views": 402,
+        "ig_views": 405,
         "ig_likes": 1,
         "ig_comments": 0,
-        "score": 1178.0,
-        "fetched": "2026-10-11T14:24:04+00:00"
+        "score": 1417.5,
+        "fetched": "2026-10-12T14:09:33+00:00"
       }
     },
     {
@@ -107,17 +116,21 @@
       "youtube_id": "pTc0yF47i1A",
       "instagram_id": "18372281464244099",
       "stats": {
-        "yt_views": 13,
+        "yt_views": 18,
         "yt_likes": 0,
         "yt_comments": 0,
-        "ig_reach": 520,
+        "yt_avp": 16.8,
+        "yt_avd": 10.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 522,
         "ig_saved": 5,
         "ig_shares": 3,
-        "ig_views": 579,
+        "ig_views": 583,
         "ig_likes": 8,
         "ig_comments": 0,
-        "score": 1432.0,
-        "fetched": "2026-10-11T14:24:04+00:00"
+        "score": 1526.0,
+        "fetched": "2026-10-12T14:09:34+00:00"
       }
     },
     {
@@ -128,17 +141,21 @@
       "youtube_id": "55r1NyCoiSs",
       "instagram_id": "18119557396949139",
       "stats": {
-        "yt_views": 26,
-        "yt_likes": 0,
+        "yt_views": 64,
+        "yt_likes": 1,
         "yt_comments": 0,
-        "ig_reach": 199,
+        "yt_avp": 29.5,
+        "yt_avd": 20.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 203,
         "ig_saved": 1,
         "ig_shares": 1,
-        "ig_views": 224,
-        "ig_likes": 0,
+        "ig_views": 228,
+        "ig_likes": 1,
         "ig_comments": 0,
-        "score": 449.5,
-        "fetched": "2026-10-11T14:24:04+00:00"
+        "score": 691.0,
+        "fetched": "2026-10-12T14:09:34+00:00"
       }
     },
     {
@@ -149,17 +166,21 @@
       "youtube_id": "ru0fE5sd0NM",
       "instagram_id": "18076028366735422",
       "stats": {
-        "yt_views": 52,
+        "yt_views": 64,
         "yt_likes": 0,
         "yt_comments": 0,
-        "ig_reach": 514,
+        "yt_avp": 34.1,
+        "yt_avd": 26.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 518,
         "ig_saved": 9,
         "ig_shares": 1,
-        "ig_views": 580,
+        "ig_views": 586,
         "ig_likes": 15,
         "ig_comments": 0,
-        "score": 1684.0,
-        "fetched": "2026-10-11T14:24:05+00:00"
+        "score": 1874.5,
+        "fetched": "2026-10-12T14:09:34+00:00"
       }
     },
     {
@@ -170,17 +191,17 @@
       "youtube_id": "5U_rtc8oRHs",
       "instagram_id": "18114047927276016",
       "stats": {
-        "yt_views": 35,
+        "yt_views": 51,
         "yt_likes": 0,
         "yt_comments": 0,
-        "ig_reach": 200,
+        "ig_reach": 218,
         "ig_saved": 1,
         "ig_shares": 0,
-        "ig_views": 214,
+        "ig_views": 237,
         "ig_likes": 1,
         "ig_comments": 0,
-        "score": 414.0,
-        "fetched": "2026-10-11T14:24:05+00:00"
+        "score": 462.0,
+        "fetched": "2026-10-12T14:09:35+00:00"
       }
     },
     {
@@ -234,11 +255,11 @@
       },
       "youtube_id": "wAYl4q3sCwc",
       "stats": {
-        "yt_views": 5,
-        "yt_likes": 0,
+        "yt_views": 637,
+        "yt_likes": 6,
         "yt_comments": 0,
-        "score": 5,
-        "fetched": "2026-10-11T18:00:14+00:00"
+        "score": 787,
+        "fetched": "2026-10-12T14:09:35+00:00"
       }
     },
     {
@@ -293,7 +314,20 @@
         "cta": "save"
       },
       "youtube_id": "4aZ5dipKfvI",
-      "instagram_id": "18025092821863422"
+      "instagram_id": "18025092821863422",
+      "stats": {
+        "yt_views": 253,
+        "yt_likes": 1,
+        "yt_comments": 0,
+        "ig_reach": 736,
+        "ig_saved": 5,
+        "ig_shares": 1,
+        "ig_views": 800,
+        "ig_likes": 10,
+        "ig_comments": 0,
+        "score": 1956.0,
+        "fetched": "2026-10-12T14:09:35+00:00"
+      }
     },
     {
       "time": "2026-10-11T14:38:12+00:00",
@@ -349,7 +383,20 @@
         "cta": "save"
       },
       "youtube_id": "sZQlLUJu54U",
-      "instagram_id": "17907826107668662"
+      "instagram_id": "17907826107668662",
+      "stats": {
+        "yt_views": 256,
+        "yt_likes": 1,
+        "yt_comments": 1,
+        "ig_reach": 324,
+        "ig_saved": 2,
+        "ig_shares": 0,
+        "ig_views": 374,
+        "ig_likes": 0,
+        "ig_comments": 1,
+        "score": 1017.0,
+        "fetched": "2026-10-12T14:09:35+00:00"
+      }
     },
     {
       "time": "2026-10-11T18:21:22+00:00",
@@ -452,6 +499,61 @@
       },
       "youtube_id": "S0YLDkabNOM",
       "instagram_id": "17948011797304068"
+    },
+    {
+      "time": "2026-10-12T17:00:12+00:00",
+      "topic": "How browser fingerprinting tracks you without cookies",
+      "format": "pyramid > wave > timeline > radial > cluster > diagonal",
+      "seed": 677143379,
+      "features": {
+        "angle": "journey",
+        "layouts": [
+          "pyramid",
+          "wave",
+          "timeline",
+          "radial",
+          "cluster",
+          "diagonal"
+        ],
+        "types": [
+          "bars",
+          "beam",
+          "burst",
+          "code",
+          "counter",
+          "donut",
+          "gauge",
+          "link",
+          "matrix",
+          "network",
+          "object",
+          "particles",
+          "ring",
+          "stack",
+          "stream",
+          "surface",
+          "text"
+        ],
+        "cams": [
+          "dolly",
+          "orbit",
+          "crane",
+          "push",
+          "dutch",
+          "fly"
+        ],
+        "hue": "Jade",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "major",
+        "length": "mid",
+        "level": "engineer",
+        "trend": true,
+        "series": "Tech Explained",
+        "cta": "save",
+        "fmt": "standard"
+      },
+      "youtube_id": "3VRDYCOh0cY",
+      "instagram_id": "18425872588147385"
     }
   ],
   "series_counts": {
@@ -467,7 +569,8 @@
     "ring > tree > spiral > diagonal > cluster > row",
     "timeline > diagonal > cluster > tree > grid > radial",
     "depth > tree > radial > stack > timeline > diagonal > cluster",
-    "row > depth > grid > spiral > stack > cluster"
+    "row > depth > grid > spiral > stack > cluster",
+    "pyramid > wave > timeline > radial > cluster > diagonal"
   ],
   "used_palettes": [
     "0:0"
@@ -487,119 +590,119 @@
   "queued_scripts": [],
   "style_memory": [
     {
-      "posted_at": "2026-10-11T22:08:16+00:00",
+      "posted_at": "2026-10-12T17:03:23+00:00",
       "style": {
-        "name": "Saffron Pulse / Indigo signal",
-        "created": "2026-10-11T21:55:13+00:00",
+        "name": "Jade Tide / Ember signal",
+        "created": "2026-10-12T14:11:30+00:00",
         "hook": null,
-        "tag": "underline",
+        "tag": "pill",
         "reflect": false,
         "glass": {
           "on": true,
-          "roughness": 0.153,
-          "ior": 1.48,
-          "thickness": 0.63,
-          "dof": 4.0,
-          "key": 2.37,
-          "rim": "#C3ED61"
+          "roughness": 0.216,
+          "ior": 1.4,
+          "thickness": 0.84,
+          "dof": 3.2,
+          "key": 1.78,
+          "rim": "#E978C2"
         },
         "mascot": {
-          "on": true,
+          "on": false,
           "side": 1,
           "kind": "user"
         },
         "_h": {
-          "bg": 54.5,
-          "signal": 216.1,
-          "holo": 34.4
+          "bg": 124.2,
+          "signal": 2.5,
+          "holo": 272.2
         },
         "palette": {
-          "ink": "#13120A",
-          "ink2": "#212013",
-          "graphite": "#626050",
-          "ash": "#ADAC9F",
-          "bone": "#F2F2EA",
-          "signal": "#1C6FEE",
-          "ember": "#637DFF",
-          "blood": "#106BC6"
+          "ink": "#081408",
+          "ink2": "#0F2411",
+          "graphite": "#556756",
+          "ash": "#93A394",
+          "bone": "#ECF3EB",
+          "signal": "#F2251C",
+          "ember": "#FF7F4E",
+          "blood": "#B00E18"
         },
         "holo": [
-          "#F0B361",
-          "#C3ED61"
+          "#AD62EF",
+          "#E978C2"
         ],
         "type": {
-          "wscale": 0.87,
-          "wtadd": 0,
-          "case": "title"
+          "wscale": 0.8,
+          "wtadd": -200,
+          "case": "upper"
         },
         "grid": {
-          "minor": 18,
-          "major": 90
+          "minor": 32,
+          "major": 128
         },
         "caption": {
-          "size": 50,
-          "dy": -7
+          "size": 52,
+          "dy": -4
         },
         "post": {
-          "bloom": 0.74,
-          "bloomThreshold": 0.74,
-          "vignette": 0.29,
-          "grain": 0.07,
-          "ca": 0.16,
-          "halation": 0.22
+          "bloom": 0.52,
+          "bloomThreshold": 0.92,
+          "vignette": 0.28,
+          "grain": 0.046,
+          "ca": 0.78,
+          "halation": 0.34
         },
         "cam2d": {
-          "zoom": 1.047,
-          "roll": 0.0008,
-          "hand": 1.76
+          "zoom": 0.981,
+          "roll": 0.0069,
+          "hand": 0.81
         },
         "cam3d": {
-          "fov": -4.5,
-          "roll": -0.037,
-          "dist": 1.02,
-          "hand": 0.69
+          "fov": -4.2,
+          "roll": -0.029,
+          "dist": 0.9,
+          "hand": 0.81
         },
         "scenes": [
           {
-            "cam": "crane",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "spiral",
+            "cam": "whip",
             "reveal": "scan",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "draw",
             "floor": "hex",
-            "spin": 1
-          },
-          {
-            "cam": "fly",
-            "reveal": "glitch",
-            "floor": "grid",
             "spin": -1
           },
           {
-            "cam": "crane",
+            "cam": "low",
             "reveal": "draw",
             "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "whip",
+            "reveal": "assemble",
+            "floor": "grid",
             "spin": -1
           },
           {
             "cam": "push",
+            "reveal": "scan",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "whip",
             "reveal": "assemble",
-            "floor": "grid",
+            "floor": "dots",
             "spin": 1
+          },
+          {
+            "cam": "fly",
+            "reveal": "scan",
+            "floor": "polar",
+            "spin": -1
           }
         ]
       },
-      "format": "row > depth > grid > spiral > stack > cluster",
-      "angle": "myth-busting"
+      "format": "pyramid > wave > timeline > radial > cluster > diagonal",
+      "angle": "journey"
     }
   ],
   "scene_signatures": [
@@ -643,7 +746,13 @@
     "grid|box:glitch,burst:pop,panel:pop,sphere:drop",
     "spiral|code:rise,sphere:pop,text:pop",
     "stack|ring:draw,sphere:assemble,stack:grow,stream:fly",
-    "cluster|network:rise,sphere:pop,sphere:unfold"
+    "cluster|network:rise,sphere:pop,sphere:unfold",
+    "pyramid|donut:pop,object:drop,object:grow",
+    "wave|code:unfold,matrix:scan,stream:fly",
+    "timeline|beam:assemble,code:pop,surface:rise,text:draw",
+    "radial|bars:rise,counter:pop,gauge:grow",
+    "cluster|link:draw,network:unfold,object:pop,stack:assemble",
+    "diagonal|burst:pop,object:rise,particles:pop,ring:draw"
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
@@ -651,11 +760,12 @@
     "ring > tree > spiral > diagonal > cluster > row",
     "timeline > diagonal > cluster > tree > grid > radial",
     "depth > tree > radial > stack > timeline > diagonal > cluster",
-    "row > depth > grid > spiral > stack > cluster"
+    "row > depth > grid > spiral > stack > cluster",
+    "pyramid > wave > timeline > radial > cluster > diagonal"
   ],
   "insights": {
-    "n": 1,
-    "updated": "2026-10-11T21:51:58+00:00",
+    "n": 3,
+    "updated": "2026-10-12T14:09:35+00:00",
     "best": {},
     "worst": {},
     "lift": {}
@@ -686,10 +796,27 @@
       "time": "2026-10-12T14:02:30+00:00",
       "ok": false,
       "error": "RuntimeError: text-to-speech failed for: Your browser can be recognized without a single cookie."
+    },
+    {
+      "time": "2026-10-12T17:03:23+00:00",
+      "ok": true
     }
   ],
   "series": {
     "name": "Tech Explained",
-    "ep": 3
-  }
+    "ep": 4
+  },
+  "seen_comments": [
+    "UgwXfDTO4tfTrp_36cB4AaABAg",
+    "UgygtUnX-LOvXYrahuZ4AaABAg",
+    "UgzDh5eiRTJ-xa5YLRt4AaABAg"
+  ],
+  "viewer_questions": [
+    {
+      "topic": "How Shopify processes an online purchase",
+      "user": "@ThomasVeljkovic",
+      "platform": "YouTube",
+      "text": "Can you make a detailed video on what happens when you purchase an item from a Shopify site?"
+    }
+  ]
 }
