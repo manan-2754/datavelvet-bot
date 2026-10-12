@@ -578,3 +578,6 @@ export class Outro extends GenPlate {
 export * from './_plates3d';
 export * from './_edit';
 export * from './_compose';
+
+export * from './_story';
+export * from './_world';

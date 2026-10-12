@@ -104,9 +104,45 @@ def _kokoro_synth(text, path, rate):
     return out
 
 
+AZURE_KEY, AZURE_REGION = os.getenv("AZURE_SPEECH_KEY", "").strip(), os.getenv("AZURE_SPEECH_REGION", "").strip()
+
+
+def _azure_synth(text, path, voice, rate):
+    """The same Andrew voice through Microsoft's official Azure Speech API (free tier), with word timings."""
+    import html
+    import azure.cognitiveservices.speech as sdk
+    cfg = sdk.SpeechConfig(subscription=AZURE_KEY, region=AZURE_REGION)
+    cfg.set_speech_synthesis_output_format(sdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3)
+    syn = sdk.SpeechSynthesizer(speech_config=cfg, audio_config=None)
+    words = []
+
+    def boundary(e):
+        if getattr(e, "boundary_type", sdk.SpeechSynthesisBoundaryType.Word) == sdk.SpeechSynthesisBoundaryType.Word:
+            s = e.audio_offset / 1e7
+            d = e.duration.total_seconds() if hasattr(e.duration, "total_seconds") else e.duration / 1e7
+            words.append((e.text, s, s + d))
+    syn.synthesis_word_boundary.connect(boundary)
+    ssml = (f'<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US"><voice name="{voice}">'
+            f'<prosody rate="{rate}">{html.escape(text)}</prosody></voice></speak>')
+    r = syn.speak_ssml_async(ssml).get()
+    if r.reason != sdk.ResultReason.SynthesizingAudioCompleted:
+        raise RuntimeError(f"Azure speech: {r.reason} {getattr(r, 'cancellation_details', '')}")
+    Path(path).write_bytes(r.audio_data)
+    return words
+
+
 def synth(text, path, voice, rate="+2%"):
     if ENGINE == "kokoro":
         return _kokoro_synth(text, path, rate)
+    if AZURE_KEY and AZURE_REGION:                  # the official route to the channel voice (the free Edge one is blocked)
+        for attempt in range(3):
+            try:
+                words = _azure_synth(text, path, voice, rate)
+                if Path(path).stat().st_size > 1000:
+                    return words
+            except Exception as e:
+                print(f"  azure tts retry {attempt + 1}: {str(e)[:120]}")
+                time.sleep(3 * (attempt + 1))
     for attempt in range(4):
         try:
             words = asyncio.run(_synth(text, path, voice, rate))
@@ -184,7 +220,7 @@ def _narrate(script, voice=None):
                 w["end"] = round(max(w["start"], min(w["end"], t + dur)), 3)
             lines.append({"text": text, "start": words[0]["start"], "end": round(t + dur, 3), "scene": si, "words": words})
             last = li == len(sc["lines"]) - 1
-            pause = ((TAIL if script.get("long") else 0.5) if si == n - 1 else BETWEEN) if last else IN_SCENE   # Shorts: tight tail so the replay loops
+            pause = ((TAIL if script.get("long") else 0.5) if si == n - 1 else (sc.get("pause") or BETWEEN)) if last else IN_SCENE   # Shorts: tight tail so the replay loops
             track += [clip, np.zeros(int(pause * SR), np.float32)]
             t += dur + pause
     y = np.concatenate(track)
@@ -440,6 +476,16 @@ def mix(script):
                     put("riser", sw[-1]["end"], -13, align="end")
                     put("impact_slam", sw[-1]["end"], -7)
                 put("reverse_suck", N / SR - 0.4, -17, align="end")
+        elif plate in ("story", "world"):          # pro beats: UI widget sounds
+            wk = (d.get("widget") or {}).get("kind")
+            if wk in ("terminal", "code"):
+                for i in range(6):
+                    put("enter_key", t0 + 0.35 + i * 0.16, -21)
+            elif wk in ("metric", "compare", "stack"):
+                for i in range(8):
+                    put("ui_tick", t0 + 0.25 + i * 0.1, -22)
+            elif wk in ("checklist", "summary", "table", "chat", "phone", "request"):
+                put("confirm_chime", t0 + 0.8, -17)
         elif plate == "edit":
             acts = d.get("acts") or []
             for k, a in enumerate(acts):

@@ -167,7 +167,12 @@ def prepare_video(script, voice=None, tag=""):
     st_ = script.get("style") or {}
     print(f"🎨 Style: {st_.get('name')}  |  angle: {script.get('angle')}  |  cameras: {' '.join(s['cam'] for s in st_.get('scenes', []))}")
     print("🔊 Narration")
-    dur, voice = audio_build.narrate(script, voice)
+    if script["scenes"] and script["scenes"][0].get("plate") == "world" and not voice:
+        import pro
+        dur, voice = pro.fit_narration(script)
+        (out_dir / "script.json").write_text(json.dumps(script, indent=2, ensure_ascii=False), encoding="utf-8")
+    else:
+        dur, voice = audio_build.narrate(script, voice)
     print(f"  {voice}, {dur:.1f}s")
     if dur > 170 and not script.get("long"):
         raise RuntimeError(f"video would be {dur:.0f}s - too long for Shorts")
@@ -365,16 +370,27 @@ def main():
         try:
             angle = art_director.pick_angle(state)
             print(f"🎬 Angle: {angle[0]}  (every scene composed from scratch)")
-            try:
-                script = composer.write(topic, banned=state.get("scene_signatures", []) + longform.load_long()["scene_signatures"], recent=state.get("compose_formats", []),
-                                        angle=angle, seed=time.time_ns(), facts=facts, hints=analytics.hints(state) + (viewer_questions.hint(vq) if vq else ""), level=level,
-                                        series=series, mode=mode, plain=bool(vq))
-                script.update(series=series, level=level, trend=trend, viewer_q=vq)
-                add_sources(script, facts["sources"] + ((trend or {}).get("sources") or []))
-            except Exception as e:
-                print(f"  composer failed ({e}) - falling back to the template writer")
-                hook = art_director.pick_hook(state)
-                script = writer.write_script(topic, art_director.recent_formats(state), seed=time.time_ns(), angle=angle, hook=hook)
+            script = None
+            if os.getenv("PRO_STYLE", "1") != "0":     # pro story: one running example, real UI objects, live pages, 3D world
+                try:
+                    import pro
+                    script = pro.script_for(topic, facts)
+                    script.update(series=series, level=level, trend=trend, viewer_q=vq)
+                    add_sources(script, facts["sources"] + ((trend or {}).get("sources") or []))
+                except Exception as e:
+                    script = None
+                    print(f"  pro story failed ({str(e)[:120]}) - using the classic composer for this slot")
+            if script is None:
+              try:
+                  script = composer.write(topic, banned=state.get("scene_signatures", []) + longform.load_long()["scene_signatures"], recent=state.get("compose_formats", []),
+                                          angle=angle, seed=time.time_ns(), facts=facts, hints=analytics.hints(state) + (viewer_questions.hint(vq) if vq else ""), level=level,
+                                          series=series, mode=mode, plain=bool(vq))
+                  script.update(series=series, level=level, trend=trend, viewer_q=vq)
+                  add_sources(script, facts["sources"] + ((trend or {}).get("sources") or []))
+              except Exception as e:
+                  print(f"  composer failed ({e}) - falling back to the template writer")
+                  hook = art_director.pick_hook(state)
+                  script = writer.write_script(topic, art_director.recent_formats(state), seed=time.time_ns(), angle=angle, hook=hook)
         except Exception:
             if args.post:                    # a topic that fails twice is skipped, so it can never block the queue
                 failed[topic] = failed.get(topic, 0) + 1

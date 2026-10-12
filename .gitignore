@@ -19,3 +19,4 @@ analysis/models/
 analysis/.venv/
 analysis/.cache/
 legacy_requirements_v3.txt
+app/public/shots/

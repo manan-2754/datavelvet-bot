@@ -10,3 +10,5 @@ anthropic>=1.0
 pillow>=10.0
 kokoro-onnx>=0.4
 soundfile>=0.12
+azure-cognitiveservices-speech>=1.40
+playwright>=1.48
