@@ -11,6 +11,10 @@ on:
         description: 'Post to Instagram (off = make the slides only)'
         type: boolean
         default: false
+      at:
+        description: 'Post at this Eastern time (e.g. 11:00) - used by the external cron-job.org trigger'
+        type: string
+        default: ''
 
 concurrency:
   group: carousel-bot
@@ -51,6 +55,7 @@ jobs:
           set -o pipefail
           if [ "$POST" = "true" ]; then FLAGS="--post"; fi
           if [ "${{ github.event_name }}" = "schedule" ]; then FLAGS="$FLAGS --at 11:00"; fi
+          if [ -n "${{ inputs.at }}" ]; then FLAGS="$FLAGS --at ${{ inputs.at }}"; fi
           python -u carousel_lane.py $FLAGS 2>&1 | tee run.log
       - name: Keep the slides (3 days)
         if: always()

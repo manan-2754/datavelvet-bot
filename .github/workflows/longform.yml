@@ -13,6 +13,10 @@ on:
         description: 'Upload after rendering'
         type: boolean
         default: true
+      at:
+        description: 'Post at this Eastern time (e.g. 15:00) - used by the external cron-job.org trigger'
+        type: string
+        default: ''
 
 concurrency:
   group: longform-bot
@@ -138,8 +142,8 @@ jobs:
           path: out/chunks
           merge-multiple: true
       - name: Wait for 3:00 PM Eastern
-        if: github.event_name == 'schedule'
-        run: python wait_until.py 15:00
+        if: github.event_name == 'schedule' || inputs.at != ''
+        run: python wait_until.py "${{ inputs.at || '15:00' }}"
       - name: Stitch, mix, upload to YouTube
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}

@@ -15,6 +15,10 @@ on:
         description: 'Upload after rendering'
         type: boolean
         default: true
+      slot:
+        description: 'Post at this Eastern time (e.g. 07:00) - used by the external cron-job.org trigger'
+        type: string
+        default: ''
 
 concurrency:
   group: explainer-bot
@@ -56,6 +60,7 @@ jobs:
             "13 13 * * *") echo "SLOT_TARGET=13:00" >> "$GITHUB_ENV" ;;
             "13 17 * * *") echo "SLOT_TARGET=17:00" >> "$GITHUB_ENV" ;;
           esac
+          if [ -n "${{ inputs.slot }}" ]; then echo "SLOT_TARGET=${{ inputs.slot }}" >> "$GITHUB_ENV"; fi
       - name: Script, research, narration, style, critic
         id: prep
         env:
@@ -167,6 +172,7 @@ jobs:
             "13 13 * * *") echo "SLOT_TARGET=13:00" >> "$GITHUB_ENV" ;;
             "13 17 * * *") echo "SLOT_TARGET=17:00" >> "$GITHUB_ENV" ;;
           esac
+          if [ -n "${{ inputs.slot }}" ]; then echo "SLOT_TARGET=${{ inputs.slot }}" >> "$GITHUB_ENV"; fi
       - name: Wait for the slot time
         if: env.SLOT_TARGET != ''
         run: python wait_until.py "$SLOT_TARGET"
