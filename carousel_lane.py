@@ -259,6 +259,12 @@ def pick_style(cs):
 
 def make(topic=None, fmt=None, post=False, at=None):
     cs, state = load_cs(), load_state()
+    if post:                                       # one carousel per Eastern day (a late scheduled run after a manual one skips)
+        from zoneinfo import ZoneInfo
+        today = datetime.now(ZoneInfo("America/Toronto")).date()
+        if any(datetime.fromisoformat(p["time"]).astimezone(ZoneInfo("America/Toronto")).date() == today for p in cs["posts"]):
+            print("⏭️ Today's carousel is already posted - skipping")
+            return []
     used = {p["topic"].lower() for p in cs["posts"]} | {t.lower() for t in state.get("used_topics", [])}
     recent = [p.get("format") for p in cs["posts"][-3:]]
     fmt = fmt or random.choice([f for f in FORMATS if f not in recent] or list(FORMATS))
