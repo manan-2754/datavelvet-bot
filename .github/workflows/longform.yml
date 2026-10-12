@@ -4,9 +4,9 @@ name: Long-form 8-10 min YouTube video (landscape, split render)
 # 20 free machines render frame-exact slices of the 1920x1080 video in parallel; a final job stitches, mixes, uploads.
 on:
   schedule:
-    # Checked daily at 15:37 UTC (between the Shorts slots); a video is made only when the last one is 3+ days old
-    # (repo variable LONG_EVERY_DAYS changes the gap). Posting stops after RUN_UNTIL (2027-04-09).
-    - cron: '37 15 * * *'
+    # Checked daily; a video is made only when the last one is 3+ days old (repo variable LONG_EVERY_DAYS). It starts at
+    # 12:13 UTC (~8 AM Eastern), plans/renders, then posts at exactly 3:00 PM Eastern. Posting stops after RUN_UNTIL.
+    - cron: '13 12 * * *'
   workflow_dispatch:
     inputs:
       post:
@@ -117,7 +117,7 @@ jobs:
     needs: [prepare, render]
     if: needs.prepare.outputs.has_video == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 340
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -137,6 +137,9 @@ jobs:
           pattern: long-chunk-${{ github.run_number }}-*
           path: out/chunks
           merge-multiple: true
+      - name: Wait for 3:00 PM Eastern
+        if: github.event_name == 'schedule'
+        run: python wait_until.py 15:00
       - name: Stitch, mix, upload to YouTube
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}

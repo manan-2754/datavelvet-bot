@@ -17,7 +17,7 @@ import shutil
 import subprocess
 import sys
 import time
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
@@ -280,10 +280,13 @@ def main():
         return stage_render(args.chunk)
     if args.stage == "finish":
         return stage_finish(args.post)
-    if args.post and not args.long and os.getenv("GITHUB_EVENT_NAME") == "schedule":   # a late scheduled run right after a manual post
+    if args.post and not args.long and os.getenv("SLOT_TARGET"):   # this slot was already covered (e.g. a manual post)
+        from zoneinfo import ZoneInfo
+        hh, mm = map(int, os.environ["SLOT_TARGET"].split(":"))
+        target = datetime.now(ZoneInfo("America/Toronto")).replace(hour=hh, minute=mm, second=0, microsecond=0)
         last = next((p.get("time") for p in reversed(load_state().get("posts", [])) if p.get("time")), None)
-        if last and (datetime.now(timezone.utc) - datetime.fromisoformat(last)).total_seconds() < 2.5 * 3600:
-            print("⏭️ A video was posted less than 2.5 h ago (manual run) - skipping this delayed slot to avoid a double post")
+        if last and datetime.fromisoformat(last) > target - timedelta(hours=3):
+            print(f"⏭️ A video was already posted for the {os.environ['SLOT_TARGET']} ET slot - skipping to avoid a double post")
             gh_output(has_video="false", chunks="[]")
             return 0
     if args.post and date.today().isoformat() > RUN_UNTIL:

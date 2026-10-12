@@ -4,10 +4,11 @@ name: Motion-as-Code explainer - create + post (split render)
 # frame-exact slices in parallel (premium glass + holograms, CPU rendering); a final job stitches, mixes and posts.
 on:
   schedule:
-    # 9am, 2pm and 7pm Eastern (EDT) = 13:07, 18:07, 23:07 UTC. GitHub may start these a few minutes late.
-    - cron: '7 13 * * *'
-    - cron: '7 18 * * *'
-    - cron: '7 23 * * *'
+    # Posts at 7:00 AM, 1:00 PM and 5:00 PM Eastern. GitHub often starts scheduled jobs hours late, so each run starts
+    # ~4 h early (07:13 / 13:13 / 17:13 UTC), makes and renders the video, then waits and uploads exactly on the slot.
+    - cron: '13 7 * * *'
+    - cron: '13 13 * * *'
+    - cron: '13 17 * * *'
   workflow_dispatch:
     inputs:
       post:
@@ -48,6 +49,13 @@ jobs:
           sudo apt-get update && sudo apt-get install -y ffmpeg
           pip install -r requirements.txt
           cd app && bun install --frozen-lockfile
+      - name: Which posting slot is this (Eastern time)
+        run: |
+          case "${{ github.event.schedule }}" in
+            "13 7 * * *") echo "SLOT_TARGET=07:00" >> "$GITHUB_ENV" ;;
+            "13 13 * * *") echo "SLOT_TARGET=13:00" >> "$GITHUB_ENV" ;;
+            "13 17 * * *") echo "SLOT_TARGET=17:00" >> "$GITHUB_ENV" ;;
+          esac
       - name: Script, research, narration, style, critic
         id: prep
         env:
@@ -132,7 +140,7 @@ jobs:
     needs: [prepare, render]
     if: needs.prepare.outputs.has_video == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 330
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -152,6 +160,16 @@ jobs:
           pattern: chunk-${{ github.run_number }}-*
           path: out/chunks
           merge-multiple: true
+      - name: Which posting slot is this (Eastern time)
+        run: |
+          case "${{ github.event.schedule }}" in
+            "13 7 * * *") echo "SLOT_TARGET=07:00" >> "$GITHUB_ENV" ;;
+            "13 13 * * *") echo "SLOT_TARGET=13:00" >> "$GITHUB_ENV" ;;
+            "13 17 * * *") echo "SLOT_TARGET=17:00" >> "$GITHUB_ENV" ;;
+          esac
+      - name: Wait for the slot time
+        if: env.SLOT_TARGET != ''
+        run: python wait_until.py "$SLOT_TARGET"
       - name: Stitch, mix, post
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}

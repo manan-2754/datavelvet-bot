@@ -3,9 +3,9 @@ name: Watchdog - email if no video was posted
 on:
   schedule:
     # ~2h25 after each posting slot (13:07, 18:07, 23:07 UTC) - split rendering takes ~30-60 min in the cloud
-    - cron: '30 15 * * *'
-    - cron: '30 20 * * *'
-    - cron: '30 1 * * *'
+    - cron: '30 12 * * *'
+    - cron: '30 18 * * *'
+    - cron: '30 22 * * *'
   workflow_dispatch:
     inputs:
       test:
