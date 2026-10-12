@@ -681,6 +681,11 @@
     {
       "time": "2026-10-11T22:08:16+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-12T14:02:30+00:00",
+      "ok": false,
+      "error": "RuntimeError: text-to-speech failed for: Your browser can be recognized without a single cookie."
     }
   ],
   "series": {
