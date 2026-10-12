@@ -1,0 +1,78 @@
+name: Daily Instagram carousel
+
+# One standalone carousel a day, alternating 3D carousels (3D objects + real charts) and presentation decks, learning
+# from saves which style the audience prefers. Starts ~7:13 AM Eastern, makes the slides, posts at 11:00 AM Eastern.
+on:
+  schedule:
+    - cron: '13 11 * * *'
+  workflow_dispatch:
+    inputs:
+      post:
+        description: 'Post to Instagram (off = make the slides only)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: carousel-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  carousel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: oven-sh/setup-bun@v2
+      - name: Install deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+          cd app && bun install --frozen-lockfile
+      - name: Make the carousel and post it at 11:00 AM Eastern
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYTHONIOENCODING: utf-8
+          POST: ${{ (github.event_name == 'schedule' && vars.AUTO_POST_INSTAGRAM == 'true') || inputs.post }}
+        run: |
+          set -o pipefail
+          if [ "$POST" = "true" ]; then FLAGS="--post"; fi
+          if [ "${{ github.event_name }}" = "schedule" ]; then FLAGS="$FLAGS --at 11:00"; fi
+          python -u carousel_lane.py $FLAGS 2>&1 | tee run.log
+      - name: Keep the slides (3 days)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carousel-${{ github.run_number }}
+          path: |
+            out/carousels/*/
+            out/carousels3d/*/
+          retention-days: 3
+      - name: Email me if it failed
+        if: failure()
+        env:
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: python notify.py --failed run.log
+      - name: Save carousel history
+        if: always()
+        run: |
+          git config user.name "explainer-bot"
+          git config user.email "explainer-bot@users.noreply.github.com"
+          git add carousel_state.json || true
+          git commit -m "bot: carousel [skip ci]" || exit 0
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done

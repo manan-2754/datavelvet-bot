@@ -67,7 +67,7 @@ def _gh(method, url, **kw):
     return r
 
 
-def host_on_github(path):
+def host_on_github(path, ctype="video/mp4"):
     """Attach the file to the 'ig-media' release of this repo and return (public_url, asset_api_url)."""
     repo = os.getenv("GITHUB_REPOSITORY")
     if not repo or not os.getenv("GITHUB_TOKEN"):
@@ -82,18 +82,19 @@ def host_on_github(path):
     name = f"{int(time.time())}_{Path(path).name}"
     with open(path, "rb") as f:
         asset = _gh("POST", f"https://uploads.github.com/repos/{repo}/releases/{release['id']}/assets",
-                    params={"name": name}, data=f, headers={"Content-Type": "video/mp4"}, timeout=600).json()
+                    params={"name": name}, data=f, headers={"Content-Type": ctype}, timeout=600).json()
     return asset["browser_download_url"], asset["url"]
 
 
-def upload_reel(video_path, caption, thumb_offset=None):
+def upload_reel(video_path, caption, thumb_offset=None, cover=None):
     token, uid = _token(), _user_id()
     small = to_1080(video_path)
     url, asset_api = host_on_github(small)
     print(f"  Instagram: video hosted at {url}")
+    cover_url, cover_api = host_on_github(cover, "image/jpeg") if cover else (None, None)
     try:
         fields = {"media_type": "REELS", "video_url": url, "caption": caption, "share_to_feed": "true",
-                  **({"thumb_offset": str(int(thumb_offset))} if thumb_offset else {}),
+                  **({"cover_url": cover_url} if cover_url else {"thumb_offset": str(int(thumb_offset))} if thumb_offset else {}),
                   "is_ai_generated": "true",   # Instagram's "AI info" self-disclosure label
                   "access_token": token}
         r = requests.post(f"https://{HOST}/{VERSION}/{uid}/media", data=fields, timeout=60)
@@ -120,8 +121,44 @@ def upload_reel(video_path, caption, thumb_offset=None):
                                    data={"creation_id": cid, "access_token": token}, timeout=60))
     finally:
         _gh("DELETE", asset_api)
+        if cover_api:
+            _gh("DELETE", cover_api)
         small.unlink(missing_ok=True)
     print(f"✅ Instagram: posted media {pub['id']}")
+    return pub["id"]
+
+
+def _wait(cid, token, tries=30):
+    for _ in range(tries):
+        st = _check(requests.get(f"https://{HOST}/{VERSION}/{cid}", params={"fields": "status_code", "access_token": token}, timeout=30))
+        if st.get("status_code") in (None, "FINISHED"):
+            return
+        if st.get("status_code") in ("ERROR", "EXPIRED"):
+            raise RuntimeError(f"Instagram processing failed: {st}")
+        time.sleep(5)
+
+
+def upload_carousel(images, caption):
+    """Posts a carousel (2-10 images) - a second, saveable post built from the video."""
+    token, uid = _token(), _user_id()
+    hosted = [host_on_github(p, "image/jpeg") for p in images[:10]]
+    try:
+        kids = []
+        for url, _ in hosted:
+            c = _check(requests.post(f"https://{HOST}/{VERSION}/{uid}/media", timeout=60,
+                                     data={"image_url": url, "is_carousel_item": "true", "access_token": token}))
+            kids.append(c["id"])
+        for k in kids:
+            _wait(k, token)
+        box = _check(requests.post(f"https://{HOST}/{VERSION}/{uid}/media", timeout=60, data={
+            "media_type": "CAROUSEL", "children": ",".join(kids), "caption": caption, "access_token": token}))
+        _wait(box["id"], token)
+        pub = _check(requests.post(f"https://{HOST}/{VERSION}/{uid}/media_publish", timeout=60,
+                                   data={"creation_id": box["id"], "access_token": token}))
+    finally:
+        for _, api in hosted:
+            _gh("DELETE", api)
+    print(f"✅ Instagram: posted carousel {pub['id']}")
     return pub["id"]
 
 
