@@ -40,6 +40,7 @@ Return ONLY JSON:
   "next_topic": a related follow-up topic for "Part 2" (max 44 chars),
   "caption": 2 short lines + "Save this for later." + 6 relevant hashtags}}
 For a comparison, points look like "SSD: ... | HDD: ...". For myths, each point starts with "Myth:" or "Fact:".
+Write for a normal phone and laptop user, not an engineer: plain everyday words, short sentences. Avoid jargon and acronyms (protocol names, standards, part numbers); if one is unavoidable, explain it in a few words.
 Accurate facts only - never invent or round up statistics. No emojis. The title must not promise more items than the
 slides show (3 sections)."""
 

@@ -95,9 +95,22 @@ OPEN_CHAPTER = """This is CHAPTER {k} of {N} of ONE long-form landscape (16:9) Y
   {last}"""
 
 
-def opening(chapter, hook_words, cta=""):
+FORMATS = {   # rotating Shorts formats (the learning loop tracks which one performs)
+    "myth": """
+  FORMAT: MYTH-BUSTER. Pick ONE belief about this topic that many people hold but is false or only half true.
+  The hook states the myth as a question (e.g. "Closing apps saves battery?"). Scene 2 gives the verdict and also has
+  "stamp": {"text": "MYTH" or "FALSE" or "HALF TRUE", "cue": 1-3 exact words where the verdict is spoken}. The rest
+  explains what really happens. The myth must be genuinely common and the correction strictly true.""",
+    "guess": """
+  FORMAT: GUESS BEFORE THE END. The hook asks viewers to guess, and scene 1 also has "guess": {"question": max 50
+  chars, "options": [2-3 short answers], "answer": index of the right one}. Do NOT reveal the answer until the LAST
+  scene, whose first line says it plainly, starting with "The answer is".""",
+}
+
+
+def opening(chapter, hook_words, cta="", kind="standard"):
     if not chapter:
-        return OPEN_SHORT.format(hook_words=hook_words, cta=cta)
+        return OPEN_SHORT.format(hook_words=hook_words, cta=cta) + FORMATS.get(kind, "")
     k, N = chapter["k"], chapter["n"]
     first = (" Because this is chapter 1, scene 1 is also the video's HOOK: a bold claim or question that makes people stay "
              "for the full video.") if k == 1 else ""
@@ -119,6 +132,7 @@ def validate(sc, banned=(), length=(140, 200), hook_max=16, outro="Follow for mo
     if not 5 <= len(scenes) <= 10:
         raise ValueError(f"need 5-10 scenes, got {len(scenes)}")
     clean, bad, total, layouts, types_all, sigs = [], 0, 0, [], set(), []
+    guess_q = None
     for i, s in enumerate(scenes):
         src = s.get("lines") or s.get("narration") or s.get("voiceover") or s.get("text") or s.get("script") or []
         if isinstance(src, str):                     # some models return one string instead of a list
@@ -225,6 +239,22 @@ def validate(sc, banned=(), length=(140, 200), hook_max=16, outro="Follow for mo
             if 0 <= ans < len(q["options"]):
                 vis["quiz"] = {"question": _clip(q.get("question"), 50), "options": [_clip(o, 22) for o in q["options"]], "answer": ans,
                                "cue": str(q.get("cue")) if q.get("cue") and _cue_ok(str(q.get("cue")), text) else ""}
+        st = s.get("stamp") or v.get("stamp")             # myth-buster verdict stamp
+        if isinstance(st, dict) and st.get("text"):
+            vis["stamp"] = {"text": _clip(str(st["text"]).upper(), 14),
+                            "cue": str(st.get("cue")) if st.get("cue") and _cue_ok(str(st.get("cue")), text) else ""}
+        g = s.get("guess") or v.get("guess")              # guess-before-the-end: options shown on the hook, answer at the end
+        if i == 0 and isinstance(g, dict) and isinstance(g.get("options"), list) and 2 <= len(g["options"]) <= 3:
+            try:
+                ga = int(g.get("answer", 0))
+            except (TypeError, ValueError):
+                ga = -1
+            if 0 <= ga < len(g["options"]):
+                guess_q = {"question": _clip(g.get("question"), 50), "options": [_clip(o, 22) for o in g["options"]], "answer": ga}
+                vis["quiz"] = {**guess_q, "noReveal": True}
+        if guess_q and i == len(scenes) - 1 and i > 0:
+            vis["quiz"] = {**guess_q, "cue": "answer" if _cue_ok("answer", text) else ""}
+            vis.pop("recap", None)
         sig = signature(vis)
         tries = 0
         while (sig in banned or sig in sigs) and tries < 40:   # never reuse a composition: re-roll entrances until unique
@@ -347,16 +377,18 @@ def length_mode(state=None):
     return best[0] if best and best[0] in LENGTHS and best[0] != "long" else "short"
 
 
-def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, hints="", level="engineer", series=None, mode="short", chapter=None):
+def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, hints="", level="engineer", series=None, mode="short", chapter=None, plain=False):
     rng = random.Random(seed)
     length, counts, hook_max = LENGTHS.get("chapter" if chapter else mode, LENGTHS["short"])
     outro = ("Subscribe for more." if chapter["k"] == chapter["n"] else None) if chapter else None
     cta_last = (chapter["k"] == chapter["n"]) if chapter else True
     pick = rng.choice(CTAS)
+    kind = "standard" if (chapter or plain) else (os.getenv("FORMAT_KIND") or rng.choice(["standard", "standard", "myth", "guess"]))
     cta = pick + " (replace the [bracketed] part with something specific to this topic)"
 
     def done(x):                                  # remember which call to action this video used (learning loop)
         x["cta_kind"] = None if chapter else pick.split()[0].lower()
+        x["format_kind"] = None if chapter else kind
         return x
     phrases = [] if chapter else search_phrases(topic)
     search = (chr(10) + "  Real YouTube searches for this topic: " + "; ".join(f'"{p}"' for p in phrases) +
@@ -378,7 +410,7 @@ def write(topic, banned=(), recent=(), angle=None, tries=6, seed=0, facts=None, 
             series_txt += f' End the last scene by teasing the next episode: "{series["next"]}" (one short line before "Follow for more.").'
     fmt = dict(topic=topic, objects="|".join(OBJECTS), layouts=", ".join(C_LAYOUTS), cams=", ".join(C_CAMS),
                trans=", ".join(C_TRANS), n=n, avoid=avoid, facts=facts_txt, level=level, series=series_txt,
-               words_min=length[0], words_max=length[1], hook_words=hook_max, opening=opening(chapter, hook_max, cta), search=search,
+               words_min=length[0], words_max=length[1], hook_words=hook_max, opening=opening(chapter, hook_max, cta, kind), search=search,
                canvas="one chapter of a landscape 16:9 long-form YouTube video" if chapter else "vertical Shorts/Reels")
     feedback, err, cands = "", None, []
     last = None                                   # the last reviewed draft: later tries EDIT it instead of starting over

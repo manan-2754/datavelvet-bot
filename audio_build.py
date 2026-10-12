@@ -360,8 +360,13 @@ def mix(script):
                 if typ in ("particles", "tunnel", "surface", "network") and not hum:
                     put("projector_run", T(w2), -26, dur=max(0.8, nxt - w2["start"]))
                     hum = True
+            stp = d.get("stamp")
+            if isinstance(stp, dict) and stp.get("text"):          # myth-buster verdict stamp
+                ws = cue(stp.get("cue"), len(els), len(els) + 1)
+                if ws:
+                    put("impact_slam", T(ws), -4)
             qz = d.get("quiz")
-            if isinstance(qz, dict):
+            if isinstance(qz, dict) and not qz.get("noReveal"):
                 wq = cue(qz.get("cue"), len(els), len(els) + 1)
                 if wq:
                     for i in range(3):

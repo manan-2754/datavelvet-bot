@@ -9,7 +9,7 @@ import { F, font, measure } from '../engine/type';
 import { norm, type Word } from '../engine/lyrics';
 import { clamp, ease, hash, hexToLinear, mulberry32, noise1, prog, pulse, TAU } from '../engine/util';
 import { type Cam, type RGB } from './_vo';
-import { GenPlate, ARCH, wrapKaraoke, mixColor } from './_gen';
+import { GenPlate, ARCH, wrapKaraoke, mixColor, makeStamp, drawStamp } from './_gen';
 import { asObj, shape, arcPts, link, along, drawObj, v3, type Obj, type Pen3, type V3, type Reveal } from './_holo3d';
 import { plan } from './_plates3d';
 import type { GlassItem, GeoKind } from './_glass';
@@ -256,6 +256,8 @@ export class Compose extends GenPlate {
   ls = 1;
   quizT = 1e9;
   recap: string[] = [];
+  stampCv: HTMLCanvasElement | null = null;
+  stampT = 1e9;
   recapT = 1e9;
   build() {
     const d = this.data, st = this.style, r = st.r;
@@ -316,7 +318,12 @@ export class Compose extends GenPlate {
       this.recap = d.recap.map((x: any) => String(x).slice(0, 26)).filter(Boolean).slice(0, 3);
       this.recapT = this.sl[1]?.start ?? ((this.ws[0]?.start ?? this.t0) + 1.2);
     }
-    if (d.quiz) this.quizT = d.quiz.cue ? this.cue(d.quiz.cue, n, n + 1).start : this.t0 + (this.t1 - this.t0) * 0.7;
+    if (d.quiz) this.quizT = d.quiz.noReveal ? 1e9 : d.quiz.cue ? this.cue(d.quiz.cue, n, n + 1).start : this.t0 + (this.t1 - this.t0) * 0.7;
+    if (d.stamp && d.stamp.text) {                       // myth-buster verdict: a rubber stamp slams in on its cue word
+      this.stampCv = makeStamp(String(d.stamp.text).toUpperCase().slice(0, 14), 'VERDICT', (Number(this.sc.meta?.seed) || 7) + this.idx);
+      this.stampT = d.stamp.cue ? this.cue(d.stamp.cue, n, n + 1).start : this.t0 + 0.8;
+      this.hits.push(this.stampT);
+    }
     this.floorR = Math.ceil(ext + 2);
     this.floorAt = ['stack', 'sphere', 'spiral', 'diagonal', 'wave', 'scatter'].includes(this.lay) ? null : [0, 0, zc];
   }
@@ -513,6 +520,9 @@ export class Compose extends GenPlate {
       ctx.fillStyle = this.style.tintHex; ctx.fillRect(W / 2 - 300 * ease.outCubic(a), y + 22, 600 * ease.outCubic(a), 4);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
+  }
+  override drawOver(ctx: CanvasRenderingContext2D, t: number, c: Cam) {
+    if (this.stampCv) drawStamp(ctx, c, this.stampCv, t, this.stampT, 0, LAND ? -60 : -180, LAND ? 0.5 : 0.62);
   }
   override postFX(t: number) {
     const k = 1 - prog(t, this.t0, this.t0 + 0.45), j = noise1(t * 40, this.idx);

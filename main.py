@@ -31,11 +31,13 @@ import art_director  # noqa: E402
 import audio_build  # noqa: E402
 import analytics  # noqa: E402
 import composer  # noqa: E402
+import covers  # noqa: E402
 import critic  # noqa: E402
 import links  # noqa: E402
 import longform  # noqa: E402
 import research  # noqa: E402
 import trends  # noqa: E402
+import viewer_questions  # noqa: E402
 import writer  # noqa: E402
 
 OUT = BASE / "out"
@@ -108,7 +110,8 @@ def features(script, meta):
             "cams": [(s.get("data") or {}).get("camera") for s in script["scenes"] if (s.get("data") or {}).get("camera")],
             "hue": (st.get("name") or "").split(" ")[0], "voice": meta.get("voice"), "music": (script.get("music") or "").split(" ")[0],
             "length": "short" if d < 50 else ("mid" if d < 75 else "long"), "level": script.get("level"),
-            "trend": bool(script.get("trend")), "series": (script.get("series") or {}).get("name"), "cta": script.get("cta_kind")}
+            "trend": bool(script.get("trend")), "series": (script.get("series") or {}).get("name"), "cta": script.get("cta_kind"),
+            "fmt": "viewer" if script.get("viewer_q") else script.get("format_kind")}
 
 
 def slugify(s):
@@ -223,6 +226,11 @@ def finish_video(script, ctx, raw, show=False):
             "review": script.get("review"), "music": script.get("music"), "sources": script.get("sources", []),
             "cover_ms": cover_ms(), "comment": script.get("comment") or "Did you know this before watching? Yes or no 👇", "series_name": (script.get("series") or {}).get("name")}
     meta["features"] = features(script, meta)
+    try:                                       # designed Reel cover + carousel slides, from this video
+        meta["cover_path"], meta["carousel"] = covers.make_all(video, script, out_dir)
+        print(f"🖼️ Cover + {len(meta['carousel'])}-slide carousel ready")
+    except Exception as e:
+        print(f"  cover/carousel skipped ({e})")
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"✅ {video} ({video.stat().st_size / 1e6:.1f} MB, {dur:.0f}s)")
     if show and Path(VLC).exists():
@@ -251,12 +259,20 @@ def upload(video, meta, state):
     if os.getenv("AUTO_POST_INSTAGRAM", "false").lower() == "true":
         try:
             from instagram_upload import upload_reel
-            rec["instagram_id"] = upload_reel(video, meta["instagram_caption"], meta.get("cover_ms"))   # AI-info label
+            rec["instagram_id"] = upload_reel(video, meta["instagram_caption"], meta.get("cover_ms"), cover=meta.get("cover_path"))   # AI-info label
             try:
                 from instagram_upload import post_comment as ig_comment
                 ig_comment(rec["instagram_id"], meta.get("comment"))
             except Exception as e:
                 print(f"  Instagram comment skipped ({e})")
+            if meta.get("carousel") and len(state["posts"]) % 6 == 2:     # a Reel-based carousel every other day (plus the daily lane)
+                try:
+                    from instagram_upload import upload_carousel
+                    title = covers.clean_title({"youtube": {"title": meta.get("title")}, "topic": meta.get("topic")})
+                    cap = (f"{title} 👉 swipe through it, then save it for later.\n\n" + meta["instagram_caption"])[:2150]
+                    rec["carousel_id"] = upload_carousel(meta["carousel"], cap)
+                except Exception as e:
+                    print(f"  Instagram carousel skipped ({e})")
         except Exception as e:
             ok = False
             print(f"❌ Instagram upload failed: {e}")
@@ -327,6 +343,17 @@ def main():
             if trend:
                 topic = trend["topic"]
                 print(f"🔥 Trending topic: {topic}  ({trend['why']})")
+        vq = None
+        if args.post:                          # viewers' questions from the comments become videos
+            try:
+                n = viewer_questions.collect(state, writer.llm)
+                print(f"🙋 Viewer questions: {n} new, {len(state.get('viewer_questions', []))} queued")
+            except Exception as e:
+                print(f"  viewer questions skipped ({e})")
+        if not args.topic and not trend and state.get("viewer_questions"):
+            vq = state["viewer_questions"].pop(0)
+            topic = vq["topic"]
+            print(f"🙋 Answering {vq['user']} ({vq['platform']}): {vq['text'][:80]}")
         print(f"📌 Topic: {topic}")
         facts = research.gather(topic, llm=writer.llm)
         print(f"📚 Research: {len(facts['sources'])} source(s)  {' '.join(facts['sources'])}")
@@ -340,9 +367,9 @@ def main():
             print(f"🎬 Angle: {angle[0]}  (every scene composed from scratch)")
             try:
                 script = composer.write(topic, banned=state.get("scene_signatures", []) + longform.load_long()["scene_signatures"], recent=state.get("compose_formats", []),
-                                        angle=angle, seed=time.time_ns(), facts=facts, hints=analytics.hints(state), level=level,
-                                        series=series, mode=mode)
-                script.update(series=series, level=level, trend=trend)
+                                        angle=angle, seed=time.time_ns(), facts=facts, hints=analytics.hints(state) + (viewer_questions.hint(vq) if vq else ""), level=level,
+                                        series=series, mode=mode, plain=bool(vq))
+                script.update(series=series, level=level, trend=trend, viewer_q=vq)
                 add_sources(script, facts["sources"] + ((trend or {}).get("sources") or []))
             except Exception as e:
                 print(f"  composer failed ({e}) - falling back to the template writer")

@@ -71,6 +71,7 @@ Return ONLY JSON:
      "icon": one of {icons}}}],
   "takeaway": one-line summary, max 90 chars,
   "caption": 2 short lines + "Save this for later." + 6 relevant hashtags}}
+Write for a normal phone and laptop user, not an engineer: plain everyday words, short sentences. Avoid jargon and acronyms (protocol names, standards, part numbers); if one is unavoidable, explain it in a few words.
 Rules: accurate, specific facts only (use the reference facts' numbers; never invent statistics); no emojis inside
 slides; pick the icon that best matches each slide."""
 TYPES = ["box", "sphere", "cylinder", "cone", "prism", "torus", "ring", "panel", "bars", "donut", "gauge", "counter", "text", "code",

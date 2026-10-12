@@ -32,15 +32,37 @@ def github_rising(n=10):
             for x in r.json().get("items", [])]
 
 
-def reddit(n=15):
-    r = requests.get("https://www.reddit.com/r/programming/hot.json", params={"limit": n}, headers=UA, timeout=20)
+def reddit(n=15, sub="technology"):
+    r = requests.get(f"https://www.reddit.com/r/{sub}/hot.json", params={"limit": n}, headers=UA, timeout=20)
     return [{"title": c["data"]["title"], "url": "https://reddit.com" + c["data"]["permalink"], "score": c["data"]["score"]}
             for c in r.json().get("data", {}).get("children", [])]
 
 
+FEEDS = [("Google News Tech", "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-US&gl=US&ceid=US:en"),
+         ("The Verge", "https://www.theverge.com/rss/index.xml"),
+         ("Ars Technica", "https://feeds.arstechnica.com/arstechnica/index")]
+
+
+def rss(url, n=15):
+    """Headlines from an RSS/Atom feed (free, no key)."""
+    import xml.etree.ElementTree as ET
+    root = ET.fromstring(requests.get(url, headers=UA, timeout=20).content)
+    out = []
+    for it in root.iter():
+        tag = it.tag.split("}")[-1]
+        if tag in ("item", "entry"):
+            t = next((c.text for c in it if c.tag.split("}")[-1] == "title"), None)
+            lk = next((c.text or c.get("href") for c in it if c.tag.split("}")[-1] == "link"), "")
+            if t:
+                out.append({"title": t.strip(), "url": lk or "", "score": 0})
+        if len(out) >= n:
+            break
+    return out
+
+
 def gather():
     items = []
-    for name, fn in (("Hacker News", hacker_news), ("GitHub", github_rising), ("Reddit", reddit)):
+    for name, fn in [*((nm, (lambda u=u: rss(u))) for nm, u in FEEDS), ("Hacker News", lambda: hacker_news(15))]:
         try:
             items += [{**x, "src": name} for x in fn()]
         except Exception as e:
@@ -48,15 +70,17 @@ def gather():
     return items
 
 
-PROMPT = """You pick topics for "DataVelvet", a 60-90 second explainer channel about software, systems and how tech works.
-Here is what developers are discussing RIGHT NOW:
+PROMPT = """You pick topics for "DataVelvet", a 45-second 3D explainer channel about the tech everyday people use:
+phones, laptops, apps, the internet, Wi-Fi, batteries, AI tools, privacy and security.
+Here is what is trending in tech news RIGHT NOW:
 {items}
 
 Already covered (do NOT pick these or near-duplicates): {used}
 
-Pick ONE topic that is (1) clearly connected to something trending above, (2) an explainable CONCEPT or mechanism
-(e.g. "How WebGPU renders in the browser", "Why Rust's borrow checker prevents data races"), not news gossip or a
-product announcement, (3) accurate to explain in 60-90 seconds. Return ONLY JSON:
+Pick ONE topic that is (1) clearly connected to something trending above, (2) an explainable mechanism that a normal
+phone or laptop user cares about (e.g. "Why the outage took down half the internet", "How the new iPhone camera sees
+in the dark", "How AI chatbots remember your chats"), not developer-only internals, gossip or a product ad,
+(3) accurate to explain in 45 seconds. Return ONLY JSON:
 {{"topic": "How/Why/What ... (max 60 chars)", "why": "one line: which trending item it connects to", "source_index": n}}"""
 
 
