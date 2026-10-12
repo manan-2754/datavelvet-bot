@@ -53,6 +53,11 @@ jobs:
           sudo apt-get update && sudo apt-get install -y ffmpeg
           pip install -r requirements.txt
           cd app && bun install --frozen-lockfile
+      - name: Cache the Kokoro voice model (backup voice)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/kokoro
+          key: kokoro-v1.0
       - name: Which posting slot is this (Eastern time)
         run: |
           case "${{ github.event.schedule }}" in

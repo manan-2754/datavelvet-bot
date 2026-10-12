@@ -11,6 +11,7 @@ import os
 import random
 import re
 import shutil
+import time
 import subprocess
 import wave
 from pathlib import Path
@@ -59,15 +60,62 @@ async def _synth(text, path, voice, rate="+2%"):
     return words
 
 
+class EdgeDown(RuntimeError):
+    """Microsoft's free Edge voice refused us (it blocks some cloud IPs and changes its tokens)."""
+
+
+ENGINE = "edge"
+KOKORO_VOICE = os.getenv("KOKORO_VOICE") or "am_michael"
+KOKORO_DIR = Path(os.getenv("KOKORO_DIR") or Path.home() / ".cache" / "kokoro")
+KOKORO_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/"
+_kokoro = None
+
+
+def _kokoro_model():
+    """Kokoro: a free open-source voice model that runs inside the bot (no outside service to block it)."""
+    global _kokoro
+    if _kokoro is None:
+        import urllib.request
+        from kokoro_onnx import Kokoro
+        KOKORO_DIR.mkdir(parents=True, exist_ok=True)
+        for f in ("kokoro-v1.0.onnx", "voices-v1.0.bin"):
+            if not (KOKORO_DIR / f).exists() or (KOKORO_DIR / f).stat().st_size < 1_000_000:
+                print(f"  downloading Kokoro voice model ({f})")
+                urllib.request.urlretrieve(KOKORO_URL + f, KOKORO_DIR / f)
+        _kokoro = Kokoro(str(KOKORO_DIR / "kokoro-v1.0.onnx"), str(KOKORO_DIR / "voices-v1.0.bin"))
+    return _kokoro
+
+
+def _kokoro_synth(text, path, rate):
+    """Kokoro speech + estimated word timings (spread over the spoken part by word length and punctuation)."""
+    import soundfile as sf
+    speed = max(0.8, min(1.25, 1 + float(rate.strip("%") or 0) / 100))
+    samples, sr = _kokoro_model().create(text, voice=KOKORO_VOICE, speed=speed, lang="en-us")
+    sf.write(str(path), samples, sr, format="WAV")
+    nz = np.nonzero(np.abs(samples) > 0.01)[0]
+    s0, s1 = (nz[0] / sr, nz[-1] / sr) if len(nz) else (0.0, len(samples) / sr)
+    toks = text.split()
+    wts = [len(w) + 2 + (4 if w[-1:] in ",;:" else 7 if w[-1:] in ".!?" else 0) for w in toks]
+    tot, t, out = sum(wts) or 1, s0, []
+    for w, k in zip(toks, wts):
+        d = (s1 - s0) * k / tot
+        out.append((w, t, t + d * 0.85))
+        t += d
+    return out
+
+
 def synth(text, path, voice, rate="+2%"):
+    if ENGINE == "kokoro":
+        return _kokoro_synth(text, path, rate)
     for attempt in range(4):
         try:
             words = asyncio.run(_synth(text, path, voice, rate))
             if Path(path).stat().st_size > 1000:
                 return words
         except Exception as e:
-            print(f"  tts retry {attempt + 1}: {e}")
-    raise RuntimeError(f"text-to-speech failed for: {text[:60]}")
+            print(f"  tts retry {attempt + 1}: {str(e)[:120]}")
+            time.sleep(5 * 2 ** attempt)            # 5, 10, 20, 40 s - the Edge service often recovers
+    raise EdgeDown(f"Edge voice unavailable for: {text[:60]}")
 
 
 def attach(tokens, bounds):
@@ -97,6 +145,20 @@ CHANNEL_VOICE = os.getenv("CHANNEL_VOICE") or "en-US-AndrewMultilingualNeural"  
 
 
 def narrate(script, voice=None):
+    """Edge voice first; if Microsoft blocks it, the whole video is narrated again with the built-in Kokoro voice."""
+    global ENGINE
+    try:
+        return _narrate(script, voice)
+    except EdgeDown as e:
+        print(f"  ⚠️ {e} - narrating this video with the built-in Kokoro voice instead")
+        ENGINE = "kokoro"
+        try:
+            return _narrate(script, voice)
+        finally:
+            ENGINE = "edge"
+
+
+def _narrate(script, voice=None):
     voice = voice or CHANNEL_VOICE
     tmp = ROOT / "out" / "vo_tmp"
     shutil.rmtree(tmp, ignore_errors=True)

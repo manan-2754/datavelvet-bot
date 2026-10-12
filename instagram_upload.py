@@ -61,7 +61,15 @@ def to_1080(video_path):
 def _gh(method, url, **kw):
     headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}", "Accept": "application/vnd.github+json"}
     headers.update(kw.pop("headers", {}))
-    r = requests.request(method, url, headers=headers, timeout=kw.pop("timeout", 60), **kw)
+    timeout = kw.pop("timeout", 60)
+    for attempt in range(4):                        # GitHub sometimes answers 5xx during incidents: wait and retry
+        if hasattr(kw.get("data"), "seek"):
+            kw["data"].seek(0)
+        r = requests.request(method, url, headers=headers, timeout=timeout, **kw)
+        if r.status_code < 500 or attempt == 3:
+            break
+        print(f"  GitHub API {r.status_code} - retrying in {15 * (attempt + 1)} s")
+        time.sleep(15 * (attempt + 1))
     if r.status_code >= 400 and r.status_code != 404:
         raise RuntimeError(f"GitHub API {r.status_code}: {r.text[:200]}")
     return r

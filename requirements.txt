@@ -8,3 +8,5 @@ google-auth-oauthlib==1.2.1
 google-auth-httplib2==0.2.0
 anthropic>=1.0
 pillow>=10.0
+kokoro-onnx>=0.4
+soundfile>=0.12
