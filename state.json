@@ -14,7 +14,8 @@
     "How browser fingerprinting tracks you without cookies",
     "How Shopify processes an online purchase",
     "ChatGPT generating a reply token by token",
-    "WhatsApp end-to-end encryption"
+    "WhatsApp end-to-end encryption",
+    "How Rust's borrow checker proves memory safety at compile time"
   ],
   "used_bank": [
     "dns_explained"
@@ -659,7 +660,21 @@
       },
       "youtube_id": "FKWJmKr-NMs",
       "instagram_id": "18118387330971395",
-      "carousel_id": "17865584778680226"
+      "carousel_id": "17865584778680226",
+      "stats": {
+        "yt_views": 54,
+        "yt_likes": 1,
+        "yt_comments": 2,
+        "ig_reach": 149,
+        "ig_saved": 0,
+        "ig_shares": 0,
+        "ig_views": 157,
+        "ig_likes": 0,
+        "ig_comments": 1,
+        "ig_avg_watch_s": 5.2,
+        "score": 542.5,
+        "fetched": "2026-10-13T21:50:16+00:00"
+      }
     },
     {
       "time": "2026-10-13T13:04:21+00:00",
@@ -729,6 +744,44 @@
       "youtube_id": "S12biz7lwLI",
       "instagram_id": "18110985320062631",
       "ig_trial": true
+    },
+    {
+      "time": "2026-10-13T22:56:10+00:00",
+      "topic": "How Rust's Borrow Checker Proves Safety",
+      "format": "world: Source > MIR > Regions > Loans > Threads > Limits > Recap",
+      "seed": 1884723260,
+      "features": {
+        "angle": "countdown",
+        "layouts": [
+          "world: Source",
+          "MIR",
+          "Regions",
+          "Loans",
+          "Threads",
+          "Limits",
+          "Recap"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Cyan",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "phrygian",
+        "length": "long",
+        "level": "engineer",
+        "trend": true,
+        "series": "Under the Hood",
+        "cta": null,
+        "fmt": null,
+        "title": "curiosity",
+        "cover": "band",
+        "lmode": "deep",
+        "trial": false
+      },
+      "title_alt": "How Rust's borrow checker works under the hood #shorts",
+      "title_style": "curiosity",
+      "youtube_id": "vT10aH2_xiU",
+      "instagram_id": "18116646296018883",
+      "ig_trial": false
     }
   ],
   "series_counts": {
@@ -748,7 +801,8 @@
     "pyramid > wave > timeline > radial > cluster > diagonal",
     "depth > stack > grid > spiral > pyramid > scatter",
     "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
-    "world: Prekeys > Handshake > Ratchet > Relay"
+    "world: Prekeys > Handshake > Ratchet > Relay",
+    "world: Source > MIR > Regions > Loans > Threads > Limits > Recap"
   ],
   "used_palettes": [
     "0:0"
@@ -768,286 +822,21 @@
   "queued_scripts": [],
   "style_memory": [
     {
-      "posted_at": "2026-10-13T13:11:57+00:00",
+      "posted_at": "2026-10-13T23:02:29+00:00",
       "style": {
-        "name": "Teal Vector / Indigo signal",
-        "created": "2026-10-13T12:07:20+00:00",
+        "name": "Cyan Signal / Amber signal",
+        "created": "2026-10-13T21:56:25+00:00",
         "hook": null,
-        "tag": "underline",
-        "reflect": true,
+        "tag": "side",
+        "reflect": false,
         "glass": {
           "on": true,
           "roughness": 0.072,
-          "ior": 1.54,
-          "thickness": 0.93,
-          "dof": 7.0,
-          "key": 2.34,
-          "rim": "#F7926A"
-        },
-        "mascot": {
-          "on": false,
-          "side": 1,
-          "kind": "bot"
-        },
-        "_h": {
-          "bg": 140.1,
-          "signal": 219.0,
-          "holo": 53.2
-        },
-        "palette": {
-          "ink": "#080E0A",
-          "ink2": "#111C14",
-          "graphite": "#4E6054",
-          "ash": "#9EACA3",
-          "bone": "#E6F0E8",
-          "signal": "#296EEF",
-          "ember": "#5266FF",
-          "blood": "#0F5DBD"
-        },
-        "holo": [
-          "#F1DE47",
-          "#F7926A"
-        ],
-        "type": {
-          "wscale": 0.92,
-          "wtadd": 0,
-          "case": "upper"
-        },
-        "grid": {
-          "minor": 20,
-          "major": 80
-        },
-        "caption": {
-          "size": 57,
-          "dy": 27
-        },
-        "post": {
-          "bloom": 0.58,
-          "bloomThreshold": 0.74,
-          "vignette": 0.57,
-          "grain": 0.062,
-          "ca": 0.18,
-          "halation": 0.24
-        },
-        "cam2d": {
-          "zoom": 0.95,
-          "roll": 0.0053,
-          "hand": 1.7
-        },
-        "cam3d": {
-          "fov": -1.0,
-          "roll": 0.024,
-          "dist": 1.03,
-          "hand": 0.68
-        },
-        "scenes": [
-          {
-            "cam": "crane",
-            "reveal": "assemble",
-            "floor": "grid",
-            "spin": -1
-          },
-          {
-            "cam": "whip",
-            "reveal": "glitch",
-            "floor": "polar",
-            "spin": -1
-          },
-          {
-            "cam": "crane",
-            "reveal": "scan",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "spiral",
-            "reveal": "assemble",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "fly",
-            "reveal": "scan",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "assemble",
-            "floor": "grid",
-            "spin": 1
-          },
-          {
-            "cam": "low",
-            "reveal": "draw",
-            "floor": "hex",
-            "spin": 1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "glitch",
-            "floor": "polar",
-            "spin": -1
-          },
-          {
-            "cam": "whip",
-            "reveal": "scan",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "fly",
-            "reveal": "glitch",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "top",
-            "reveal": "draw",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "assemble",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "push",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "fly",
-            "reveal": "assemble",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "whip",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "spiral",
-            "reveal": "scan",
-            "floor": "grid",
-            "spin": -1
-          },
-          {
-            "cam": "dolly",
-            "reveal": "draw",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "top",
-            "reveal": "scan",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "spiral",
-            "reveal": "glitch",
-            "floor": "polar",
-            "spin": -1
-          },
-          {
-            "cam": "fly",
-            "reveal": "draw",
-            "floor": "grid",
-            "spin": 1
-          },
-          {
-            "cam": "low",
-            "reveal": "scan",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "orbit",
-            "reveal": "glitch",
-            "floor": "grid",
-            "spin": -1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "assemble",
-            "floor": "hex",
-            "spin": 1
-          },
-          {
-            "cam": "push",
-            "reveal": "draw",
-            "floor": "grid",
-            "spin": -1
-          },
-          {
-            "cam": "orbit",
-            "reveal": "glitch",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "fly",
-            "reveal": "scan",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "spiral",
-            "reveal": "glitch",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "low",
-            "reveal": "assemble",
-            "floor": "grid",
-            "spin": 1
-          },
-          {
-            "cam": "orbit",
-            "reveal": "glitch",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "top",
-            "reveal": "scan",
-            "floor": "grid",
-            "spin": -1
-          },
-          {
-            "cam": "crane",
-            "reveal": "draw",
-            "floor": "polar",
-            "spin": 1
-          }
-        ]
-      },
-      "format": "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
-      "angle": "zoom-out"
-    },
-    {
-      "posted_at": "2026-10-13T17:06:01+00:00",
-      "style": {
-        "name": "Violet Halo / Lime signal",
-        "created": "2026-10-13T15:23:15+00:00",
-        "hook": null,
-        "tag": "chip",
-        "reflect": true,
-        "glass": {
-          "on": true,
-          "roughness": 0.04,
-          "ior": 1.36,
-          "thickness": 0.85,
+          "ior": 1.62,
+          "thickness": 0.84,
           "dof": 8.0,
-          "key": 2.61,
-          "rim": "#70EA4E"
+          "key": 1.95,
+          "rim": "#C065EE"
         },
         "mascot": {
           "on": true,
@@ -1055,127 +844,229 @@
           "kind": "chip"
         },
         "_h": {
-          "bg": 242.2,
-          "signal": 55.9,
-          "holo": 155.1
+          "bg": 179.5,
+          "signal": 32.9,
+          "holo": 238.5
         },
         "palette": {
-          "ink": "#06050E",
-          "ink2": "#0D0C1E",
-          "graphite": "#535264",
-          "ash": "#9A99A8",
-          "bone": "#E6E5EC",
-          "signal": "#F7E929",
-          "ember": "#E6FF66",
-          "blood": "#AE930E"
+          "ink": "#081111",
+          "ink2": "#112020",
+          "graphite": "#4E605F",
+          "ash": "#97A7A7",
+          "bone": "#E9F0EF",
+          "signal": "#FE9719",
+          "ember": "#FFDC5F",
+          "blood": "#BA5C0F"
         },
         "holo": [
-          "#3FF6AA",
-          "#70EA4E"
+          "#484CF0",
+          "#C065EE"
         ],
         "type": {
-          "wscale": 1.06,
-          "wtadd": -100,
+          "wscale": 0.91,
+          "wtadd": -200,
           "case": "lower"
         },
         "grid": {
-          "minor": 36,
-          "major": 180
+          "minor": 16,
+          "major": 80
         },
         "caption": {
-          "size": 45,
-          "dy": 38
+          "size": 50,
+          "dy": -24
         },
         "post": {
-          "bloom": 0.56,
-          "bloomThreshold": 0.93,
-          "vignette": 0.39,
-          "grain": 0.087,
-          "ca": 0.08,
-          "halation": 0.08
+          "bloom": 1.03,
+          "bloomThreshold": 0.74,
+          "vignette": 0.33,
+          "grain": 0.025,
+          "ca": 0.28,
+          "halation": 0.1
         },
         "cam2d": {
-          "zoom": 0.983,
-          "roll": 0.003,
-          "hand": 1.61
+          "zoom": 1.045,
+          "roll": 0.0075,
+          "hand": 1.51
         },
         "cam3d": {
-          "fov": 3.9,
-          "roll": 0.057,
-          "dist": 0.9,
-          "hand": 0.67
+          "fov": 4.4,
+          "roll": 0.011,
+          "dist": 0.89,
+          "hand": 0.49
         },
         "scenes": [
           {
-            "cam": "spiral",
+            "cam": "dutch",
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "push",
             "reveal": "glitch",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "whip",
+            "reveal": "assemble",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "dolly",
+            "reveal": "draw",
             "floor": "dots",
             "spin": -1
           },
           {
-            "cam": "top",
-            "reveal": "scan",
-            "floor": "grid",
-            "spin": -1
+            "cam": "orbit",
+            "reveal": "glitch",
+            "floor": "hex",
+            "spin": 1
           },
           {
-            "cam": "spiral",
+            "cam": "whip",
+            "reveal": "draw",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "orbit",
             "reveal": "glitch",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "draw",
             "floor": "hex",
             "spin": -1
           },
           {
             "cam": "push",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "crane",
-            "reveal": "assemble",
-            "floor": "grid",
-            "spin": -1
-          },
-          {
-            "cam": "orbit",
-            "reveal": "scan",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "dolly",
             "reveal": "assemble",
             "floor": "polar",
             "spin": 1
           },
           {
-            "cam": "spiral",
-            "reveal": "draw",
-            "floor": "dots",
+            "cam": "dutch",
+            "reveal": "scan",
+            "floor": "grid",
             "spin": 1
           },
           {
             "cam": "crane",
-            "reveal": "glitch",
-            "floor": "grid",
-            "spin": -1
-          },
-          {
-            "cam": "spiral",
-            "reveal": "assemble",
+            "reveal": "draw",
             "floor": "hex",
             "spin": 1
           },
           {
             "cam": "low",
             "reveal": "scan",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "dolly",
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "whip",
+            "reveal": "scan",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "assemble",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "fly",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "whip",
+            "reveal": "glitch",
             "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "fly",
+            "reveal": "assemble",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "whip",
+            "reveal": "glitch",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "assemble",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "crane",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "low",
+            "reveal": "glitch",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "fly",
+            "reveal": "draw",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "push",
+            "reveal": "assemble",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "top",
+            "reveal": "scan",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "push",
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "orbit",
+            "reveal": "glitch",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "push",
+            "reveal": "assemble",
+            "floor": "hex",
             "spin": -1
           }
         ]
       },
-      "format": "world: Prekeys > Handshake > Ratchet > Relay",
-      "angle": "journey"
+      "format": "world: Source > MIR > Regions > Loans > Threads > Limits > Recap",
+      "angle": "countdown"
     }
   ],
   "scene_signatures": [
@@ -1270,7 +1161,35 @@
     "chip@1,0|file@0,1|file@2,1/L2",
     "badge@1,2|user@0,0|user@2,0/L2",
     "phone@0,1|phone@2,1|queue@1,2|tower@1,0/L2",
-    "file@2,0|phone@1,1|queue@0,0/L2"
+    "file@2,0|phone@1,1|queue@0,0/L2",
+    "badge@0,0|chip@2,1/L1",
+    "badge@1,0|stack@1,1/L0",
+    "code@1,1/L0",
+    "badge@0,0|file@2,2/L1",
+    "badge@2,0|chip@2,2|gear@0,1/L2",
+    "chip@2,1|file@0,1|node@1,0|node@1,2/L3",
+    "node@0,2|node@2,2|queue@1,0/L2",
+    "code@1,1/L0",
+    "badge@1,0|chip@2,2|stack@0,1/L2",
+    "badge@1,2|bars@1,1/L0",
+    "node@0,1|node@1,0|node@2,1/L2",
+    "badge@1,2|compare@1,1/L0",
+    "badge@2,0|code@0,1/L1",
+    "badge@2,1|node@0,0/L1",
+    "bars@0,1|lock@2,1/L1",
+    "badge@1,2|lock@2,0|node@0,2/L1",
+    "avatars@0,1|badge@1,2|user@2,1/L0",
+    "badge@2,0|node@0,1|slots@2,2/L1",
+    "chip@0,0|chip@0,2|cloud@2,1/L2",
+    "badge@2,1|code@0,1/L1",
+    "lock@1,0|node@0,2|node@2,2/L2",
+    "badge@2,1|gauge@0,1/L1",
+    "node@0,0|node@1,2|node@2,0/L2",
+    "badge@2,1|chip@0,1/L1",
+    "bars@1,1|chip@1,1|file@0,1|lock@2,1/L3",
+    "badge@2,2|code@0,1/L1",
+    "badge@0,0|badge@2,1/L0",
+    "badge@1,0|summary@1,2/L0"
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
@@ -1282,125 +1201,150 @@
     "pyramid > wave > timeline > radial > cluster > diagonal",
     "depth > stack > grid > spiral > pyramid > scatter",
     "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
-    "world: Prekeys > Handshake > Ratchet > Relay"
+    "world: Prekeys > Handshake > Ratchet > Relay",
+    "world: Source > MIR > Regions > Loans > Threads > Limits > Recap"
   ],
   "insights": {
-    "n": 6,
-    "updated": "2026-10-13T15:21:48+00:00",
+    "n": 7,
+    "updated": "2026-10-13T21:50:16+00:00",
     "best": {
-      "angle": [],
+      "angle": [
+        "journey"
+      ],
       "layouts": [
-        "timeline",
         "radial",
+        "timeline",
         "cluster"
       ],
       "types": [
+        "code",
+        "burst",
         "network"
       ],
-      "cams": [],
-      "hue": [],
+      "cams": [
+        "dutch",
+        "fly",
+        "push"
+      ],
+      "hue": [
+        "Jade"
+      ],
       "voice": [],
       "music": [],
-      "length": [],
+      "length": [
+        "short"
+      ],
       "level": [],
-      "trend": [],
+      "trend": [
+        "True"
+      ],
       "cta": []
     },
     "worst": {
       "angle": [],
       "layouts": [
-        "row",
-        "tree",
-        "ring"
+        "pyramid",
+        "ring",
+        "scatter"
       ],
       "types": [
         "tunnel",
+        "bars",
         "wave"
       ],
-      "cams": [],
+      "cams": [
+        "low"
+      ],
       "hue": [],
       "voice": [],
-      "music": [],
+      "music": [
+        "dorian"
+      ],
       "length": [],
-      "level": [],
+      "level": [
+        "engineer"
+      ],
       "trend": [],
       "cta": []
     },
     "lift": {
       "angle": {
-        "journey": 1.0
+        "journey": 1.14,
+        "versus": 0.95
       },
       "layouts": {
-        "row": 0.83,
-        "depth": 1.15,
-        "pyramid": 0.95,
-        "wave": 0.95,
-        "stack": 1.15,
-        "ring": 0.39,
-        "diagonal": 1.02,
-        "cluster": 1.16,
-        "spiral": 1.13,
-        "tree": 0.79,
-        "grid": 1.01,
-        "timeline": 1.17,
-        "radial": 1.17
+        "stack": 1.02,
+        "row": 0.94,
+        "depth": 1.02,
+        "ring": 0.44,
+        "pyramid": 0.78,
+        "scatter": 0.21,
+        "wave": 1.09,
+        "spiral": 0.91,
+        "cluster": 1.32,
+        "tree": 0.91,
+        "diagonal": 1.16,
+        "grid": 0.82,
+        "radial": 1.34,
+        "timeline": 1.34
       },
       "types": {
-        "text": 1.0,
-        "tunnel": 0.68,
-        "beam": 0.86,
-        "code": 1.09,
-        "panel": 0.86,
+        "matrix": 0.98,
         "stream": 1.0,
-        "object": 0.86,
+        "text": 1.0,
+        "wave": 0.41,
+        "burst": 1.14,
+        "beam": 0.98,
+        "code": 1.24,
+        "panel": 0.98,
+        "particles": 0.84,
         "ring": 1.0,
-        "orbit": 0.87,
-        "link": 1.09,
-        "wave": 0.36,
-        "matrix": 0.86,
-        "particles": 0.86,
-        "burst": 1.0,
-        "counter": 0.85,
-        "bars": 0.85,
-        "cylinder": 1.03,
-        "network": 1.16,
-        "gauge": 0.85,
-        "stack": 1.07,
-        "sphere": 1.01
+        "tunnel": 0.78,
+        "object": 0.84,
+        "orbit": 0.99,
+        "link": 1.06,
+        "stack": 1.0,
+        "counter": 0.97,
+        "gauge": 0.97,
+        "cylinder": 0.84,
+        "network": 1.12,
+        "bars": 0.77,
+        "sphere": 0.82,
+        "donut": 1.04
       },
       "cams": {
-        "push": 1.0,
-        "orbit": 1.0,
-        "dolly": 1.0,
-        "fly": 1.0,
-        "low": 0.96,
-        "spiral": 0.87,
+        "fly": 1.14,
         "crane": 1.0,
-        "dutch": 1.02
+        "spiral": 0.99,
+        "push": 1.14,
+        "dolly": 1.0,
+        "low": 0.79,
+        "orbit": 1.0,
+        "dutch": 1.16
       },
       "hue": {
-        "Jade": 1.0
+        "Jade": 1.14
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "dorian": 0.86
+        "dorian": 0.77
       },
       "length": {
-        "mid": 0.99,
-        "short": 1.01
+        "mid": 0.94,
+        "short": 1.15
       },
       "level": {
-        "beginner": 0.96,
-        "engineer": 0.85
+        "beginner": 1.1,
+        "engineer": 0.77
       },
       "trend": {
-        "False": 1.0,
-        "True": 1.0
+        "False": 0.94,
+        "True": 1.14
       },
       "cta": {
-        "save": 1.02
+        "save": 0.96
       }
     }
   },
@@ -1446,17 +1390,22 @@
     {
       "time": "2026-10-13T17:06:01+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-13T23:02:29+00:00",
+      "ok": true
     }
   ],
   "series": {
-    "name": "Security Decoded",
-    "ep": 1
+    "name": "Under the Hood",
+    "ep": 2
   },
   "seen_comments": [
-    "UgwXfDTO4tfTrp_36cB4AaABAg",
-    "UgzDh5eiRTJ-xa5YLRt4AaABAg",
     "UgwvXGIuM76nR9CVH6V4AaABAg",
-    "UgygtUnX-LOvXYrahuZ4AaABAg"
+    "UgzDh5eiRTJ-xa5YLRt4AaABAg",
+    "UgygtUnX-LOvXYrahuZ4AaABAg",
+    "UgwXfDTO4tfTrp_36cB4AaABAg",
+    "Ugw4ah4_eVwn_Y1DQ3N4AaABAg"
   ],
   "viewer_questions": []
 }
