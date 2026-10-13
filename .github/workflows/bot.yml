@@ -164,6 +164,11 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg
           pip install -r requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: HyperFrames (chapter shader transitions)
+        run: cd hf && npm ci --no-audit --no-fund || echo "HyperFrames install failed - videos go out without chapter transitions"
       - uses: actions/download-artifact@v4
         with:
           name: bundle-${{ github.run_number }}

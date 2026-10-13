@@ -1,0 +1,13 @@
+{
+  "name": "datavelvet-hf",
+  "private": true,
+  "description": "HyperFrames post pass: shader transitions + chapter cards",
+  "dependencies": {
+    "@hyperframes/shader-transitions": "0.8.152",
+    "gsap": "3.14.2",
+    "hyperframes": "0.8.152"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true
+  }
+}

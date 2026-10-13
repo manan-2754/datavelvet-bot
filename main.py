@@ -33,8 +33,10 @@ import analytics  # noqa: E402
 import composer  # noqa: E402
 import covers  # noqa: E402
 import critic  # noqa: E402
+import hf_post  # noqa: E402
 import links  # noqa: E402
 import longform  # noqa: E402
+import master  # noqa: E402
 import research  # noqa: E402
 import trends  # noqa: E402
 import viewer_questions  # noqa: E402
@@ -257,18 +259,27 @@ def finish_video(script, ctx, raw, show=False):
     out_dir, dur, voice = Path(ctx["out_dir"]), ctx["dur"], ctx["voice"]
     out_dir.mkdir(parents=True, exist_ok=True)
     print("🎵 Sound design")
-    mixed = audio_build.mix(script)
+    mixed = master.master(audio_build.mix(script))
     if script.get("long"):
         print("📑 Chapters: " + " | ".join(longform.describe(script)))
+    elif os.getenv("HF_POST", "1") != "0":
+        print("🎞️ HyperFrames chapter transitions")
+        styled = hf_post.apply(raw, script)
+        if styled != raw:
+            raw.unlink(missing_ok=True)
+            raw = styled
     video = out_dir / "video.mp4"
     subprocess.run([audio_build.ffmpeg(), "-v", "error", "-y", "-i", str(raw), "-i", str(mixed), "-map", "0:v", "-map", "1:a",
                     "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "-shortest", str(video)], check=True)
     raw.unlink(missing_ok=True)
+    check = master.qa(video, dur)
+    if not check["ok"]:
+        raise RuntimeError(f"QA failed, not posting: {'; '.join(check['issues'])}")
     meta = {**script.get("youtube", {}), "instagram_caption": script.get("instagram_caption", ""), "topic": script["topic"],
             "duration": round(dur, 1), "voice": voice, "format": script.get("format"), "seed": script.get("seed"),
             "style_name": (script.get("style") or {}).get("name"), "angle": script.get("angle"),
             "review": script.get("review"), "music": script.get("music"), "sources": script.get("sources", []),
-            "cover_ms": cover_ms(), "title_alt": script.get("title_alt"), "title_style": script.get("title_style"), "comment": script.get("comment") or "Did you know this before watching? Yes or no 👇", "series_name": (script.get("series") or {}).get("name")}
+            "cover_ms": cover_ms(), "title_alt": script.get("title_alt"), "title_style": script.get("title_style"), "comment": script.get("comment") or "Did you know this before watching? Yes or no 👇", "series_name": (script.get("series") or {}).get("name"), "qa": check}
     meta["features"] = features(script, meta)
     try:                                       # designed Reel cover + carousel slides, from this video
         meta["cover_path"], meta["carousel"] = covers.make_all(video, script, out_dir)
