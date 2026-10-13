@@ -12,7 +12,8 @@
     "What actually happens when you type google.com",
     "Why Chrome eats all your RAM",
     "How browser fingerprinting tracks you without cookies",
-    "How Shopify processes an online purchase"
+    "How Shopify processes an online purchase",
+    "ChatGPT generating a reply token by token"
   ],
   "used_bank": [
     "dns_explained"
@@ -26,12 +27,12 @@
         "yt_views": 100,
         "yt_likes": 1,
         "yt_comments": 0,
-        "yt_avp": 49.8,
-        "yt_avd": 48.0,
+        "yt_avp": 48.0,
+        "yt_avd": 46.0,
         "yt_subs": 1,
         "yt_shares": 0,
-        "score": 524.0,
-        "fetched": "2026-10-12T14:09:32+00:00"
+        "score": 515.0,
+        "fetched": "2026-10-13T12:03:01+00:00"
       }
     },
     {
@@ -40,21 +41,21 @@
       "youtube_id": "9P7QiMeIP9U",
       "instagram_id": "18126836476852213",
       "stats": {
-        "yt_views": 1326,
+        "yt_views": 1332,
         "yt_likes": 30,
         "yt_comments": 0,
-        "yt_avp": 61.2,
-        "yt_avd": 60.0,
+        "yt_avp": 44.4,
+        "yt_avd": 43.0,
         "yt_subs": 1,
-        "yt_shares": 1,
+        "yt_shares": 2,
         "ig_reach": 202,
         "ig_saved": 3,
         "ig_shares": 1,
         "ig_views": 236,
         "ig_likes": 5,
         "ig_comments": 2,
-        "score": 3354.0,
-        "fetched": "2026-10-12T14:09:32+00:00"
+        "score": 3336.0,
+        "fetched": "2026-10-13T12:03:02+00:00"
       }
     },
     {
@@ -68,21 +69,21 @@
       "youtube_id": "lSAY6wbyT_A",
       "instagram_id": "18076383422549123",
       "stats": {
-        "yt_views": 282,
+        "yt_views": 284,
         "yt_likes": 3,
         "yt_comments": 0,
-        "yt_avp": 25.5,
-        "yt_avd": 27.0,
+        "yt_avp": 37.5,
+        "yt_avd": 40.0,
         "yt_subs": 0,
         "yt_shares": 0,
         "ig_reach": 458,
         "ig_saved": 3,
         "ig_shares": 1,
-        "ig_views": 520,
+        "ig_views": 521,
         "ig_likes": 5,
         "ig_comments": 0,
-        "score": 1538.5,
-        "fetched": "2026-10-12T14:09:33+00:00"
+        "score": 1601.5,
+        "fetched": "2026-10-13T12:03:02+00:00"
       }
     },
     {
@@ -96,9 +97,9 @@
         "yt_views": 290,
         "yt_likes": 6,
         "yt_comments": 2,
-        "yt_avp": 29.4,
-        "yt_avd": 25.0,
-        "yt_subs": 0,
+        "yt_avp": 35.7,
+        "yt_avd": 31.0,
+        "yt_subs": 2,
         "yt_shares": 0,
         "ig_reach": 361,
         "ig_saved": 1,
@@ -106,8 +107,8 @@
         "ig_views": 405,
         "ig_likes": 1,
         "ig_comments": 0,
-        "score": 1417.5,
-        "fetched": "2026-10-12T14:09:33+00:00"
+        "score": 1749.0,
+        "fetched": "2026-10-13T12:03:03+00:00"
       }
     },
     {
@@ -117,21 +118,21 @@
       "youtube_id": "pTc0yF47i1A",
       "instagram_id": "18372281464244099",
       "stats": {
-        "yt_views": 18,
+        "yt_views": 19,
         "yt_likes": 0,
         "yt_comments": 0,
         "yt_avp": 16.8,
         "yt_avd": 10.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 522,
+        "ig_reach": 524,
         "ig_saved": 5,
         "ig_shares": 3,
-        "ig_views": 583,
+        "ig_views": 584,
         "ig_likes": 8,
         "ig_comments": 0,
-        "score": 1526.0,
-        "fetched": "2026-10-12T14:09:34+00:00"
+        "score": 1529.0,
+        "fetched": "2026-10-13T12:03:03+00:00"
       }
     },
     {
@@ -142,21 +143,21 @@
       "youtube_id": "55r1NyCoiSs",
       "instagram_id": "18119557396949139",
       "stats": {
-        "yt_views": 64,
+        "yt_views": 66,
         "yt_likes": 1,
         "yt_comments": 0,
-        "yt_avp": 29.5,
-        "yt_avd": 20.0,
+        "yt_avp": 28.0,
+        "yt_avd": 19.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 203,
+        "ig_reach": 207,
         "ig_saved": 1,
         "ig_shares": 1,
-        "ig_views": 228,
+        "ig_views": 231,
         "ig_likes": 1,
         "ig_comments": 0,
-        "score": 691.0,
-        "fetched": "2026-10-12T14:09:34+00:00"
+        "score": 690.5,
+        "fetched": "2026-10-13T12:03:03+00:00"
       }
     },
     {
@@ -167,11 +168,11 @@
       "youtube_id": "ru0fE5sd0NM",
       "instagram_id": "18076028366735422",
       "stats": {
-        "yt_views": 64,
+        "yt_views": 69,
         "yt_likes": 0,
         "yt_comments": 0,
-        "yt_avp": 34.1,
-        "yt_avd": 26.0,
+        "yt_avp": 35.8,
+        "yt_avd": 27.0,
         "yt_subs": 0,
         "yt_shares": 0,
         "ig_reach": 518,
@@ -180,8 +181,8 @@
         "ig_views": 586,
         "ig_likes": 15,
         "ig_comments": 0,
-        "score": 1874.5,
-        "fetched": "2026-10-12T14:09:34+00:00"
+        "score": 1888.0,
+        "fetched": "2026-10-13T12:03:03+00:00"
       }
     },
     {
@@ -192,17 +193,21 @@
       "youtube_id": "5U_rtc8oRHs",
       "instagram_id": "18114047927276016",
       "stats": {
-        "yt_views": 51,
+        "yt_views": 53,
         "yt_likes": 0,
         "yt_comments": 0,
-        "ig_reach": 218,
+        "yt_avp": 39.9,
+        "yt_avd": 29.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 219,
         "ig_saved": 1,
         "ig_shares": 0,
         "ig_views": 237,
         "ig_likes": 1,
         "ig_comments": 0,
-        "score": 462.0,
-        "fetched": "2026-10-12T14:09:35+00:00"
+        "score": 664.0,
+        "fetched": "2026-10-13T12:03:04+00:00"
       }
     },
     {
@@ -256,11 +261,15 @@
       },
       "youtube_id": "wAYl4q3sCwc",
       "stats": {
-        "yt_views": 637,
+        "yt_views": 646,
         "yt_likes": 6,
         "yt_comments": 0,
-        "score": 787,
-        "fetched": "2026-10-12T14:09:35+00:00"
+        "yt_avp": 9.3,
+        "yt_avd": 5.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "score": 842.5,
+        "fetched": "2026-10-13T12:03:04+00:00"
       }
     },
     {
@@ -317,17 +326,21 @@
       "youtube_id": "4aZ5dipKfvI",
       "instagram_id": "18025092821863422",
       "stats": {
-        "yt_views": 253,
+        "yt_views": 285,
         "yt_likes": 1,
         "yt_comments": 0,
-        "ig_reach": 736,
+        "yt_avp": 22.5,
+        "yt_avd": 12.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 739,
         "ig_saved": 5,
         "ig_shares": 1,
-        "ig_views": 800,
+        "ig_views": 802,
         "ig_likes": 10,
         "ig_comments": 0,
-        "score": 1956.0,
-        "fetched": "2026-10-12T14:09:35+00:00"
+        "score": 2104.0,
+        "fetched": "2026-10-13T12:03:04+00:00"
       }
     },
     {
@@ -386,17 +399,17 @@
       "youtube_id": "sZQlLUJu54U",
       "instagram_id": "17907826107668662",
       "stats": {
-        "yt_views": 256,
+        "yt_views": 271,
         "yt_likes": 1,
         "yt_comments": 1,
-        "ig_reach": 324,
-        "ig_saved": 2,
+        "ig_reach": 381,
+        "ig_saved": 3,
         "ig_shares": 0,
-        "ig_views": 374,
-        "ig_likes": 0,
+        "ig_views": 428,
+        "ig_likes": 2,
         "ig_comments": 1,
-        "score": 1017.0,
-        "fetched": "2026-10-12T14:09:35+00:00"
+        "score": 1204.5,
+        "fetched": "2026-10-13T12:03:04+00:00"
       }
     },
     {
@@ -453,17 +466,17 @@
       "youtube_id": "8hYtOJwJJxE",
       "instagram_id": "18178100578445939",
       "stats": {
-        "yt_views": 242,
+        "yt_views": 247,
         "yt_likes": 5,
         "yt_comments": 5,
         "ig_reach": 1988,
-        "ig_saved": 13,
+        "ig_saved": 14,
         "ig_shares": 1,
-        "ig_views": 2223,
+        "ig_views": 2227,
         "ig_likes": 46,
         "ig_comments": 2,
-        "score": 5734.0,
-        "fetched": "2026-10-12T23:36:41+00:00"
+        "score": 5783.0,
+        "fetched": "2026-10-13T12:03:05+00:00"
       }
     },
     {
@@ -514,17 +527,17 @@
       "youtube_id": "S0YLDkabNOM",
       "instagram_id": "17948011797304068",
       "stats": {
-        "yt_views": 962,
+        "yt_views": 968,
         "yt_likes": 17,
         "yt_comments": 3,
-        "ig_reach": 2052,
-        "ig_saved": 11,
+        "ig_reach": 2068,
+        "ig_saved": 12,
         "ig_shares": 2,
-        "ig_views": 2277,
+        "ig_views": 2289,
         "ig_likes": 33,
         "ig_comments": 3,
-        "score": 6435.0,
-        "fetched": "2026-10-12T23:36:41+00:00"
+        "score": 6501.0,
+        "fetched": "2026-10-13T12:03:05+00:00"
       }
     },
     {
@@ -633,6 +646,40 @@
       "youtube_id": "FKWJmKr-NMs",
       "instagram_id": "18118387330971395",
       "carousel_id": "17865584778680226"
+    },
+    {
+      "time": "2026-10-13T13:04:21+00:00",
+      "topic": "How ChatGPT Writes a Reply One Token at a Time",
+      "format": "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
+      "seed": 218089699,
+      "features": {
+        "angle": "zoom-out",
+        "layouts": [
+          "world: Prompt",
+          "Tokens",
+          "Attention",
+          "Sampling",
+          "KV Cache",
+          "Scale"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Teal",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "phrygian",
+        "length": "long",
+        "level": "beginner",
+        "trend": false,
+        "series": "AI Explained",
+        "cta": null,
+        "fmt": null,
+        "title": "direct",
+        "cover": "band"
+      },
+      "title_alt": "ChatGPT never knows its whole answer. Here's what it does #shorts",
+      "title_style": "direct",
+      "youtube_id": "17ohiia63Hs",
+      "instagram_id": "17898777042608588"
     }
   ],
   "series_counts": {
@@ -650,7 +697,8 @@
     "depth > tree > radial > stack > timeline > diagonal > cluster",
     "row > depth > grid > spiral > stack > cluster",
     "pyramid > wave > timeline > radial > cluster > diagonal",
-    "depth > stack > grid > spiral > pyramid > scatter"
+    "depth > stack > grid > spiral > pyramid > scatter",
+    "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale"
   ],
   "used_palettes": [
     "0:0"
@@ -670,81 +718,237 @@
   "queued_scripts": [],
   "style_memory": [
     {
-      "posted_at": "2026-10-13T00:17:50+00:00",
+      "posted_at": "2026-10-13T13:11:57+00:00",
       "style": {
-        "name": "Crimson Tide / Jade signal",
-        "created": "2026-10-12T23:51:19+00:00",
+        "name": "Teal Vector / Indigo signal",
+        "created": "2026-10-13T12:07:20+00:00",
         "hook": null,
         "tag": "underline",
-        "reflect": false,
+        "reflect": true,
         "glass": {
           "on": true,
-          "roughness": 0.185,
-          "ior": 1.31,
-          "thickness": 0.57,
-          "dof": 4.2,
-          "key": 1.8,
-          "rim": "#699EEA"
+          "roughness": 0.072,
+          "ior": 1.54,
+          "thickness": 0.93,
+          "dof": 7.0,
+          "key": 2.34,
+          "rim": "#F7926A"
         },
         "mascot": {
-          "on": true,
-          "side": -1,
-          "kind": "chip"
+          "on": false,
+          "side": 1,
+          "kind": "bot"
         },
         "_h": {
-          "bg": 358.1,
-          "signal": 128.6,
-          "holo": 240.8
+          "bg": 140.1,
+          "signal": 219.0,
+          "holo": 53.2
         },
         "palette": {
-          "ink": "#140B0B",
-          "ink2": "#221414",
-          "graphite": "#635151",
-          "ash": "#AFA1A2",
-          "bone": "#EEE0E3",
-          "signal": "#1CEF3A",
-          "ember": "#52FF93",
-          "blood": "#0EB015"
+          "ink": "#080E0A",
+          "ink2": "#111C14",
+          "graphite": "#4E6054",
+          "ash": "#9EACA3",
+          "bone": "#E6F0E8",
+          "signal": "#296EEF",
+          "ember": "#5266FF",
+          "blood": "#0F5DBD"
         },
         "holo": [
-          "#6260E9",
-          "#699EEA"
+          "#F1DE47",
+          "#F7926A"
         ],
         "type": {
-          "wscale": 0.77,
-          "wtadd": -200,
-          "case": "lower"
+          "wscale": 0.92,
+          "wtadd": 0,
+          "case": "upper"
         },
         "grid": {
-          "minor": 32,
-          "major": 96
+          "minor": 20,
+          "major": 80
         },
         "caption": {
-          "size": 48,
-          "dy": 26
+          "size": 57,
+          "dy": 27
         },
         "post": {
-          "bloom": 1.0,
-          "bloomThreshold": 0.84,
-          "vignette": 0.43,
-          "grain": 0.03,
-          "ca": 0.14,
-          "halation": 0.01
+          "bloom": 0.58,
+          "bloomThreshold": 0.74,
+          "vignette": 0.57,
+          "grain": 0.062,
+          "ca": 0.18,
+          "halation": 0.24
         },
         "cam2d": {
-          "zoom": 1.032,
-          "roll": 0.0184,
-          "hand": 1.29
+          "zoom": 0.95,
+          "roll": 0.0053,
+          "hand": 1.7
         },
         "cam3d": {
-          "fov": 5.4,
-          "roll": 0.047,
-          "dist": 0.86,
-          "hand": 1.44
+          "fov": -1.0,
+          "roll": 0.024,
+          "dist": 1.03,
+          "hand": 0.68
         },
         "scenes": [
           {
+            "cam": "crane",
+            "reveal": "assemble",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "whip",
+            "reveal": "glitch",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "crane",
+            "reveal": "scan",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "assemble",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
             "cam": "fly",
+            "reveal": "scan",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "assemble",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "low",
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "glitch",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "whip",
+            "reveal": "scan",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "fly",
+            "reveal": "glitch",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "top",
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "assemble",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "push",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "fly",
+            "reveal": "assemble",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "whip",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "scan",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "dolly",
+            "reveal": "draw",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "top",
+            "reveal": "scan",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "glitch",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "fly",
+            "reveal": "draw",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "low",
+            "reveal": "scan",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "orbit",
+            "reveal": "glitch",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "assemble",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "push",
+            "reveal": "draw",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "orbit",
+            "reveal": "glitch",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "fly",
+            "reveal": "scan",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "spiral",
             "reveal": "glitch",
             "floor": "hex",
             "spin": -1
@@ -752,37 +956,31 @@
           {
             "cam": "low",
             "reveal": "assemble",
-            "floor": "polar",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "orbit",
+            "reveal": "glitch",
+            "floor": "dots",
             "spin": -1
           },
           {
-            "cam": "dolly",
-            "reveal": "glitch",
+            "cam": "top",
+            "reveal": "scan",
             "floor": "grid",
             "spin": -1
           },
           {
-            "cam": "push",
-            "reveal": "draw",
-            "floor": "hex",
-            "spin": 1
-          },
-          {
             "cam": "crane",
-            "reveal": "glitch",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "spiral",
-            "reveal": "scan",
+            "reveal": "draw",
             "floor": "polar",
-            "spin": -1
+            "spin": 1
           }
         ]
       },
-      "format": "depth > stack > grid > spiral > pyramid > scatter",
-      "angle": "versus"
+      "format": "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
+      "angle": "zoom-out"
     }
   ],
   "scene_signatures": [
@@ -838,7 +1036,36 @@
     "grid|network:glitch,text:pop,text:pop",
     "spiral|bars:draw,cone:fly,cone:fly,particles:grow",
     "pyramid|cylinder:grow,sphere:fly,stack:assemble",
-    "scatter|donut:draw,ring:grow,text:pop"
+    "scatter|donut:draw,ring:grow,text:pop",
+    "badge@1,2|chip@1,1/L1",
+    "node@0,1|node@2,1|orbit@1,1/L2",
+    "code@0,1|queue@2,2/L1",
+    "node@0,0|node@0,2|node@2,0|node@2,2/L0",
+    "file@0,2|stack@1,1/L0",
+    "gear@1,1|node@0,0|queue@2,0/L2",
+    "badge@1,0|bars@0,1|chip@2,2/L2",
+    "code@1,0|metric@1,2/L1",
+    "badge@2,2|slots@0,1/L1",
+    "gauge@1,2|node@0,0|node@1,0|node@2,0/L2",
+    "badge@0,0|badge@0,2|badge@1,1|bars@2,1/L3",
+    "queue@0,2|queue@2,2|shield@1,0/L2",
+    "badge@2,2|bars@0,1|gauge@2,1/L0",
+    "bars@2,1|chip@0,1/L1",
+    "gauge@1,1|node@0,0|node@2,0/L2",
+    "badge@2,0|bot@1,1|node@0,0/L2",
+    "badge@2,2|bars@2,1|gauge@0,1/L0",
+    "badge@1,2|orbit@1,1/L0",
+    "cylinder@0,1|stack@2,1/L1",
+    "tower@0,1|tower@2,1/L1",
+    "badge@0,0|phone@2,1|queue@1,1/L1",
+    "queue@2,1|slots@0,1/L1",
+    "badge@2,1|node@0,1|node@1,1|node@1,1/L2",
+    "avatars@0,1|chip@2,1|stack@1,1/L2",
+    "cylinder@0,2|cylinder@2,2|slots@1,0/L2",
+    "chip@0,2|chip@1,2|chip@2,2|cloud@1,0/L3",
+    "node@0,1|node@1,0|node@1,2|stack@2,1/L3",
+    "bot@0,1|cylinder@1,2|orbit@2,1/L2",
+    "chip@0,1|phone@2,1|queue@1,0/L2"
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
@@ -848,15 +1075,16 @@
     "depth > tree > radial > stack > timeline > diagonal > cluster",
     "row > depth > grid > spiral > stack > cluster",
     "pyramid > wave > timeline > radial > cluster > diagonal",
-    "depth > stack > grid > spiral > pyramid > scatter"
+    "depth > stack > grid > spiral > pyramid > scatter",
+    "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale"
   ],
   "insights": {
     "n": 5,
-    "updated": "2026-10-12T23:36:41+00:00",
+    "updated": "2026-10-13T12:03:05+00:00",
     "best": {
       "layouts": [
-        "stack",
         "depth",
+        "stack",
         "spiral"
       ],
       "types": [
@@ -902,69 +1130,69 @@
     "lift": {
       "layouts": {
         "row": 0.96,
-        "ring": 0.43,
-        "stack": 1.36,
-        "depth": 1.36,
-        "spiral": 1.32,
-        "tree": 0.91,
-        "diagonal": 0.91,
+        "depth": 1.33,
+        "ring": 0.45,
+        "stack": 1.33,
+        "tree": 0.92,
         "cluster": 1.19,
+        "diagonal": 0.92,
+        "spiral": 1.31,
         "grid": 1.17,
-        "radial": 1.06,
-        "timeline": 1.06
+        "timeline": 1.06,
+        "radial": 1.06
       },
       "types": {
-        "tunnel": 0.79,
-        "stream": 1.0,
+        "particles": 0.76,
+        "matrix": 0.76,
+        "object": 0.76,
+        "beam": 0.76,
+        "code": 1.09,
+        "link": 1.09,
         "text": 1.0,
-        "beam": 0.75,
-        "ring": 1.0,
+        "stream": 1.0,
+        "wave": 0.42,
+        "orbit": 1.01,
         "panel": 1.0,
-        "orbit": 1.02,
-        "link": 1.1,
-        "matrix": 0.75,
-        "object": 0.75,
-        "particles": 0.75,
+        "ring": 1.0,
         "burst": 1.0,
-        "code": 1.1,
-        "wave": 0.39,
-        "bars": 0.47,
-        "stack": 0.98,
-        "counter": 0.47,
+        "tunnel": 0.79,
+        "cylinder": 1.2,
         "network": 1.19,
-        "gauge": 0.47,
-        "cylinder": 1.21,
+        "bars": 0.5,
+        "counter": 0.5,
+        "gauge": 0.5,
+        "stack": 0.99,
         "sphere": 1.17
       },
       "cams": {
-        "spiral": 1.02,
-        "low": 1.13,
+        "dolly": 1.0,
         "push": 1.0,
         "orbit": 1.0,
-        "fly": 1.0,
-        "dolly": 1.0,
         "crane": 1.0,
-        "dutch": 0.91
+        "low": 1.12,
+        "spiral": 1.01,
+        "fly": 1.0,
+        "dutch": 0.92
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "dorian": 0.98
+        "dorian": 0.99
       },
       "length": {
         "mid": 0.89,
         "short": 1.17
       },
       "level": {
-        "beginner": 1.13,
-        "engineer": 0.47
+        "beginner": 1.12,
+        "engineer": 0.5
       },
       "trend": {
-        "False": 1.17
+        "False": 1.16
       },
       "cta": {
-        "save": 0.91
+        "save": 0.92
       }
     }
   },
@@ -1002,17 +1230,21 @@
     {
       "time": "2026-10-13T00:17:50+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-13T13:11:57+00:00",
+      "ok": true
     }
   ],
   "series": {
-    "name": "Tech Explained",
-    "ep": 5
+    "name": "AI Explained",
+    "ep": 1
   },
   "seen_comments": [
-    "UgwXfDTO4tfTrp_36cB4AaABAg",
+    "UgwvXGIuM76nR9CVH6V4AaABAg",
     "UgzDh5eiRTJ-xa5YLRt4AaABAg",
-    "UgygtUnX-LOvXYrahuZ4AaABAg",
-    "UgwvXGIuM76nR9CVH6V4AaABAg"
+    "UgwXfDTO4tfTrp_36cB4AaABAg",
+    "UgygtUnX-LOvXYrahuZ4AaABAg"
   ],
   "viewer_questions": []
 }
