@@ -102,6 +102,44 @@ def add_links(script, state):
     script["links_done"] = True
 
 
+def pick_variants(script, state):
+    """A/B: choose the title style and cover style, weighted by what has performed best so far (25% exploration)."""
+    rnd = random.SystemRandom()
+    tv = script.get("title_variants") or {}
+    if len(tv) == 2:
+        styles = list(tv)
+        style = rnd.choice(styles) if rnd.random() < 0.25 else max(styles, key=lambda k: analytics.weight(state, "title", k) + rnd.random() * 0.01)
+        script.setdefault("youtube", {})["title"] = tv[style]
+        script["title_style"], script["title_alt"] = style, tv[[k for k in styles if k != style][0]]
+    covers_ = ["band", "bold"]
+    script["cover_style"] = rnd.choice(covers_) if rnd.random() < 0.25 else max(covers_, key=lambda k: analytics.weight(state, "cover", k) + rnd.random() * 0.01)
+    print(f"  A/B title: {script.get('title_style')} | cover: {script['cover_style']}")
+
+
+def swap_weak_titles(state):
+    """24 h check: a Short far below the channel's usual views gets its other title (YouTube allows title edits)."""
+    posts = [p for p in state.get("posts", []) if p.get("youtube_id")]
+    views = sorted((p.get("stats") or {}).get("yt_views", 0) for p in posts[-12:] if (p.get("stats") or {}).get("yt_views") is not None)
+    if len(views) < 4:
+        return
+    median = views[len(views) // 2]
+    for p in posts[-6:]:
+        v = (p.get("stats") or {}).get("yt_views")
+        if not p.get("title_alt") or p.get("title_swapped") or v is None or not (20 <= analytics._age_h(p) <= 60) or v >= 0.6 * median:
+            continue
+        try:
+            from googleapiclient.discovery import build
+            from youtube_upload import get_credentials
+            api = build("youtube", "v3", credentials=get_credentials(), cache_discovery=False)
+            sn = api.videos().list(part="snippet", id=p["youtube_id"]).execute()["items"][0]["snippet"]
+            api.videos().update(part="snippet", body={"id": p["youtube_id"], "snippet": {"title": p["title_alt"][:100], "description": sn.get("description", ""),
+                                                                                           "tags": sn.get("tags", []), "categoryId": sn.get("categoryId", "28")}}).execute()
+            p["title_swapped"] = True
+            print(f"  retitled {p['youtube_id']} ({v} views vs median {median}): {p['title_alt'][:60]}")
+        except Exception as e:
+            print(f"  title swap skipped ({str(e)[:100]})")
+
+
 def features(script, meta):
     st = script.get("style") or {}
     d = meta.get("duration") or 0
@@ -111,7 +149,8 @@ def features(script, meta):
             "hue": (st.get("name") or "").split(" ")[0], "voice": meta.get("voice"), "music": (script.get("music") or "").split(" ")[0],
             "length": "short" if d < 50 else ("mid" if d < 75 else "long"), "level": script.get("level"),
             "trend": bool(script.get("trend")), "series": (script.get("series") or {}).get("name"), "cta": script.get("cta_kind"),
-            "fmt": "viewer" if script.get("viewer_q") else script.get("format_kind")}
+            "fmt": "viewer" if script.get("viewer_q") else script.get("format_kind"),
+            "title": script.get("title_style"), "cover": script.get("cover_style")}
 
 
 def slugify(s):
@@ -229,7 +268,7 @@ def finish_video(script, ctx, raw, show=False):
             "duration": round(dur, 1), "voice": voice, "format": script.get("format"), "seed": script.get("seed"),
             "style_name": (script.get("style") or {}).get("name"), "angle": script.get("angle"),
             "review": script.get("review"), "music": script.get("music"), "sources": script.get("sources", []),
-            "cover_ms": cover_ms(), "comment": script.get("comment") or "Did you know this before watching? Yes or no 👇", "series_name": (script.get("series") or {}).get("name")}
+            "cover_ms": cover_ms(), "title_alt": script.get("title_alt"), "title_style": script.get("title_style"), "comment": script.get("comment") or "Did you know this before watching? Yes or no 👇", "series_name": (script.get("series") or {}).get("name")}
     meta["features"] = features(script, meta)
     try:                                       # designed Reel cover + carousel slides, from this video
         meta["cover_path"], meta["carousel"] = covers.make_all(video, script, out_dir)
@@ -245,7 +284,7 @@ def finish_video(script, ctx, raw, show=False):
 
 def upload(video, meta, state):
     rec = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"), "topic": meta["topic"], "format": meta.get("format"),
-           "seed": meta.get("seed"), "features": meta.get("features")}
+           "seed": meta.get("seed"), "features": meta.get("features"), "title_alt": meta.get("title_alt"), "title_style": meta.get("title_style")}
     ok = True
     if os.getenv("AUTO_POST_YOUTUBE", "false").lower() == "true":
         try:
@@ -320,6 +359,8 @@ def main():
     art_director.prune(state)          # styles posted more than 3 hours ago are forgotten
     try:                               # the learning loop: fresh stats -> what works -> next script
         n = analytics.collect(state)
+        if args.post:
+            swap_weak_titles(state)
         ins = analytics.learn(state)
         print(f"📈 Analytics: {n} post(s) refreshed, learning from {ins.get('n', 0)} rated video(s)")
         if args.post and analytics.reach_check(state) and analytics.should_skip(state):
@@ -351,6 +392,12 @@ def main():
             if trend:
                 topic = trend["topic"]
                 print(f"🔥 Trending topic: {topic}  ({trend['why']})")
+        if not args.topic and os.getenv("PRO_STYLE", "1") != "0" and (args.trend or (args.post and len(state["posts"]) % 3 == 1)):
+            import pro
+            trend = pro.trend_topic(set(state["used_topics"]) | set(json.loads((BASE / "topics_deep.json").read_text(encoding="utf-8"))))
+            if trend:
+                topic = trend["topic"]
+                print(f"🔥 Trending tech topic: {topic}  ({trend['why']})")
         vq = None
         if args.post:                          # viewers' questions from the comments become videos
             try:
@@ -378,6 +425,7 @@ def main():
                 try:
                     import pro
                     script = pro.script_for(topic, facts, banned=state.get("scene_signatures", []))
+                    pick_variants(script, state)
                     script.update(series=series, level=level, trend=trend, viewer_q=vq)
                     add_sources(script, facts["sources"] + ((trend or {}).get("sources") or []))
                 except Exception as e:

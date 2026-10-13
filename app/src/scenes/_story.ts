@@ -160,6 +160,21 @@ export class Story extends GenPlate {
       ctx.restore();
       if (d.example) this.text(ctx, String(d.example).slice(0, 40), cx + 28, cy + 148, 18, '#64748B', F.archivo(100, 500), cw - 56);
     }
+    if (this.idx === 0 && d.hook_text) {                                          // first frame: huge hook headline
+      const words = String(d.hook_text).toUpperCase().split(/\s+/), fam = ARCH(120, 900), k = spring(age + 0.05);
+      const rows: string[] = []; let cur = '';
+      for (const w of words) { const n = cur ? `${cur} ${w}` : w; if (measure(n, fam, 104) > W - 140 && cur) { rows.push(cur); cur = w; } else cur = n; }
+      if (cur) rows.push(cur);
+      const sz = Math.min(104, 250 / Math.max(1, rows.length) / 1.05 + 30, (104 * (W - 140)) / Math.max(1, ...rows.map((r) => measure(r, fam, 104))));
+      ctx.save(); ctx.globalAlpha = 1;
+      const g = ctx.createLinearGradient(0, 150, 0, 620); g.addColorStop(0, 'rgba(7,9,14,0.92)'); g.addColorStop(1, 'rgba(7,9,14,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 150, W, 470);
+      ctx.translate(W / 2, 300); ctx.scale(0.85 + 0.15 * k, 0.85 + 0.15 * k); ctx.translate(-W / 2, -300);
+      ctx.font = font(fam, sz); ctx.textAlign = 'center';
+      rows.forEach((r, i) => { ctx.fillStyle = i === rows.length - 1 ? this.style.tintHex : '#FFFFFF'; ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 18; ctx.fillText(r, W / 2, 250 + i * sz * 1.05); });
+      ctx.restore(); ctx.textAlign = 'left';
+      return;
+    }
     const ch = this.chunks.find((c) => t >= c.t0 - 0.08 && t <= c.t1 + 0.25) ?? (t < (this.chunks[0]?.t0 ?? 0) ? null : this.chunks[this.chunks.length - 1]);
     if (ch) {                                                                       // caption chunk + key word box
       const fam = ARCH(110, 850), keyset = new Set(String(d.key ?? '').split(/\s+/).map(norm).filter(Boolean));

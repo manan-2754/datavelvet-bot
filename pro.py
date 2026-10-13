@@ -38,7 +38,8 @@ the hood?" Explain the REAL mechanism, like a senior engineer whiteboarding it -
 {facts}
 DO NOT use a fixed template or a fixed scene order. Derive the sequence from the real architecture of the topic: start from
 what the developer/user touches, peel back each real layer, then rebuild the whole system. Keep this SHAPE (rename freely):
-1. HOOK (1-2 beats): "Let's design <the system>." plus the most surprising true fact about it.
+1. HOOK (1-2 beats): beat 1 MUST be the single most surprising TRUE fact about the system (a number, a contrast or a
+   myth it breaks) - never a slow intro. Beat 2 may say "Let's design <the system>."
 2. USER VIEW (2-4 beats): the simplest thing a developer touches (a checkout call, a sign-in form, a deploy command) with a
    few lines of real code, and what they would normally have to build themselves around it.
 3. REVEAL (1-2 beats): what is actually underneath (the real runtime / database / network / cluster).
@@ -90,7 +91,10 @@ Return ONLY JSON:
 {{"title": max 60 chars, "example": the running example (max 34 chars), "stages": [...], "counter": {{"label": e.g. "T+",
  "unit": e.g. "ms"}}, "beats": [{{"stage": index, "chapter": "...", "theme": "light"|"dark", "line": "...", "key": "...",
  "object": "...", "counter": number,
- "widget": {{"kind": "...", ...}}}}], "youtube": {{"title": max 70 chars ending " #shorts" - lead with the famous product/brand name and a curiosity gap, e.g. "How ChatGPT REALLY writes your answer (token by token) #shorts", "description": 2 sentences + 5
+ "widget": {{"kind": "...", ...}}}}], "hook_text": the first-frame headline, max 6 words, punchy and true (e.g. "ChatGPT never knows its answer"),
+ "titles": {{"curiosity": max 70 chars ending " #shorts", brand first + curiosity gap, "direct": max 70 chars ending " #shorts",
+ a plain "How <brand> <does X> under the hood" title}},
+ "youtube": {{"title": the curiosity title, "description": 2 sentences + 5
  hashtags, "tags": [6-8]}}, "instagram_caption": 2 lines + "Save this for later." + 6 hashtags, "comment": one question}}
 {feedback}"""
 
@@ -130,8 +134,8 @@ def _review(sc):
     rows = [f"{i + 1}. [{s['plate']}] {s['title']}: {' '.join(s['lines'])}  (on screen: {json.dumps(s['data'], ensure_ascii=False)[:400]})"
             for i, s in enumerate(sc["scenes"])]
     data = json.loads(_story_llm(DEEP_REVIEW.format(topic=sc["topic"], script="\n".join(rows))))
-    return {"score": int(data.get("score", 0)), "critical": [str(x) for x in data.get("critical_errors") or []],
-            "minor": [str(x) for x in data.get("minor_issues") or []]}
+    crit = [str(x) for x in data.get("critical_errors") or [] if not re.search(r"\bno error\b|\bnot a factual\b", str(x), re.I)]
+    return {"score": int(data.get("score", 0)), "critical": crit, "minor": [str(x) for x in data.get("minor_issues") or []]}
 
 
 DEEP_REVIEW = """You are a staff engineer fact-checking a 2-3 minute developer deep-dive about "{topic}" before it is published.
@@ -205,6 +209,15 @@ def write_story(topic, facts=None, banned=()):
             print(f"  fact-check after fix: {rv['score']}/10, {len(rv['critical'])} real error(s)")
             for c in rv["critical"]:
                 print(f"    - {c[:160]}")
+        if rv["critical"] and len(beats) > 24:                        # last resort: drop the beats that still carry a doubtful claim
+            bad = {int(n) for c in rv["critical"] for n in re.findall(r"beats?\s*(\d+)", c, re.I)}
+            bad = {n for n in bad if 2 < n < len(beats)}               # never the hook or the ending
+            if bad and len(beats) - len(bad) >= 22:
+                beats = [b for i, b in enumerate(beats, 1) if i not in bad]
+                sc = {"topic": topic, "scenes": [{"plate": "story", "title": stages[min(len(stages) - 1, int(b.get("stage") or 0))],
+                                                  "lines": [b["line"]], "data": {"widget": b.get("widget")}} for b in beats]}
+                rv = _review(sc)
+                print(f"  dropped beat(s) {sorted(bad)} -> fact-check: {rv['score']}/10, {len(rv['critical'])} real error(s)")
         if not rv["critical"] and rv["score"] >= 6:
             st["beats"], st["stages"], st["sources"] = beats, stages, facts["sources"]
             return st
@@ -342,7 +355,10 @@ def to_script(st):
         nxt = st["beats"][i + 1] if i + 1 < len(st["beats"]) else None      # the live bot's rhythm: short pause inside a stage, longer between stages
         pause = 0.28 if nxt is not None and int(nxt.get("stage") or 0) == int(b.get("stage") or 0) else 0.7
         scenes.append({"plate": "world", "pause": pause, "title": st["stages"][stage], "lines": [re.sub(r"\s+", " ", str(b["line"])).strip()], "data": data})
-    return {"topic": st["title"], "scenes": scenes, "youtube": st.get("youtube", {}), "instagram_caption": st.get("instagram_caption", ""),
+    if scenes and st.get("hook_text"):                          # big headline on the first frame
+        scenes[0]["data"]["hook_text"] = str(st["hook_text"])[:48]
+    return {"title_variants": {k: str(v)[:100] for k, v in (st.get("titles") or {}).items() if k in ("curiosity", "direct") and v},
+            "topic": st["title"], "scenes": scenes, "youtube": st.get("youtube", {}), "instagram_caption": st.get("instagram_caption", ""),
             "comment": st.get("comment"), "sources": st.get("sources", [])}
 
 
@@ -471,3 +487,32 @@ def fit_narration(sc):
         del sc["scenes"][cut]
         dur, voice = audio_build.narrate(sc)
     return dur, voice
+
+
+TREND = """Here are today's top tech stories:
+{items}
+Pick ONE that MANY people know about - prefer big, famous brands, products, launches or outages (OpenAI, Apple, Google,
+AWS, Meta, Microsoft, Netflix, Tesla, a major outage) over niche hobby projects - and turn it into a deep-dive topic about how the real system behind it
+works under the hood (e.g. an outage -> "How AWS us-east-1 really works", a model launch -> "How <model> generates text").
+Only real, current events from the list; the topic must be explainable from public engineering docs. Not any of: {used}
+Return ONLY JSON: {{"topic": max 70 chars, a "how X works under the hood" subject (no "How does"), "why": one line, "source_index": n}}"""
+
+
+def trend_topic(used):
+    """Today's tech news -> a deep-dive topic (one slot a day)."""
+    import trends
+    items = sorted(trends.gather() or [], key=lambda x: -x.get("score", 0))[:40]
+    if not items:
+        return None
+    try:
+        res = json.loads(_story_llm(TREND.format(items="\n".join(f"{i}. [{x['src']}] {x['title']}" for i, x in enumerate(items)),
+                                                 used=", ".join(list(used)[-80:]))))
+        topic = str(res.get("topic", "")).strip()
+        if not topic or topic in used:
+            return None
+        i = res.get("source_index")
+        src = items[i]["url"] if isinstance(i, int) and 0 <= i < len(items) else None
+        return {"topic": topic[:80], "why": str(res.get("why", ""))[:160], "sources": [src] if src else []}
+    except Exception as e:
+        print(f"  tech trend pick failed ({e})")
+        return None

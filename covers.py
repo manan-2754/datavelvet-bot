@@ -104,7 +104,29 @@ def scene_times():
     return out
 
 
+def bold_cover(video, script, out_path, t):
+    """Cover B: a dimmed frame with a huge 2-4 line hook headline and one accent line."""
+    pal = _palette(script)
+    src = Path(out_path).with_suffix(".src.png")
+    img = _frame(video, t, src).resize((1080, 1920))
+    img = _shade(img, pal["ink"], top=0.0, bottom=0.92)
+    d = ImageDraw.Draw(img)
+    head = str(((script.get("scenes") or [{}])[0].get("data") or {}).get("hook_text") or clean_title(script)).upper()
+    f, lines = _fit(d, head, 960, 4, 150)
+    block = len(lines) * f.size * 1.05
+    y0 = 760 - block / 2
+    _text_block(d, lines[:-1], f, 60, y0, pal["bone"], gap=1.05)
+    if lines:
+        d.text((60, y0 + (len(lines) - 1) * f.size * 1.05), lines[-1], font=f, fill=pal["signal"])
+    d.text((60, 1700), "DATAVELVET  ·  UNDER THE HOOD", font=_font(34, "label"), fill=pal["ash"])
+    img.save(out_path, quality=92)
+    src.unlink(missing_ok=True)
+    return str(out_path)
+
+
 def reel_cover(video, script, out_path, t):
+    if script.get("cover_style") == "bold":
+        return bold_cover(video, script, out_path, t)
     pal = _palette(script)
     src = Path(out_path).with_suffix(".src.png")
     img = _band(Image.new("RGB", (1080, 1920), pal["ink"]), _frame(video, t, src).resize((1080, 1920)), 1060, 860, pal["ink"])
