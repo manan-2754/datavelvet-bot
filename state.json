@@ -13,7 +13,8 @@
     "Why Chrome eats all your RAM",
     "How browser fingerprinting tracks you without cookies",
     "How Shopify processes an online purchase",
-    "ChatGPT generating a reply token by token"
+    "ChatGPT generating a reply token by token",
+    "WhatsApp end-to-end encryption"
   ],
   "used_bank": [
     "dns_explained"
@@ -593,7 +594,20 @@
         "fmt": "standard"
       },
       "youtube_id": "3VRDYCOh0cY",
-      "instagram_id": "18425872588147385"
+      "instagram_id": "18425872588147385",
+      "stats": {
+        "yt_views": 247,
+        "yt_likes": 2,
+        "yt_comments": 1,
+        "ig_reach": 1951,
+        "ig_saved": 27,
+        "ig_shares": 9,
+        "ig_views": 2251,
+        "ig_likes": 47,
+        "ig_comments": 1,
+        "score": 6438.5,
+        "fetched": "2026-10-13T15:21:48+00:00"
+      }
     },
     {
       "time": "2026-10-13T00:13:31+00:00",
@@ -680,6 +694,41 @@
       "title_style": "direct",
       "youtube_id": "17ohiia63Hs",
       "instagram_id": "17898777042608588"
+    },
+    {
+      "time": "2026-10-13T17:02:57+00:00",
+      "topic": "How WhatsApp E2EE really works under the hood",
+      "format": "world: Prekeys > Handshake > Ratchet > Relay",
+      "seed": 1306771721,
+      "features": {
+        "angle": "journey",
+        "layouts": [
+          "world: Prekeys",
+          "Handshake",
+          "Ratchet",
+          "Relay"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Violet",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "dorian",
+        "length": "mid",
+        "level": "beginner",
+        "trend": false,
+        "series": "Security Decoded",
+        "cta": null,
+        "fmt": null,
+        "title": "direct",
+        "cover": "bold",
+        "lmode": "quick",
+        "trial": true
+      },
+      "title_alt": "WhatsApp reads none of your chats. Here's the math #shorts",
+      "title_style": "direct",
+      "youtube_id": "S12biz7lwLI",
+      "instagram_id": "18110985320062631",
+      "ig_trial": true
     }
   ],
   "series_counts": {
@@ -698,7 +747,8 @@
     "row > depth > grid > spiral > stack > cluster",
     "pyramid > wave > timeline > radial > cluster > diagonal",
     "depth > stack > grid > spiral > pyramid > scatter",
-    "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale"
+    "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
+    "world: Prekeys > Handshake > Ratchet > Relay"
   ],
   "used_palettes": [
     "0:0"
@@ -981,6 +1031,151 @@
       },
       "format": "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
       "angle": "zoom-out"
+    },
+    {
+      "posted_at": "2026-10-13T17:06:01+00:00",
+      "style": {
+        "name": "Violet Halo / Lime signal",
+        "created": "2026-10-13T15:23:15+00:00",
+        "hook": null,
+        "tag": "chip",
+        "reflect": true,
+        "glass": {
+          "on": true,
+          "roughness": 0.04,
+          "ior": 1.36,
+          "thickness": 0.85,
+          "dof": 8.0,
+          "key": 2.61,
+          "rim": "#70EA4E"
+        },
+        "mascot": {
+          "on": true,
+          "side": -1,
+          "kind": "chip"
+        },
+        "_h": {
+          "bg": 242.2,
+          "signal": 55.9,
+          "holo": 155.1
+        },
+        "palette": {
+          "ink": "#06050E",
+          "ink2": "#0D0C1E",
+          "graphite": "#535264",
+          "ash": "#9A99A8",
+          "bone": "#E6E5EC",
+          "signal": "#F7E929",
+          "ember": "#E6FF66",
+          "blood": "#AE930E"
+        },
+        "holo": [
+          "#3FF6AA",
+          "#70EA4E"
+        ],
+        "type": {
+          "wscale": 1.06,
+          "wtadd": -100,
+          "case": "lower"
+        },
+        "grid": {
+          "minor": 36,
+          "major": 180
+        },
+        "caption": {
+          "size": 45,
+          "dy": 38
+        },
+        "post": {
+          "bloom": 0.56,
+          "bloomThreshold": 0.93,
+          "vignette": 0.39,
+          "grain": 0.087,
+          "ca": 0.08,
+          "halation": 0.08
+        },
+        "cam2d": {
+          "zoom": 0.983,
+          "roll": 0.003,
+          "hand": 1.61
+        },
+        "cam3d": {
+          "fov": 3.9,
+          "roll": 0.057,
+          "dist": 0.9,
+          "hand": 0.67
+        },
+        "scenes": [
+          {
+            "cam": "spiral",
+            "reveal": "glitch",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "top",
+            "reveal": "scan",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "glitch",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "push",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "crane",
+            "reveal": "assemble",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "orbit",
+            "reveal": "scan",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "dolly",
+            "reveal": "assemble",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "crane",
+            "reveal": "glitch",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "assemble",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "low",
+            "reveal": "scan",
+            "floor": "grid",
+            "spin": -1
+          }
+        ]
+      },
+      "format": "world: Prekeys > Handshake > Ratchet > Relay",
+      "angle": "journey"
     }
   ],
   "scene_signatures": [
@@ -1065,7 +1260,17 @@
     "chip@0,2|chip@1,2|chip@2,2|cloud@1,0/L3",
     "node@0,1|node@1,0|node@1,2|stack@2,1/L3",
     "bot@0,1|cylinder@1,2|orbit@2,1/L2",
-    "chip@0,1|phone@2,1|queue@1,0/L2"
+    "chip@0,1|phone@2,1|queue@1,0/L2",
+    "badge@1,2|globe@0,1|tower@2,1/L1",
+    "stack@1,1/L0",
+    "cylinder@2,0|lock@0,2|phone@0,1/L1",
+    "chip@1,2|cylinder@2,0|user@0,0/L2",
+    "lock@1,1|phone@2,0|user@0,0/L1",
+    "file@2,0|gear@1,1|lock@0,0/L2",
+    "chip@1,0|file@0,1|file@2,1/L2",
+    "badge@1,2|user@0,0|user@2,0/L2",
+    "phone@0,1|phone@2,1|queue@1,2|tower@1,0/L2",
+    "file@2,0|phone@1,1|queue@0,0/L2"
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
@@ -1076,123 +1281,126 @@
     "row > depth > grid > spiral > stack > cluster",
     "pyramid > wave > timeline > radial > cluster > diagonal",
     "depth > stack > grid > spiral > pyramid > scatter",
-    "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale"
+    "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
+    "world: Prekeys > Handshake > Ratchet > Relay"
   ],
   "insights": {
-    "n": 5,
-    "updated": "2026-10-13T12:03:05+00:00",
+    "n": 6,
+    "updated": "2026-10-13T15:21:48+00:00",
     "best": {
+      "angle": [],
       "layouts": [
-        "depth",
-        "stack",
-        "spiral"
+        "timeline",
+        "radial",
+        "cluster"
       ],
       "types": [
-        "cylinder",
-        "network",
-        "sphere"
-      ],
-      "cams": [
-        "low"
-      ],
-      "voice": [],
-      "music": [],
-      "length": [
-        "short"
-      ],
-      "level": [
-        "beginner"
-      ],
-      "trend": [
-        "False"
-      ],
-      "cta": []
-    },
-    "worst": {
-      "layouts": [
-        "ring"
-      ],
-      "types": [
-        "counter",
-        "gauge",
-        "wave"
+        "network"
       ],
       "cams": [],
+      "hue": [],
       "voice": [],
       "music": [],
       "length": [],
-      "level": [
-        "engineer"
+      "level": [],
+      "trend": [],
+      "cta": []
+    },
+    "worst": {
+      "angle": [],
+      "layouts": [
+        "row",
+        "tree",
+        "ring"
       ],
+      "types": [
+        "tunnel",
+        "wave"
+      ],
+      "cams": [],
+      "hue": [],
+      "voice": [],
+      "music": [],
+      "length": [],
+      "level": [],
       "trend": [],
       "cta": []
     },
     "lift": {
+      "angle": {
+        "journey": 1.0
+      },
       "layouts": {
-        "row": 0.96,
-        "depth": 1.33,
-        "ring": 0.45,
-        "stack": 1.33,
-        "tree": 0.92,
-        "cluster": 1.19,
-        "diagonal": 0.92,
-        "spiral": 1.31,
-        "grid": 1.17,
-        "timeline": 1.06,
-        "radial": 1.06
+        "row": 0.83,
+        "depth": 1.15,
+        "pyramid": 0.95,
+        "wave": 0.95,
+        "stack": 1.15,
+        "ring": 0.39,
+        "diagonal": 1.02,
+        "cluster": 1.16,
+        "spiral": 1.13,
+        "tree": 0.79,
+        "grid": 1.01,
+        "timeline": 1.17,
+        "radial": 1.17
       },
       "types": {
-        "particles": 0.76,
-        "matrix": 0.76,
-        "object": 0.76,
-        "beam": 0.76,
-        "code": 1.09,
-        "link": 1.09,
         "text": 1.0,
+        "tunnel": 0.68,
+        "beam": 0.86,
+        "code": 1.09,
+        "panel": 0.86,
         "stream": 1.0,
-        "wave": 0.42,
-        "orbit": 1.01,
-        "panel": 1.0,
+        "object": 0.86,
         "ring": 1.0,
+        "orbit": 0.87,
+        "link": 1.09,
+        "wave": 0.36,
+        "matrix": 0.86,
+        "particles": 0.86,
         "burst": 1.0,
-        "tunnel": 0.79,
-        "cylinder": 1.2,
-        "network": 1.19,
-        "bars": 0.5,
-        "counter": 0.5,
-        "gauge": 0.5,
-        "stack": 0.99,
-        "sphere": 1.17
+        "counter": 0.85,
+        "bars": 0.85,
+        "cylinder": 1.03,
+        "network": 1.16,
+        "gauge": 0.85,
+        "stack": 1.07,
+        "sphere": 1.01
       },
       "cams": {
-        "dolly": 1.0,
         "push": 1.0,
         "orbit": 1.0,
-        "crane": 1.0,
-        "low": 1.12,
-        "spiral": 1.01,
+        "dolly": 1.0,
         "fly": 1.0,
-        "dutch": 0.92
+        "low": 0.96,
+        "spiral": 0.87,
+        "crane": 1.0,
+        "dutch": 1.02
+      },
+      "hue": {
+        "Jade": 1.0
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "dorian": 0.99
+        "dorian": 0.86
       },
       "length": {
-        "mid": 0.89,
-        "short": 1.17
+        "mid": 0.99,
+        "short": 1.01
       },
       "level": {
-        "beginner": 1.12,
-        "engineer": 0.5
+        "beginner": 0.96,
+        "engineer": 0.85
       },
       "trend": {
-        "False": 1.16
+        "False": 1.0,
+        "True": 1.0
       },
       "cta": {
-        "save": 0.92
+        "save": 1.02
       }
     }
   },
@@ -1234,16 +1442,20 @@
     {
       "time": "2026-10-13T13:11:57+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-13T17:06:01+00:00",
+      "ok": true
     }
   ],
   "series": {
-    "name": "AI Explained",
+    "name": "Security Decoded",
     "ep": 1
   },
   "seen_comments": [
-    "UgwvXGIuM76nR9CVH6V4AaABAg",
-    "UgzDh5eiRTJ-xa5YLRt4AaABAg",
     "UgwXfDTO4tfTrp_36cB4AaABAg",
+    "UgzDh5eiRTJ-xa5YLRt4AaABAg",
+    "UgwvXGIuM76nR9CVH6V4AaABAg",
     "UgygtUnX-LOvXYrahuZ4AaABAg"
   ],
   "viewer_questions": []
