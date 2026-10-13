@@ -11,7 +11,8 @@
     "How compiler register allocation works",
     "What actually happens when you type google.com",
     "Why Chrome eats all your RAM",
-    "How browser fingerprinting tracks you without cookies"
+    "How browser fingerprinting tracks you without cookies",
+    "How Shopify processes an online purchase"
   ],
   "used_bank": [
     "dns_explained"
@@ -450,7 +451,20 @@
         "cta": "save"
       },
       "youtube_id": "8hYtOJwJJxE",
-      "instagram_id": "18178100578445939"
+      "instagram_id": "18178100578445939",
+      "stats": {
+        "yt_views": 242,
+        "yt_likes": 5,
+        "yt_comments": 5,
+        "ig_reach": 1988,
+        "ig_saved": 13,
+        "ig_shares": 1,
+        "ig_views": 2223,
+        "ig_likes": 46,
+        "ig_comments": 2,
+        "score": 5734.0,
+        "fetched": "2026-10-12T23:36:41+00:00"
+      }
     },
     {
       "time": "2026-10-11T22:05:54+00:00",
@@ -498,7 +512,20 @@
         "cta": "send"
       },
       "youtube_id": "S0YLDkabNOM",
-      "instagram_id": "17948011797304068"
+      "instagram_id": "17948011797304068",
+      "stats": {
+        "yt_views": 962,
+        "yt_likes": 17,
+        "yt_comments": 3,
+        "ig_reach": 2052,
+        "ig_saved": 11,
+        "ig_shares": 2,
+        "ig_views": 2277,
+        "ig_likes": 33,
+        "ig_comments": 3,
+        "score": 6435.0,
+        "fetched": "2026-10-12T23:36:41+00:00"
+      }
     },
     {
       "time": "2026-10-12T17:00:12+00:00",
@@ -554,6 +581,58 @@
       },
       "youtube_id": "3VRDYCOh0cY",
       "instagram_id": "18425872588147385"
+    },
+    {
+      "time": "2026-10-13T00:13:31+00:00",
+      "topic": "How Shopify processes an online purchase",
+      "format": "depth > stack > grid > spiral > pyramid > scatter",
+      "seed": 58579544,
+      "features": {
+        "angle": "versus",
+        "layouts": [
+          "depth",
+          "stack",
+          "grid",
+          "spiral",
+          "pyramid",
+          "scatter"
+        ],
+        "types": [
+          "bars",
+          "cone",
+          "cylinder",
+          "donut",
+          "link",
+          "network",
+          "object",
+          "particles",
+          "ring",
+          "sphere",
+          "stack",
+          "stream",
+          "text"
+        ],
+        "cams": [
+          "low",
+          "crane",
+          "dolly",
+          "orbit",
+          "top",
+          "whip"
+        ],
+        "hue": "Crimson",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "dorian",
+        "length": "mid",
+        "level": "engineer",
+        "trend": false,
+        "series": "Tech Explained",
+        "cta": "save",
+        "fmt": "viewer"
+      },
+      "youtube_id": "FKWJmKr-NMs",
+      "instagram_id": "18118387330971395",
+      "carousel_id": "17865584778680226"
     }
   ],
   "series_counts": {
@@ -570,7 +649,8 @@
     "timeline > diagonal > cluster > tree > grid > radial",
     "depth > tree > radial > stack > timeline > diagonal > cluster",
     "row > depth > grid > spiral > stack > cluster",
-    "pyramid > wave > timeline > radial > cluster > diagonal"
+    "pyramid > wave > timeline > radial > cluster > diagonal",
+    "depth > stack > grid > spiral > pyramid > scatter"
   ],
   "used_palettes": [
     "0:0"
@@ -590,119 +670,119 @@
   "queued_scripts": [],
   "style_memory": [
     {
-      "posted_at": "2026-10-12T17:03:23+00:00",
+      "posted_at": "2026-10-13T00:17:50+00:00",
       "style": {
-        "name": "Jade Tide / Ember signal",
-        "created": "2026-10-12T14:11:30+00:00",
+        "name": "Crimson Tide / Jade signal",
+        "created": "2026-10-12T23:51:19+00:00",
         "hook": null,
-        "tag": "pill",
+        "tag": "underline",
         "reflect": false,
         "glass": {
           "on": true,
-          "roughness": 0.216,
-          "ior": 1.4,
-          "thickness": 0.84,
-          "dof": 3.2,
-          "key": 1.78,
-          "rim": "#E978C2"
+          "roughness": 0.185,
+          "ior": 1.31,
+          "thickness": 0.57,
+          "dof": 4.2,
+          "key": 1.8,
+          "rim": "#699EEA"
         },
         "mascot": {
-          "on": false,
-          "side": 1,
-          "kind": "user"
+          "on": true,
+          "side": -1,
+          "kind": "chip"
         },
         "_h": {
-          "bg": 124.2,
-          "signal": 2.5,
-          "holo": 272.2
+          "bg": 358.1,
+          "signal": 128.6,
+          "holo": 240.8
         },
         "palette": {
-          "ink": "#081408",
-          "ink2": "#0F2411",
-          "graphite": "#556756",
-          "ash": "#93A394",
-          "bone": "#ECF3EB",
-          "signal": "#F2251C",
-          "ember": "#FF7F4E",
-          "blood": "#B00E18"
+          "ink": "#140B0B",
+          "ink2": "#221414",
+          "graphite": "#635151",
+          "ash": "#AFA1A2",
+          "bone": "#EEE0E3",
+          "signal": "#1CEF3A",
+          "ember": "#52FF93",
+          "blood": "#0EB015"
         },
         "holo": [
-          "#AD62EF",
-          "#E978C2"
+          "#6260E9",
+          "#699EEA"
         ],
         "type": {
-          "wscale": 0.8,
+          "wscale": 0.77,
           "wtadd": -200,
-          "case": "upper"
+          "case": "lower"
         },
         "grid": {
           "minor": 32,
-          "major": 128
+          "major": 96
         },
         "caption": {
-          "size": 52,
-          "dy": -4
+          "size": 48,
+          "dy": 26
         },
         "post": {
-          "bloom": 0.52,
-          "bloomThreshold": 0.92,
-          "vignette": 0.28,
-          "grain": 0.046,
-          "ca": 0.78,
-          "halation": 0.34
+          "bloom": 1.0,
+          "bloomThreshold": 0.84,
+          "vignette": 0.43,
+          "grain": 0.03,
+          "ca": 0.14,
+          "halation": 0.01
         },
         "cam2d": {
-          "zoom": 0.981,
-          "roll": 0.0069,
-          "hand": 0.81
+          "zoom": 1.032,
+          "roll": 0.0184,
+          "hand": 1.29
         },
         "cam3d": {
-          "fov": -4.2,
-          "roll": -0.029,
-          "dist": 0.9,
-          "hand": 0.81
+          "fov": 5.4,
+          "roll": 0.047,
+          "dist": 0.86,
+          "hand": 1.44
         },
         "scenes": [
           {
-            "cam": "whip",
-            "reveal": "scan",
+            "cam": "fly",
+            "reveal": "glitch",
             "floor": "hex",
             "spin": -1
           },
           {
             "cam": "low",
-            "reveal": "draw",
+            "reveal": "assemble",
             "floor": "polar",
             "spin": -1
           },
           {
-            "cam": "whip",
-            "reveal": "assemble",
+            "cam": "dolly",
+            "reveal": "glitch",
             "floor": "grid",
             "spin": -1
           },
           {
             "cam": "push",
-            "reveal": "scan",
-            "floor": "polar",
-            "spin": -1
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": 1
           },
           {
-            "cam": "whip",
-            "reveal": "assemble",
+            "cam": "crane",
+            "reveal": "glitch",
             "floor": "dots",
             "spin": 1
           },
           {
-            "cam": "fly",
+            "cam": "spiral",
             "reveal": "scan",
             "floor": "polar",
             "spin": -1
           }
         ]
       },
-      "format": "pyramid > wave > timeline > radial > cluster > diagonal",
-      "angle": "journey"
+      "format": "depth > stack > grid > spiral > pyramid > scatter",
+      "angle": "versus"
     }
   ],
   "scene_signatures": [
@@ -752,7 +832,13 @@
     "timeline|beam:assemble,code:pop,surface:rise,text:draw",
     "radial|bars:rise,counter:pop,gauge:grow",
     "cluster|link:draw,network:unfold,object:pop,stack:assemble",
-    "diagonal|burst:pop,object:rise,particles:pop,ring:draw"
+    "diagonal|burst:pop,object:rise,particles:pop,ring:draw",
+    "depth|object:fly,sphere:grow,text:pop",
+    "stack|link:pop,object:assemble,sphere:drop,sphere:grow,stream:scan",
+    "grid|network:glitch,text:pop,text:pop",
+    "spiral|bars:draw,cone:fly,cone:fly,particles:grow",
+    "pyramid|cylinder:grow,sphere:fly,stack:assemble",
+    "scatter|donut:draw,ring:grow,text:pop"
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
@@ -761,14 +847,126 @@
     "timeline > diagonal > cluster > tree > grid > radial",
     "depth > tree > radial > stack > timeline > diagonal > cluster",
     "row > depth > grid > spiral > stack > cluster",
-    "pyramid > wave > timeline > radial > cluster > diagonal"
+    "pyramid > wave > timeline > radial > cluster > diagonal",
+    "depth > stack > grid > spiral > pyramid > scatter"
   ],
   "insights": {
-    "n": 3,
-    "updated": "2026-10-12T14:09:35+00:00",
-    "best": {},
-    "worst": {},
-    "lift": {}
+    "n": 5,
+    "updated": "2026-10-12T23:36:41+00:00",
+    "best": {
+      "layouts": [
+        "stack",
+        "depth",
+        "spiral"
+      ],
+      "types": [
+        "cylinder",
+        "network",
+        "sphere"
+      ],
+      "cams": [
+        "low"
+      ],
+      "voice": [],
+      "music": [],
+      "length": [
+        "short"
+      ],
+      "level": [
+        "beginner"
+      ],
+      "trend": [
+        "False"
+      ],
+      "cta": []
+    },
+    "worst": {
+      "layouts": [
+        "ring"
+      ],
+      "types": [
+        "counter",
+        "gauge",
+        "wave"
+      ],
+      "cams": [],
+      "voice": [],
+      "music": [],
+      "length": [],
+      "level": [
+        "engineer"
+      ],
+      "trend": [],
+      "cta": []
+    },
+    "lift": {
+      "layouts": {
+        "row": 0.96,
+        "ring": 0.43,
+        "stack": 1.36,
+        "depth": 1.36,
+        "spiral": 1.32,
+        "tree": 0.91,
+        "diagonal": 0.91,
+        "cluster": 1.19,
+        "grid": 1.17,
+        "radial": 1.06,
+        "timeline": 1.06
+      },
+      "types": {
+        "tunnel": 0.79,
+        "stream": 1.0,
+        "text": 1.0,
+        "beam": 0.75,
+        "ring": 1.0,
+        "panel": 1.0,
+        "orbit": 1.02,
+        "link": 1.1,
+        "matrix": 0.75,
+        "object": 0.75,
+        "particles": 0.75,
+        "burst": 1.0,
+        "code": 1.1,
+        "wave": 0.39,
+        "bars": 0.47,
+        "stack": 0.98,
+        "counter": 0.47,
+        "network": 1.19,
+        "gauge": 0.47,
+        "cylinder": 1.21,
+        "sphere": 1.17
+      },
+      "cams": {
+        "spiral": 1.02,
+        "low": 1.13,
+        "push": 1.0,
+        "orbit": 1.0,
+        "fly": 1.0,
+        "dolly": 1.0,
+        "crane": 1.0,
+        "dutch": 0.91
+      },
+      "voice": {
+        "en-US-AndrewMultilingualNeural": 1.0
+      },
+      "music": {
+        "dorian": 0.98
+      },
+      "length": {
+        "mid": 0.89,
+        "short": 1.17
+      },
+      "level": {
+        "beginner": 1.13,
+        "engineer": 0.47
+      },
+      "trend": {
+        "False": 1.17
+      },
+      "cta": {
+        "save": 0.91
+      }
+    }
   },
   "runs": [
     {
@@ -800,23 +998,21 @@
     {
       "time": "2026-10-12T17:03:23+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-13T00:17:50+00:00",
+      "ok": true
     }
   ],
   "series": {
     "name": "Tech Explained",
-    "ep": 4
+    "ep": 5
   },
   "seen_comments": [
     "UgwXfDTO4tfTrp_36cB4AaABAg",
+    "UgzDh5eiRTJ-xa5YLRt4AaABAg",
     "UgygtUnX-LOvXYrahuZ4AaABAg",
-    "UgzDh5eiRTJ-xa5YLRt4AaABAg"
+    "UgwvXGIuM76nR9CVH6V4AaABAg"
   ],
-  "viewer_questions": [
-    {
-      "topic": "How Shopify processes an online purchase",
-      "user": "@ThomasVeljkovic",
-      "platform": "YouTube",
-      "text": "Can you make a detailed video on what happens when you purchase an item from a Shopify site?"
-    }
-  ]
+  "viewer_questions": []
 }
