@@ -425,7 +425,7 @@ class Deck:
                     self.tile(d, M, y, 72, s.get("icon") or pick_icon(s["heading"] + " " + s.get("body", ""), k), self.a1 if k % 2 else self.a2)
                 hf, hl = fit(d, s["heading"], W - 2 * M - 110, 2, 40)
                 y = max(block(d, hl, hf, M + 104, y + 12, t["ink"], 1.1), y + 72) + 34
-        d.text((M, H - 160), "Save this   ·   Share it   ·   Follow @datavelvet", font=F(32, "label"), fill=self.a2)
+        d.text((M, H - 160), "Save this   ·   Send it to a dev friend   ·   Follow @datavelvet", font=F(32, "label"), fill=self.a2)
         self.slides.append(img)
 
     def build(self, out_dir):

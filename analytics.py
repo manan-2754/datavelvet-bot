@@ -12,8 +12,8 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 
-WEIGHTS = {"yt_views": 1, "yt_likes": 25, "yt_comments": 60, "yt_avp": 5, "yt_subs": 150, "yt_shares": 60, "ig_views": 1, "ig_reach": 0.5, "ig_saved": 40, "ig_shares": 60,
-           "ig_likes": 25, "ig_comments": 60}
+WEIGHTS = {"yt_views": 1, "yt_likes": 25, "yt_comments": 60, "yt_avp": 15, "yt_subs": 150, "yt_shares": 60, "ig_views": 1, "ig_reach": 0.5, "ig_saved": 40, "ig_shares": 60,
+           "ig_likes": 25, "ig_comments": 60, "ig_avg_watch_s": 10}
 FEATURES = ["angle", "layouts", "types", "cams", "hue", "voice", "music", "length", "level", "trend", "cta", "fmt", "title", "cover", "lmode", "trial"]
 
 
@@ -70,7 +70,18 @@ def collect(state, max_posts=40):
                         st[f"ig_{m['name']}"] = int((m.get("values") or [{}])[0].get("value", 0))
             except Exception as e:
                 print(f"  analytics: Instagram insights unavailable ({e})")
+            try:                                 # Reels watch time = how long people really stay
+                r = requests.get(f"https://graph.instagram.com/v21.0/{p['instagram_id']}/insights", timeout=30,
+                                 params={"metric": "ig_reels_avg_watch_time", "access_token": tok})
+                if r.ok:
+                    for m in r.json().get("data", []):
+                        st["ig_avg_watch_s"] = round(int((m.get("values") or [{}])[0].get("value", 0)) / 1000, 1)
+            except Exception:
+                pass
         if st:
+            if st.get("yt_avp") is not None:
+                print(f"  📊 retention: {p['topic'][:36]} - {st['yt_avp']}% watched ({st.get('yt_avd')} s) on YouTube"
+                      + (f", {st['ig_avg_watch_s']} s on Instagram" if st.get("ig_avg_watch_s") else ""))
             st["score"] = round(sum(WEIGHTS.get(k, 0) * v for k, v in st.items() if isinstance(v, (int, float))), 1)
             st["fetched"] = _now().isoformat(timespec="seconds")
             p["stats"] = st

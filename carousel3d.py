@@ -22,11 +22,11 @@ import writer
 BASE = Path(__file__).resolve().parent
 W, H, M = 1080, 1350, 72
 OBJECTS = writer.OBJECTS
-WRITE = """You write a premium, highly shareable Instagram carousel for "DataVelvet", a 3D tech-explainer brand for
-everyday people. Goal: people SAVE it, SHARE it and FOLLOW for more. Topic: "{topic}". Format: {fmt_desc}
+WRITE = """You write a premium, highly shareable Instagram carousel for "DataVelvet", a 3D tech-explainer brand.
+Goal: people SAVE it, SHARE it and FOLLOW for more. Topic: "{topic}". Format: {fmt_desc}
 {facts}
 Return ONLY JSON:
-{{"title": scroll-stopping cover headline, max 44 chars (a surprising truth, a question or a promise),
+{{"title": scroll-stopping cover headline, max 44 chars: a HARD HOOK headline: a surprising number, a myth it breaks, or a bold promise that is true (e.g. "Chrome runs 1 process per tab", "5 things your browser does before the page loads"),
   "cover_stat": {{"value": the single most striking real number that DIRECTLY supports the title's hook (max 8 chars,
                  e.g. "100x"), "label": max 34 chars}},
   "subtitle": max 70 chars, "object": the 3D object for the cover, one of {objects},
@@ -38,20 +38,21 @@ Return ONLY JSON:
       "object": the 3D object that best represents this section, one of {objects}}}],
   "summary": [4 one-line takeaways, max 56 chars each],
   "next_topic": a related follow-up topic for "Part 2" (max 44 chars),
-  "caption": 2 short lines + "Save this for later." + 6 relevant hashtags}}
+  "caption": line 1 = a hook, line 2 = the specific reason to save it (e.g. "Save this before your next system-design interview."), then 6 relevant hashtags}}
 For a comparison, points look like "SSD: ... | HDD: ...". For myths, each point starts with "Myth:" or "Fact:".
-Write for a normal phone and laptop user, not an engineer: plain everyday words, short sentences. Avoid jargon and acronyms (protocol names, standards, part numbers); if one is unavoidable, explain it in a few words.
+{audience}
 Accurate facts only - never invent or round up statistics. No emojis. The title must not promise more items than the
 slides show (3 sections)."""
 
 
-def write_content(topic, fmt):
+def write_content(topic, fmt, dev=False):
     facts = research.gather(topic, llm=writer.llm)
     ftxt = (f"REFERENCE FACTS (from {', '.join(facts['sources'][:3])}):\n{facts['facts'][:3000]}") if facts.get("facts") else ""
     err = ""
     for _ in range(3):
-        c = json.loads(writer.llm(WRITE.format(topic=topic, fmt_desc=lane.FORMATS[fmt][1], facts=ftxt, objects=", ".join(OBJECTS)) + err,
-                                  label="carousel 3d"))
+        c = json.loads(lane.gen(WRITE.format(topic=topic, fmt_desc=lane.FORMATS[fmt][1], facts=ftxt, objects=", ".join(OBJECTS),
+                                                  audience=lane.AUDIENCE_DEV if dev else lane.PLAIN) + err,
+                                "carousel 3d", dev))
         secs = [s for s in (c.get("sections") or []) if isinstance(s, dict) and s.get("heading") and s.get("points")][:3]
         if len(secs) < 3:
             err = "\nGive exactly 3 sections, each with 3 points."
@@ -64,10 +65,9 @@ def write_content(topic, fmt):
                                                                     for i in ch.get("items", []) if isinstance(i, dict))] if ch else []
             return [*s["points"], *extra]
         cs = c.get("cover_stat") or {}
-        rv = writer.review({"topic": topic, "scenes": [{"plate": "compose", "title": c["title"], "lines": [f'{cs.get("value", "")} {cs.get("label", "")}'],
-                            "data": {}}] + [{"plate": "compose", "title": s["heading"], "lines": lines(s), "data": {}} for s in secs]})
-        print(f"  fact-check: {rv['score']}/10, {len(rv['critical'])} real error(s)")
-        if not rv["critical"] and rv["score"] >= 7:
+        ok, rv = lane.check({"topic": topic, "scenes": [{"plate": "compose", "title": c["title"], "lines": [f'{cs.get("value", "")} {cs.get("label", "")}'],
+                            "data": {}}] + [{"plate": "compose", "title": s["heading"], "lines": lines(s), "data": {}} for s in secs]}, dev)
+        if ok:
             c["sources"] = facts["sources"]
             return c
         err = "\nA fact-checker rejected the previous version. Fix every point (charts included):\n- " + "\n- ".join(rv["critical"] + rv["minor"])
@@ -235,7 +235,7 @@ def design(content, fmt, genome, stills, out_dir):
         d.text((M + 20, by + 24), "PART 2 IS COMING", font=covers._font(30, "label"), fill=ink)
         nf, nl = covers._fit(d, nxt, W - 2 * M - 40, 2, 44, "head", 30)
         covers._text_block(d, nl, nf, M + 20, by + 70, ink, 1.1)
-    d.text((M, H - 132), "Follow @datavelvet so you don't miss it", font=covers._font(32, "label"), fill=c1)
+    d.text((M, H - 132), "Save this  ·  Send it to a dev friend  ·  Follow @datavelvet", font=covers._font(32, "label"), fill=c1)
     footer(d, 5)
     out.append(img)
     paths = []
@@ -254,9 +254,9 @@ def hero(obj, k):
                          {"type": random.choice(["ring", "torus", "orbit"]), "label": "accent", "size": 1.3}]}
 
 
-def make(topic, fmt):
+def make(topic, fmt, dev=False):
     print(f"🗂️ 3D carousel: {lane.FORMATS[fmt][0]} - {topic}")
-    content = write_content(topic, fmt)
+    content = write_content(topic, fmt, dev)
     genome = art_director.new_genome({}, 5)
     genome.update(reflect=False, mascot={"on": False})
     genome["post"]["bloom"] = max(genome["post"].get("bloom", 0.7), 0.85)        # brighter, punchier backgrounds

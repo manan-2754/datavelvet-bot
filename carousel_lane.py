@@ -9,6 +9,7 @@ and never-repeat memory; its own history lives in carousel_state.json.
 """
 import argparse
 import json
+import os
 import random
 import re
 import shutil
@@ -56,12 +57,17 @@ IDEAS = {
     "glossary": ["Internet terms everyone uses but nobody explains", "AI words explained", "Cybersecurity terms explained",
                  "Phone spec sheet terms explained", "Cloud computing terms explained"],
 }
-WRITE = """You write a premium Instagram carousel for "DataVelvet", a 3D tech-explainer brand for everyday people.
+PLAIN = ('Write for a normal phone and laptop user, not an engineer: plain every'
+         'day words, short sentences. Avoid jargon and acronyms (protocol names, standards, part numbers); if one is unavoidable, explain it in a few words.')
+DEV_FORMATS = ["cheatsheet", "steps", "glossary", "mythfact"]       # developer lane (no consumer-style "versus" / "things")
+AUDIENCE_DEV = ("Write for developers and curious tech people: use the real terms (e.g. TLS handshake, idempotency key) and explain each in a few "
+                "words, with concrete numbers and mechanisms. Specific beats generic - a slide someone would screenshot for an interview.")
+WRITE = """You write a premium Instagram carousel for "DataVelvet", a 3D tech-explainer brand.
 Topic: "{topic}"
 Format: {fmt_desc}
 {facts}
 Return ONLY JSON:
-{{"title": cover headline, max 48 chars, curiosity + clarity, "icon": one of {icons},
+{{"title": cover headline, max 48 chars: a HARD HOOK headline: a surprising number, a myth it breaks, or a bold promise that is true (e.g. "Chrome runs 1 process per tab", "5 things your browser does before the page loads"), "icon": one of {icons},
   "subtitle": max 70 chars,
   "a": first item name (versus only, else ""), "b": second item name (versus only, else ""),
   "slides": [5 objects: {{"heading": max 34 chars, "body": max 140 chars, plain and specific,
@@ -70,13 +76,36 @@ Return ONLY JSON:
      "score_a", "score_b": 1-5 how well a and b do on this point for a typical user (versus only),
      "icon": one of {icons}}}],
   "takeaway": one-line summary, max 90 chars,
-  "caption": 2 short lines + "Save this for later." + 6 relevant hashtags}}
-Write for a normal phone and laptop user, not an engineer: plain everyday words, short sentences. Avoid jargon and acronyms (protocol names, standards, part numbers); if one is unavoidable, explain it in a few words.
+  "caption": line 1 = a hook, line 2 = the specific reason to save it (e.g. "Save this before your next system-design interview."), then 6 relevant hashtags}}
+{audience}
 Rules: accurate, specific facts only (use the reference facts' numbers; never invent statistics); no emojis inside
 slides; pick the icon that best matches each slide."""
 TYPES = ["box", "sphere", "cylinder", "cone", "prism", "torus", "ring", "panel", "bars", "donut", "gauge", "counter", "text", "code",
          "link", "stream", "network", "orbit", "object"]
 LAYOUTS = ["row", "radial", "grid", "stack", "pyramid", "diagonal", "cluster", "ring"]
+
+
+def gen(prompt, label, dev):
+    """Developer carousels are written by the same strong model as the deep-dive Shorts."""
+    if dev:
+        import pro
+        return pro._story_llm(prompt)
+    return writer.llm(prompt, label=label)
+
+
+def check(sc, dev):
+    """Fact-check gate: (ok, report). Developer content is judged on real errors only (not consumer-style nitpicks)."""
+    if dev:
+        import pro
+        rv = pro._review(sc)
+        ok = not rv["critical"] and rv["score"] >= 6
+    else:
+        rv = writer.review(sc)
+        ok = not rv["critical"] and rv["score"] >= 7
+    print(f"  fact-check: {rv['score']}/10, {len(rv['critical'])} real error(s)")
+    for c in rv["critical"]:
+        print(f"    - {c[:150]}")
+    return ok, rv
 
 
 def load_cs():
@@ -85,13 +114,13 @@ def load_cs():
     return st
 
 
-def write_content(topic, fmt):
+def write_content(topic, fmt, dev=False):
     facts = research.gather(topic, llm=writer.llm)
     ftxt = (f"REFERENCE FACTS (from {', '.join(facts['sources'][:3])}):\n{facts['facts'][:3000]}") if facts.get("facts") else ""
     err = ""
     for attempt in range(3):
-        c = json.loads(writer.llm(WRITE.format(topic=topic, fmt_desc=FORMATS[fmt][1], facts=ftxt, icons=", ".join(deck.ICONS)) + err,
-                                  label="carousel"))
+        c = json.loads(gen(WRITE.format(topic=topic, fmt_desc=FORMATS[fmt][1], facts=ftxt, icons=", ".join(deck.ICONS), audience=AUDIENCE_DEV if dev else PLAIN) + err,
+                           "carousel", dev))
         slides = [s for s in (c.get("slides") or []) if isinstance(s, dict) and s.get("heading")][:6]
         if len(slides) < 4:
             err = f"\nYour previous answer had only {len(slides)} usable slides - give 5."
@@ -99,9 +128,8 @@ def write_content(topic, fmt):
         c["slides"] = slides
         sc = {"topic": topic, "scenes": [{"plate": "compose", "title": s["heading"], "lines": [s.get("body", ""),
               *([f'{c.get("a")}: {s.get("a")}; {c.get("b")}: {s.get("b")}'] if fmt == "versus" else [])], "data": {}} for s in slides]}
-        rv = writer.review(sc)                      # the same fact-check gate the videos use
-        print(f"  fact-check: {rv['score']}/10, {len(rv['critical'])} real error(s)")
-        if not rv["critical"] and rv["score"] >= 7:
+        ok, rv = check(sc, dev)                     # the same fact-check gate the videos use
+        if ok:
             c["sources"] = facts["sources"]
             return c
         err = "\nA fact-checker rejected the previous version. Fix every point:\n- " + "\n- ".join(rv["critical"] + rv["minor"])
@@ -257,6 +285,22 @@ def pick_style(cs):
     return alt
 
 
+def dev_topic(cs, state):
+    """Developer lane: the best-performing Shorts first (their audience already proved it cares), then the famous-topics list."""
+    done = {str(p.get("source_topic") or p["topic"]).lower() for p in cs["posts"]}
+
+    def rank(p):
+        st = p.get("stats") or {}
+        return st.get("score") or (st.get("yt_views", 0) + st.get("ig_views", 0))
+    for p in sorted(state.get("posts", []), key=rank, reverse=True)[:12]:
+        if p.get("topic") and p["topic"].lower() not in done and rank(p) > 0:
+            return p["topic"], True
+    for t in json.loads((BASE / "topics_deep.json").read_text(encoding="utf-8")):
+        if t.lower() not in done and t.lower() not in {u.lower() for u in state.get("used_topics", [])}:
+            return t, False
+    return None, False
+
+
 def make(topic=None, fmt=None, post=False, at=None):
     cs, state = load_cs(), load_state()
     if post:                                       # one carousel per Eastern day (a late scheduled run after a manual one skips)
@@ -267,7 +311,12 @@ def make(topic=None, fmt=None, post=False, at=None):
             return []
     used = {p["topic"].lower() for p in cs["posts"]} | {t.lower() for t in state.get("used_topics", [])}
     recent = [p.get("format") for p in cs["posts"][-3:]]
-    fmt = fmt or random.choice([f for f in FORMATS if f not in recent] or list(FORMATS))
+    dev, from_short = os.getenv("CAROUSEL_LANE", "dev") == "dev" and not topic, False
+    if dev:
+        topic, from_short = dev_topic(cs, state)
+        dev = bool(topic)
+    pool = DEV_FORMATS if dev else list(FORMATS)
+    fmt = fmt or random.choice([f for f in pool if f not in recent] or pool)
     topic = topic or next((t for t in random.sample(IDEAS[fmt], len(IDEAS[fmt])) if t.lower() not in used), None)
     if not topic:
         topic = json.loads(writer.llm(f'Suggest ONE new everyday-tech carousel topic for the format "{FORMATS[fmt][1]}", not one of: '
@@ -277,10 +326,10 @@ def make(topic=None, fmt=None, post=False, at=None):
     print(f"🗂️ Carousel ({style}): {FORMATS[fmt][0]} - {topic}")
     if style == "3d":                              # 3D objects as backgrounds, real charts, 5 dense slides
         import carousel3d
-        slides = carousel3d.make(topic, fmt)
+        slides = carousel3d.make(topic, fmt, dev)
         content = json.loads((slides[0].parent / "content.json").read_text(encoding="utf-8"))
-        return _publish(cs, content, slides, topic, fmt, style, "-", post, at)
-    content = write_content(topic, fmt)
+        return _publish(cs, content, slides, topic, fmt, style, "-", post, at, dev, from_short)
+    content = write_content(topic, fmt, dev)
     work = BASE / "out" / "carousels" / f"{time.strftime('%Y%m%d-%H%M%S')}_{fmt}"
     work.mkdir(parents=True, exist_ok=True)
     (work / "content.json").write_text(json.dumps(content, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -288,19 +337,19 @@ def make(topic=None, fmt=None, post=False, at=None):
     theme = random.choice([t for t in deck.THEMES if t != last_theme])
     slides = deck.Deck(content, fmt, theme, FORMATS[fmt][0]).build(work)     # presentation-style slide deck
     print(f"✅ {len(slides)} slides in {work}")
-    return _publish(cs, content, slides, topic, fmt, "deck", theme, post, at)
+    return _publish(cs, content, slides, topic, fmt, "deck", theme, post, at, dev, from_short)
 
 
-def _publish(cs, content, slides, topic, fmt, style, theme, post, at):
+def _publish(cs, content, slides, topic, fmt, style, theme, post, at, dev=False, from_short=False):
     if post:
         if at:                                     # made early; post exactly at the slot time (Eastern)
             subprocess.run([__import__("sys").executable, str(BASE / "wait_until.py"), at], check=False)
         from instagram_upload import upload_carousel
-        cap = (content.get("caption", "") + ("\n\nSources: " + ", ".join(s.split("/")[2] for s in content.get("sources", [])[:3] if "//" in s)
+        cap = (content.get("caption", "") + ("\n\nThe full 60-second breakdown is on our latest Reel." if from_short else "") + ("\n\nSources: " + ", ".join(s.split("/")[2] for s in content.get("sources", [])[:3] if "//" in s)
                                              if content.get("sources") else ""))[:2150]
         pid = upload_carousel([str(p) for p in slides], cap)
         cs["posts"].append({"time": datetime.now(timezone.utc).isoformat(timespec="seconds"), "topic": topic, "format": fmt, "theme": theme,
-                            "style": style,
+                            "style": style, "lane": "dev" if dev else "general", "source_topic": topic if dev else None,
                             "instagram_id": pid})
         STATE.write_text(json.dumps(cs, indent=2, ensure_ascii=False), encoding="utf-8")
     return slides

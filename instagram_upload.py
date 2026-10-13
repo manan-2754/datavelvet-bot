@@ -123,7 +123,7 @@ def upload_reel(video_path, caption, thumb_offset=None, cover=None, trial=False,
         container = _check(r)
         cid = container["id"]
         print("  Instagram: processing...")
-        for _ in range(60):
+        for _ in range(240 if landscape else 60):        # a 9-minute landscape video can take 30+ min to process
             st = _check(requests.get(f"https://{HOST}/{VERSION}/{cid}",
                                      params={"fields": "status_code,status", "access_token": token}, timeout=30))
             if st.get("status_code") == "FINISHED":

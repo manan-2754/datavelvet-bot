@@ -111,6 +111,9 @@ def add_to_playlist(video_id, title, description=""):
 def retention(video_ids, days=60):
     """Average % viewed, average view duration, subscribers gained and shares per video (YouTube Analytics)."""
     creds = get_credentials()
+    if video_ids and not has_scope(creds, "yt-analytics"):
+        print("  analytics: retention skipped - this YouTube login has no yt-analytics.readonly permission "
+              "(re-run `python youtube_upload.py --auth` and update the YT_TOKEN_JSON secret)")
     if not (video_ids and has_scope(creds, "yt-analytics")):
         return {}
     from datetime import date, timedelta
