@@ -174,7 +174,7 @@ def prepare_video(script, voice=None, tag=""):
     else:
         dur, voice = audio_build.narrate(script, voice)
     print(f"  {voice}, {dur:.1f}s")
-    if dur > 170 and not script.get("long"):
+    if dur > 180 and not script.get("long"):
         raise RuntimeError(f"video would be {dur:.0f}s - too long for Shorts")
     env = env_with_tools()
     subprocess.run([sys.executable, str(BASE / "analysis" / "audio_vo.py")], cwd=BASE, env=env, check=True)
@@ -342,8 +342,11 @@ def main():
         failed = state.setdefault("failed_topics", {})
         fresh = [t for t in topics if t not in state["used_topics"] and failed.get(t, 0) < 2] or topics
         topic = args.topic or fresh[0]
+        if os.getenv("PRO_STYLE", "1") != "0" and not args.topic:      # deep dives use the developer topic list
+            deep = json.loads((BASE / "topics_deep.json").read_text(encoding="utf-8"))
+            topic = ([t for t in deep if t not in state["used_topics"] and failed.get(t, 0) < 2] or deep)[0]
         trend = None
-        if not args.topic and (args.trend or (args.post and len(state["posts"]) % 3 == 1)):
+        if not args.topic and os.getenv("PRO_STYLE", "1") == "0" and (args.trend or (args.post and len(state["posts"]) % 3 == 1)):
             trend = trends.pick(set(state["used_topics"]) | set(topics), writer.llm)
             if trend:
                 topic = trend["topic"]
@@ -355,7 +358,7 @@ def main():
                 print(f"🙋 Viewer questions: {n} new, {len(state.get('viewer_questions', []))} queued")
             except Exception as e:
                 print(f"  viewer questions skipped ({e})")
-        if not args.topic and not trend and state.get("viewer_questions"):
+        if not args.topic and not trend and state.get("viewer_questions") and os.getenv("PRO_STYLE", "1") == "0":
             vq = state["viewer_questions"].pop(0)
             topic = vq["topic"]
             print(f"🙋 Answering {vq['user']} ({vq['platform']}): {vq['text'][:80]}")

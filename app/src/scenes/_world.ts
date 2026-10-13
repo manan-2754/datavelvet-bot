@@ -16,6 +16,8 @@ import type { Frame, PostOverrides } from '../engine/scene';
 import type * as T from 'three';
 import { Story } from './_story';
 import { Presenter, type Gesture } from './_presenter';
+import { Pen3, View, drawObj, floor, asObj, type Floor, type Reveal } from './_holo3d';
+import { LineBatch } from '../engine/lines';
 
 const IMG: Record<string, Promise<HTMLImageElement>> = {};
 function loadImg(src: string) {
@@ -356,6 +358,38 @@ class World {
     this.swarm.instanceMatrix.needsUpdate = true;
   }
 
+  /** The engine's hologram View for the exact same camera (target / yaw / pitch / dist / fov / roll). */
+  holoView() {
+    const d = this.cam.position.clone().sub(this.camTgt), dist = d.length();
+    const v = new View({ tgt: [this.camTgt.x, this.camTgt.y, this.camTgt.z], yaw: Math.atan2(d.x, d.z), pitch: Math.asin(d.y / dist), dist, fov: this.cam.fov, roll: -this.roll });
+    v.cy = 1920 / 2;
+    return v;
+  }
+  /** Engine holograms: floor rings per stage, a dashed path between stages, scan rings, and each object's hologram twin. */
+  drawHolo(P: Pen3, t: number) {
+    const col: [number, number, number] = [this.tint.r * 1.6, this.tint.g * 1.6, this.tint.b * 1.6];
+    const fl = String(this.look.holoFloor ?? 'polar') as Floor, rv = String(this.look.reveal ?? 'assemble') as Reveal;
+    this.hubs.forEach((h, s) => {
+      const age = t - this.stageT0[s]!;
+      if (age < -1.6) return;
+      floor(P, fl, [h.x, 0.03, h.z], 4.4, clamp((age + 1.6) / 1.6), col, t);
+      if (s > 0) {                                                       // dashed hologram path from the previous stage
+        const a = this.hubs[s - 1]!, k = clamp((age + 1.6) / 1.2), n = 26;
+        for (let j = 0; j < n * k; j += 2) {
+          const p0 = a.clone().lerp(h, j / n), p1 = a.clone().lerp(h, Math.min(1, (j + 1) / n));
+          P.seg([p0.x, 0.06, p0.z], [p1.x, 0.06, p1.z], 1.6, col, 0.55);
+        }
+      }
+      if (age > 0) {                                                   // scan ring rising through the object
+        const y = ((age * 0.9) % 1) * 2.6;
+        P.ring([h.x, y, h.z], 1.6 + 0.2 * Math.sin(age * 2), 1.4, col, 0.45 * (1 - y / 2.6), 64);
+      }
+      const obj = asObj(String(this.scenes[this.beatStage.indexOf(s)]?.data?.object ?? 'cube'));
+      const p = clamp((age + 0.4) / 1.1), fade = 1 - clamp((age - 1.1) / 0.6) * 0.75;   // assemble, then stay as a faint x-ray shell
+      if (p > 0 && fade > 0) drawObj(P, obj, [h.x, 0, h.z], 1.25, t * 0.4 + s, p, t, rv, [col[0] * fade, col[1] * fade, col[2] * fade], s + 3, Math.max(0, 1 - Math.abs(age - 0.6) * 2));
+    });
+  }
+
   stageAt(t: number) { let s = 0; this.stageT0.forEach((t0, i) => { if (t >= t0) s = i; }); return s; }
   beatAt(t: number) { let b = 0; this.beatT0.forEach((t0, i) => { if (t >= t0) b = i; }); return b; }
 
@@ -363,18 +397,29 @@ class World {
   pose(i: number, t: number) {
     const hub = this.hubs[this.beatStage[i]!]!, a = this.beatAng[i]!, age = Math.max(0, t - this.beatT0[i]!);
     const dur = Math.max(1, (this.beatT0[i + 1] ?? this.beatT0[i]! + 4) - this.beatT0[i]!), k = clamp(age / dur);
-    return { hub, ang: a + 0.015 * k * (i % 2 ? 1 : -1), r: (Number(this.look.camR) || RC) - (Number(this.look.push) || 1.1) * ease.inOutQuad(k), lift: 0 };
+    const mode = String(this.scenes[i]?.data?.cam ?? 'push'), s = i % 2 ? 1 : -1, e = ease.inOutQuad(k);   // engine camera modes
+    let ang = a + 0.015 * k * s, r = (Number(this.look.camR) || RC) - (Number(this.look.push) || 1.1) * e, lift = 0, roll = 0;
+    if (mode === 'orbit') ang += 0.32 * e * s;
+    else if (mode === 'crane') lift = -1.1 + 2.2 * e;
+    else if (mode === 'dolly') r -= 1.4 * e;
+    else if (mode === 'low') lift = -1.5;
+    else if (mode === 'top') { lift = 2.6; r -= 0.8; }
+    else if (mode === 'dutch') roll = 0.075 * s;
+    else if (mode === 'spiral') { ang += 0.22 * e * s; lift = 0.9 * e; }
+    else if (mode === 'fly') ang += 0.12 * e * s;
+    return { hub, ang, r, lift, roll };
   }
 
   camAt(t: number) {
     const i = this.beatAt(t), cur = this.pose(i, t);
     if (i > 0) {
       const prev = this.pose(i - 1, this.beatT0[i]!), stageJump = this.beatStage[i] !== this.beatStage[i - 1];
-      const dur = stageJump ? 1.15 : 0.6, k = clamp((t - this.beatT0[i]!) / dur);
+      const dur = stageJump ? 1.15 : String(this.scenes[i]?.data?.cam) === 'whip' ? 0.32 : 0.6, k = clamp((t - this.beatT0[i]!) / dur);
       if (k < 1) {
         const e = ease.inOutCubic(k);
         let da = cur.ang - prev.ang; da = Math.atan2(Math.sin(da), Math.cos(da));
-        return { hub: prev.hub.clone().lerp(cur.hub, e), ang: prev.ang + da * e, r: prev.r + (cur.r - prev.r) * e + (stageJump ? 5 * Math.sin(Math.PI * e) : 0.6 * Math.sin(Math.PI * e)), lift: stageJump ? 3.2 * Math.sin(Math.PI * e) : 0 };
+        const rl = prev.roll + (cur.roll - prev.roll) * e;
+        return { roll: rl, hub: prev.hub.clone().lerp(cur.hub, e), ang: prev.ang + da * e, r: prev.r + (cur.r - prev.r) * e + (stageJump ? 5 * Math.sin(Math.PI * e) : 0.6 * Math.sin(Math.PI * e)), lift: prev.lift + (cur.lift - prev.lift) * e + (stageJump ? 3.2 * Math.sin(Math.PI * e) : 0) };
       }
     }
     return cur;
@@ -407,6 +452,8 @@ class World {
   }
 
   look: any = {};
+  camTgt = new THREE.Vector3();
+  roll = 0;
   ambient: THREE.Object3D[] = [];
   /** Per-video world genome (seeded): stage layout, camera, floor and the ever-moving background. */
   hubAt(st: number) {
@@ -457,8 +504,9 @@ class World {
     const st = this.stageAt(t);
     this.heroes.forEach((h, s) => {
       const age = t - this.stageT0[s]!;
-      h.scale.setScalar(Math.max(0.001, age < 0 ? 0.001 : 0.82 * ease.outBack(clamp(age / 0.6))));
-      const spin = age > 0 ? Math.PI * 2 * ease.outCubic(clamp(age / 1.4)) : 0;
+      const solid = age - 0.75;                                       // the engine hologram assembles first, then the object turns solid
+      h.scale.setScalar(Math.max(0.001, solid < 0 ? 0.001 : 0.82 * ease.outBack(clamp(solid / 0.5))));
+      const spin = age > 0.75 ? Math.PI * 2 * ease.outCubic(clamp((age - 0.75) / 1.4)) : 0;
       h.rotation.y = spin + 0.35 * Math.sin(t * 0.45 + s);
       h.position.y = 0.05 * Math.sin(t * 1.4 + s);
       if (h.userData.spin) h.userData.spin.rotation.y = t * 0.5;
@@ -481,7 +529,10 @@ class World {
     const c = this.camAt(t), hub = c.hub;
     this.cam.position.set(hub.x + Math.sin(c.ang) * c.r, (Number(this.look.camH) || 3.6) + c.lift, hub.z + Math.cos(c.ang) * c.r);
     this.cam.position.x += Math.sin(t * 0.7) * 0.06; this.cam.position.y += Math.sin(t * 0.9 + 1) * 0.05;   // handheld breath
-    this.cam.lookAt(hub.x, 2.6 + c.lift * 0.3, hub.z);
+    this.camTgt.set(hub.x, 2.6 + c.lift * 0.3, hub.z);
+    this.cam.lookAt(this.camTgt);
+    this.roll = Number((c as any).roll) || 0;
+    if (this.roll) this.cam.rotateZ(this.roll);
     this.cam.updateMatrixWorld();
     const tp = this.curve.getPointAt(clamp(u, 0, 1));                 // the running example floats over the current hub
     this.token.position.set(tp.x + Math.sin(c.ang) * 2.4, 0.3 + 0.05 * Math.sin(t * 2), tp.z + Math.cos(c.ang) * 2.4);
@@ -511,6 +562,7 @@ let WORLD: World | null = null, WORLD_KEY: any = null;
 const IMGS = new Map<string, HTMLImageElement>();
 
 export class WorldPlate extends Story {
+  holo: LineBatch | null = null;
   override async init() {
     const base = (import.meta as any).env?.BASE_URL ?? '/';
     const want = (this.ctx.lyrics.scenes ?? []).map((s: any) => s?.data?.widget?.img).filter((x: any) => x && !IMGS.has(x));
@@ -542,12 +594,16 @@ export class WorldPlate extends Story {
     renderer.setClearColor(bg, 1);
     renderer.clear(true, true, true);
     renderer.render(Wd.scene, Wd.cam);
+    const Z = (this.holo ??= new LineBatch(160000)); Z.clear();
+    Wd.drawHolo(new Pen3(Z, Wd.holoView(), [1, 1, 1]), t);
+    Z.render(renderer, out);
     const i = this.idx, g = (Wd.scenes[i]?.data?.gesture ?? 'idle') as Gesture, pg = (Wd.scenes[i - 1]?.data?.gesture ?? 'idle') as Gesture;
     void g; void pg;                                                         // no presenter: the objects carry the story
     const U = this.ui; U.clear();
     this.drawUI(U.ctx, t, { cx: 0, cy: 0, z: 1, roll: 0 });
     comp.draw(renderer, U.upload(), out);
     const age = t - this.t0;
-    return { bloom: 0.12, bloomThreshold: 1.5, vignette: 0.22, grain: 0.03, zoom: 1 + 0.012 * Math.exp(-age * 9) };
+    const b = Wd.beatAt(t), whip = b > 0 ? Math.exp(-Math.max(0, t - Wd.beatT0[b]!) * 7) : 0;      // engine post: cut punch + aberration on moves
+    return { bloom: 0.22, bloomThreshold: 1.2, vignette: 0.24, grain: 0.035, halation: 0.06, ca: 0.4 + 1.6 * whip, zoom: 1 + 0.018 * Math.exp(-age * 9) };
   }
 }

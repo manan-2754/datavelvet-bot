@@ -29,31 +29,46 @@ import audio_build  # noqa: E402
 import research  # noqa: E402
 import writer  # noqa: E402
 
-MAX_SECONDS = 90                      # 1:30 cap
-MAX_WORDS = 190                       # ~140 words a minute (the live bot's pace) + pauses = under 90 s
 KINDS = ["scene", "terminal", "code", "browser", "table", "chat", "phone", "request", "stack", "metric", "compare", "flow", "checklist", "summary"]
 VLC = r"C:\Program Files\VideoLAN\VLC\vlc.exe"
-MAX_SECONDS = 90                      # 1:30 cap
-MAX_WORDS = 190                       # ~140 words a minute (the live bot's pace) + pauses = under 90 s
-PROMPT = """You write a premium "how it REALLY works" YouTube Short / Instagram Reel for "DataVelvet" (everyday people,
-3D tech explainers). Topic: "{topic}"
+MAX_SECONDS = 178                     # deep dives: 2-3 min, never over the 3:00 Shorts/Reels limit
+MAX_WORDS = 390                       # ~140 words a minute (the live bot's pace) + pauses
+PROMPT = """You write a 2-3 minute vertical deep-dive for developers on "DataVelvet": "How does {topic} really work under
+the hood?" Explain the REAL mechanism, like a senior engineer whiteboarding it - not a beginner overview.
 {facts}
-Style (what the best tech explainers do):
-- ONE running example followed through every step (e.g. "you type 'hi' to ChatGPT", "you tap Pay on your phone").
-- 5-7 STAGES of the journey (max 12 chars each), in order. Every beat belongs to one stage.
-- 13-16 BEATS, 170-190 words in total (the video must stay under 90 seconds). Each beat = ONE spoken sentence of 8-14 words, plain everyday words, specific and surprising, with
-  real numbers where known (ms, km, how many, how big). Beat 1 is a scroll-stopping hook. The last beat recaps the
-  whole journey and ask viewers one question to comment on.
+DO NOT use a fixed template or a fixed scene order. Derive the sequence from the real architecture of the topic: start from
+what the developer/user touches, peel back each real layer, then rebuild the whole system. Keep this SHAPE (rename freely):
+1. HOOK (1-2 beats): "Let's design <the system>." plus the most surprising true fact about it.
+2. USER VIEW (2-4 beats): the simplest thing a developer touches (a checkout call, a sign-in form, a deploy command) with a
+   few lines of real code, and what they would normally have to build themselves around it.
+3. REVEAL (1-2 beats): what is actually underneath (the real runtime / database / network / cluster).
+4. LAYERS (12-18 beats): 3-6 REAL layers of the architecture, in order, 3-4 beats each. For every layer: what it is,
+   the mechanism ("it does X, so Y happens"), ONE concrete demo with the running example travelling through it
+   (a request, a row being written, a counter rising, an LED turning green), and ITS FAILURE CASE (what breaks / gets
+   blocked / times out, and how the system handles it).
+5. SCALE (3-5 beats): what happens at real scale - limits, the bottleneck hitting its ceiling, and the real fix.
+6. REASSEMBLE (2-3 beats): the layers stack back into one system; replay the running example end to end.
+7. END (1 beat): one-line recap + "Follow for more breakdowns."
+Rules:
+- ONE running example through everything (e.g. "Maya pays $24 for sneakers", "a push to main at 9:41").
+- 5-7 STAGES = the real layers' short names (max 12 chars), in order. Every beat belongs to one stage.
+- 26-34 BEATS, 330-390 words total. Each beat = ONE spoken sentence of 9-15 words: short, direct, one idea, the mechanism.
+  Use the same key nouns every time they reappear so viewers can track them.
+- Use real terms (idempotency key, WAL, consensus, edge cache, TLS handshake...) and explain them in plain words.
+- Numbers must come from the reference facts or official docs; otherwise describe without a number. Never invent metrics.
+- Each beat: "chapter": "hook"|"user"|"reveal"|"layer"|"scale"|"reassemble"|"end"; "theme": "light" for user-facing views
+  (user, end) and "dark" for internals (reveal, layer, scale).
 - Each beat gets ITS OWN VISUAL, designed from scratch for exactly what that sentence says. Mostly use
   "scene" (a free composition you design): {{"kind": "scene", "elements": 2-6 {{"id", "type", "x": 0-100, "y": 0-100,
   "size": "S"|"M"|"L", "label": max 18 chars, "sub": max 22 chars, "color": "emerald"|"blue"|"amber"|"cyan"|"violet"|"rose"|"white",
   "count", "items": [...], "value", "translate", "enter": "pop"|"drop"|"slide"|"zoom"|"unfold", "motion": "float"|"pulse"|"spin"|"none",
-  "at": 0-0.8 (when it pops in, as a fraction of the beat)}}, "links": 0-5 {{"from": id, "to": id, "label": max 14 chars, "color"}}}}.
+  "at": 0-0.8 (when it pops in, as a fraction of the beat), "exit": "dot" to collapse into a dot when the beat ends}}, "links": 0-5 {{"from": id, "to": id, "label": max 14 chars, "color"}}}}.
   Element types: cylinder (database, "count" = rings), stack (isometric layers, "items" = layer names bottom first),
   tower (server/console), orbit (a core with "count" avatars/icons orbiting it in 3D, "items" = their names), node (service/UI card),
   code ("items" = 2-5 code lines typed live, OR "translate": {{"from_lang", "to_lang", "from": [lines], "to": [lines]}} morphing
-  one language into another), metric ("value": e.g. "4.2 ms", label = what it is), avatars ("items" = first names), globe,
-  gauge ("value": 0-1), queue ("items" = what is waiting), bars ("items" = numbers), lock, cloud, file, user, chip, phone, badge.
+  one language into another), metric ("value": e.g. "4.2 ms", label = what it is), avatars ("items" = first names), globe ("count" = glowing arcs between regions),
+  gauge ("value": 0-1), slots ("value": 0-1 how full; past 80% the cells turn red = a limit being hit),
+  vm (an isolated microVM box, "items" = its own kernel/filesystem/network rows), queue ("items" = what is waiting), bars ("items" = numbers), lock, cloud, file, user, chip, phone, badge.
   Links draw themselves and carry glowing packets - use them for anything that FLOWS (requests, data, replication, keys).
   Lay elements out so they never overlap (spread x/y), stagger "at" so something new appears every ~1-2 seconds,
   and make EVERY beat's composition different (different types, positions, links) - never reuse a layout.
@@ -66,14 +81,16 @@ Style (what the best tech explainers do):
   of the sentence (e.g. the actual RFC or official doc). Most videos should have none.
 - REAL PHOTO: at most ONE beat may add "photo": a short Wikimedia Commons query for a real photo of a physical thing
   (e.g. "submarine communications cable"). Most beats should be designed scenes instead.
-{banned}- "key": 1-2 words copied EXACTLY from the beat's sentence to highlight.
+{banned}- "key": 1-2 words copied EXACTLY from the beat's sentence to highlight (the key term only).
+- Failure cases: use color "rose", a badge like "BLOCKED"/"TIMEOUT"/"402 DECLINED", table "marks": false, or a slots grid filling red.
 - "object": a 3D object for the beat's stage, one of {objects}.
 - A running "counter" that grows along the journey (e.g. elapsed ms, km travelled, bytes) - give its value per beat.
 Accurate facts only; never invent statistics; no emojis; no "in this video".
 Return ONLY JSON:
 {{"title": max 60 chars, "example": the running example (max 34 chars), "stages": [...], "counter": {{"label": e.g. "T+",
- "unit": e.g. "ms"}}, "beats": [{{"stage": index, "line": "...", "key": "...", "object": "...", "counter": number,
- "widget": {{"kind": "...", ...}}}}], "youtube": {{"title": max 70 chars ending " #shorts", "description": 2 sentences + 5
+ "unit": e.g. "ms"}}, "beats": [{{"stage": index, "chapter": "...", "theme": "light"|"dark", "line": "...", "key": "...",
+ "object": "...", "counter": number,
+ "widget": {{"kind": "...", ...}}}}], "youtube": {{"title": max 70 chars ending " #shorts" - lead with the famous product/brand name and a curiosity gap, e.g. "How ChatGPT REALLY writes your answer (token by token) #shorts", "description": 2 sentences + 5
  hashtags, "tags": [6-8]}}, "instagram_caption": 2 lines + "Save this for later." + 6 hashtags, "comment": one question}}
 {feedback}"""
 
@@ -108,18 +125,59 @@ def _story_llm(prompt):
         return writer.llm(prompt, label="pro story")
 
 
+def _review(sc):
+    """Fact-check with the same strong model that wrote it (consistent on deep technical detail)."""
+    rows = [f"{i + 1}. [{s['plate']}] {s['title']}: {' '.join(s['lines'])}  (on screen: {json.dumps(s['data'], ensure_ascii=False)[:400]})"
+            for i, s in enumerate(sc["scenes"])]
+    data = json.loads(_story_llm(DEEP_REVIEW.format(topic=sc["topic"], script="\n".join(rows))))
+    return {"score": int(data.get("score", 0)), "critical": [str(x) for x in data.get("critical_errors") or []],
+            "minor": [str(x) for x in data.get("minor_issues") or []]}
+
+
+DEEP_REVIEW = """You are a staff engineer fact-checking a 2-3 minute developer deep-dive about "{topic}" before it is published.
+Each numbered beat is one spoken sentence plus what is on screen.
+{script}
+Classify problems carefully:
+- critical_errors: ONLY statements that are factually FALSE, or that would give a developer a WRONG mental model of how the
+  system works (wrong order of steps, wrong component doing the work, invented numbers, wrong API/protocol behaviour).
+- minor_issues: simplifications that are directionally correct, missing caveats or edge cases, defaults that vary by
+  configuration, wording nitpicks. These are acceptable in a short video and must NOT be listed as critical.
+Score 0-10 for accuracy + depth + clarity for developers.
+Return ONLY JSON: {{"score": n, "critical_errors": ["beat N: what is false and what is true", ...], "minor_issues": [...]}}"""
+
+
+FIX = """Below is a video story as JSON; its beats are numbered from 1. A fact-checker found these errors:
+- {errors}
+Fix ONLY the beats involved (sentence and/or on-screen widget). Keep every other beat exactly as it is, keep the same
+running example, keep each sentence 9-15 words. Prefer removing or softening a claim to guessing.
+Return ONLY JSON: {{"beats": {{"<beat number>": <the full corrected beat object>}}}}
+STORY:
+{story}"""
+
+
+def _fix_lines(st, beats, errors):
+    """Targeted repair: rewrite only the flagged beats, so fixing one error does not introduce new ones."""
+    out = json.loads(_story_llm(FIX.format(errors="\n- ".join(errors), story=json.dumps({**st, "beats": beats}, ensure_ascii=False)[:14000])))
+    fixed = dict(enumerate(beats, 1))
+    for k, b in (out.get("beats") or {}).items():
+        if str(k).isdigit() and int(k) in fixed and isinstance(b, dict) and len(str(b.get("line", "")).split()) >= 4:
+            fixed[int(k)] = {**fixed[int(k)], **b}
+    print(f"  targeted fix of beat(s) {', '.join(str(k) for k in (out.get('beats') or {}))}")
+    return [fixed[i] for i in sorted(fixed)]
+
+
 def write_story(topic, facts=None, banned=()):
     facts = facts or research.gather(topic, llm=writer.llm)
     ftxt = (f"REFERENCE FACTS (from {', '.join(facts['sources'][:3])}) - use their numbers:\n{facts['facts'][:3500]}") if facts.get("facts") else ""
     fb = ""
-    for attempt in range(4):
+    for attempt in range(6):
         ban = ("- These scene layouts were already used in earlier videos - do NOT reproduce any of them:\n  " + "\n  ".join(list(banned)[-60:])) if banned else ""
         st = json.loads(_story_llm(PROMPT.format(topic=topic, facts=ftxt, objects=", ".join(writer.OBJECTS), feedback=fb, banned=ban)))
         beats = [b for b in (st.get("beats") or []) if isinstance(b, dict) and len(str(b.get("line", "")).split()) >= 4]
         stages = [str(s)[:12] for s in (st.get("stages") or [])][:7]
         words = sum(len(str(b['line']).split()) for b in beats)
-        if len(beats) < 11 or len(stages) < 4 or words > MAX_WORDS:
-            fb = f"\nThe previous draft had {len(beats)} beats, {words} words and {len(stages)} stages - give 13-16 beats, at most {MAX_WORDS} words in total, and 5-7 stages." + ("\nPREVIOUS DRAFT (shorten it, keep the best beats):\n" + json.dumps(st, ensure_ascii=False)[:9000] if words > MAX_WORDS else "")
+        if len(beats) < 22 or len(stages) < 4 or words > MAX_WORDS:
+            fb = f"\nThe previous draft had {len(beats)} beats, {words} words and {len(stages)} stages - give 26-34 beats, at most {MAX_WORDS} words in total, and 5-7 stages." + ("\nPREVIOUS DRAFT (shorten it, keep the best beats):\n" + json.dumps(st, ensure_ascii=False)[:9000] if words > MAX_WORDS else "")
             continue
         sigs = [signature(b.get("widget")) for b in beats]
         seen, clash = set(banned), []
@@ -128,17 +186,26 @@ def write_story(topic, facts=None, banned=()):
                 clash.append(i + 1)
             seen.add(g)
         n_scene = sum(1 for b in beats if (b.get("widget") or {}).get("kind") == "scene")
-        if (clash or n_scene < len(beats) * 0.6) and attempt < 3:
+        if (clash or n_scene < len(beats) * 0.6) and attempt < 2:
             fb = (f"\nRedesign: beats {clash} reuse a layout that already exists" if clash else "\nRedesign:") + (f"; only {n_scene} of {len(beats)} beats are designed scenes - make at least 70% of beats 'scene' compositions" if n_scene < len(beats) * 0.6 else "") + ". Keep the same lines.\nPREVIOUS DRAFT:\n" + json.dumps(st, ensure_ascii=False)[:9000]
             print(f"  redesign asked (clashes {clash}, {n_scene}/{len(beats)} scenes)")
             continue
         sc = {"topic": topic, "scenes": [{"plate": "story", "title": stages[min(len(stages) - 1, int(b.get("stage") or 0))],
                                           "lines": [b["line"]], "data": {"widget": b.get("widget")}} for b in beats]}
-        rv = writer.review(sc)
+        rv = _review(sc)
         print(f"  fact-check: {rv['score']}/10, {len(rv['critical'])} real error(s)")
         for c in rv["critical"]:
             print(f"    - {c[:160]}")
-        if not rv["critical"] and rv["score"] >= 7:
+        fixes = 0
+        while rv["critical"] and len(rv["critical"]) <= 4 and fixes < 3:      # close: repair only the flagged beats
+            beats, fixes = _fix_lines(st, beats, rv["critical"]), fixes + 1
+            sc = {"topic": topic, "scenes": [{"plate": "story", "title": stages[min(len(stages) - 1, int(b.get("stage") or 0))],
+                                              "lines": [b["line"]], "data": {"widget": b.get("widget")}} for b in beats]}
+            rv = _review(sc)
+            print(f"  fact-check after fix: {rv['score']}/10, {len(rv['critical'])} real error(s)")
+            for c in rv["critical"]:
+                print(f"    - {c[:160]}")
+        if not rv["critical"] and rv["score"] >= 6:
             st["beats"], st["stages"], st["sources"] = beats, stages, facts["sources"]
             return st
         # revise the same draft instead of starting over - it converges much faster
@@ -243,7 +310,9 @@ def to_script(st):
     tint = look.choice(["#00F0FF", "#10B981", "#F59E0B", "#3B82F6", "#8B5CF6", "#F43F5E"])  # neon accents on the dark stage
     world = {"layout": look.choice(["line", "zigzag", "arc", "spiral", "stairs"]), "gap": look.random(), "camR": round(look.uniform(8.6, 10.6), 2),
              "camH": round(look.uniform(2.9, 4.6), 2), "fov": look.choice([32, 34, 36, 38, 40]), "push": round(look.uniform(0.7, 1.6), 2),
-             "ambient": look.choice(["rings", "particles", "beams"]), "floor": look.choice(["dots", "lines", "cross"])}
+             "ambient": look.choice(["rings", "particles", "beams"]), "floor": look.choice(["dots", "lines", "cross"]),
+             "reveal": look.choice(["scan", "draw", "assemble", "glitch"]), "holoFloor": look.choice(["polar", "hex", "grid", "dots"])}
+    modes, last = ["fly", "orbit", "crane", "dolly", "low", "top", "dutch", "spiral", "whip", "push"], None
     outfit = look.choice(["#5B3FD6", "#1F7A5C", "#C2410C", "#1E40AF", "#9D174D", "#334155"])
     for i, b in enumerate(st["beats"]):
         stage = max(0, min(len(st["stages"]) - 1, int(b.get("stage") or 0)))
@@ -256,7 +325,7 @@ def to_script(st):
             val = None
         data = {"stages": st["stages"], "stage": stage, "example": st.get("example", ""), "key": str(b.get("key") or ""), "widget": wd,
                 "object": b.get("object") if b.get("object") in writer.OBJECTS else random.choice(["phone", "server", "globe", "chip", "router"]),
-                "light": False}
+                "light": str(b.get("theme", "")).lower() == "light"}
         if val is not None:
             data["counter"] = {"label": ctr.get("label", ""), "unit": ctr.get("unit", ""), "from": prev, "value": val}
             prev = val
@@ -265,6 +334,7 @@ def to_script(st):
         elif b.get("pic"):
             data["widget"] = {"kind": "photo", "img": b["pic"], "credit": b.get("credit", "")}
         data["tint"], data["outfit"], data["look"] = tint, outfit, world
+        last = data["cam"] = look.choice([m for m in modes if m != last])          # engine camera move for this beat
         data["gesture"] = gesture(i, len(st["beats"]), str(b["line"]), wd.get("kind"))
         data["swarm"] = False                                   # swarms are off (owner preference)
         if data["swarm"]:
@@ -348,7 +418,7 @@ def make(topic, show=False):
     print("🔊 Narration")
     dur, voice = audio_build.narrate(sc)
     print(f"  {voice}, {dur:.1f}s")
-    while dur > MAX_SECONDS and len(sc["scenes"]) > 11:          # hard cap: drop the weakest middle beat until it fits
+    while dur > MAX_SECONDS and len(sc["scenes"]) > 20:          # hard cap: drop the weakest middle beat until it fits
         cut = max(range(2, len(sc["scenes"]) - 1), key=lambda i: (sc["scenes"][i]["data"].get("widget") or {}).get("kind") in ("checklist", "flow"))
         print(f"  {dur:.0f}s is over {MAX_SECONDS}s - dropping beat {cut + 1}")
         del sc["scenes"][cut]
@@ -394,7 +464,7 @@ def script_for(topic, facts=None, banned=()):
 def fit_narration(sc):
     """Narrate at the live bot's rhythm and drop middle beats until the Short is at most MAX_SECONDS."""
     dur, voice = audio_build.narrate(sc)
-    while dur > MAX_SECONDS and len(sc["scenes"]) > 11:
+    while dur > MAX_SECONDS and len(sc["scenes"]) > 20:
         cut = next((i for i in range(len(sc["scenes"]) - 2, 1, -1)
                     if not sc["scenes"][i]["data"].get("swarm") and not (sc["scenes"][i]["data"].get("widget") or {}).get("img")), len(sc["scenes"]) - 2)
         print(f"  {dur:.0f}s is over {MAX_SECONDS}s - dropping beat {cut + 1}")

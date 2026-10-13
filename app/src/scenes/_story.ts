@@ -428,7 +428,8 @@ export class Story extends GenPlate {
           const k = P.k, sc = (en === 'zoom' ? 0.2 + 0.8 * k : 0.5 + 0.5 * k) * pu;
           const oy = en === 'drop' ? (1 - k) * -160 : 0, ox = en === 'slide' ? (1 - k) * (i % 2 ? 220 : -220) : 0;
           ctx.save(); ctx.globalAlpha = a * clamp(k * 1.6); ctx.translate(P.x + ox, P.y + oy + fl);
-          if (en === 'unfold') ctx.scale(clamp(k, 0.01, 1.2), 1); else ctx.scale(sc, sc);
+          const gone = String(e.exit ?? '') === 'dot' ? ease.inCubic(clamp((age - (dur - 0.32)) / 0.32)) : 0;   // exit: collapse into a dot
+          if (en === 'unfold') ctx.scale(clamp(k, 0.01, 1.2) * (1 - gone) + 0.001, 1 - gone + 0.001); else ctx.scale(sc * (1 - gone) + 0.001, sc * (1 - gone) + 0.001);
           if (mo === 'spin') ctx.rotate(Math.sin(age * 0.8 + i) * 0.06);
           drawBlock(ctx, String(e.type ?? 'node'), e, col, sz, age - clamp(Number(e.at ?? i * 0.12), 0, 0.85) * Math.min(dur, 6));
           ctx.restore();
@@ -621,13 +622,49 @@ function drawBlock(ctx: CanvasRenderingContext2D, type: string, e: any, col: str
       ctx.textAlign = 'left'; label(66);
       break;
     }
+    case 'slots': {                                                     // a capacity grid filling up; past the limit it turns red
+      const cols = 10, rows = 6, n = cols * rows, cw = R * 0.34, used = clamp(Number(e.value ?? 0.85)), fill = used * clamp((age - 0.1) / 1.6);
+      for (let j = 0; j < n; j++) {
+        const cx = (j % cols - (cols - 1) / 2) * (cw + 6), cy = (Math.floor(j / cols) - (rows - 1) / 2) * (cw + 6), on = j < fill * n;
+        const hot = on && j / n > 0.8;
+        ctx.fillStyle = on ? (hot ? '#F43F5E' : col) : '#1E293B'; ctx.beginPath(); (ctx as any).roundRect(cx - cw / 2, cy - cw / 2, cw, cw, 4); ctx.fill();
+      }
+      label((rows / 2) * (cw + 6) + 40);
+      break;
+    }
+    case 'vm': {                                                        // an isolated microVM box: own kernel / filesystem / network
+      const w = R * 2.1, h = R * 1.7, rows = (items.length ? items : ['own kernel', 'own filesystem', 'own network']).slice(0, 4);
+      ctx.fillStyle = '#0B1220'; ctx.beginPath(); (ctx as any).roundRect(-w / 2, -h / 2, w, h, 14); ctx.fill(); glowStroke(2.5);
+      ctx.fillStyle = Math.sin(age * 6) > -0.3 ? '#10B981' : '#064E3B'; ctx.beginPath(); ctx.arc(w / 2 - 22, -h / 2 + 22, 7, 0, 6.3); ctx.fill();
+      ctx.font = font(F.mono(800), 24); ctx.fillStyle = col; ctx.fillText(lab.slice(0, 16) || 'microVM', -w / 2 + 18, -h / 2 + 32);
+      rows.forEach((r2, j) => {
+        const kk = clamp((age - 0.3 - j * 0.15) / 0.25); if (kk <= 0) return;
+        ctx.fillStyle = '#1E293B'; ctx.beginPath(); (ctx as any).roundRect(-w / 2 + 16, -h / 2 + 52 + j * 42, (w - 32) * kk, 34, 8); ctx.fill();
+        ctx.font = font(F.mono(600), 19); ctx.fillStyle = '#E5E7EB'; ctx.fillText(r2.slice(0, 18), -w / 2 + 30, -h / 2 + 76 + j * 42);
+      });
+      if (sub) { ctx.font = font(F.mono(500), 20); ctx.fillStyle = '#94A3B8'; ctx.textAlign = 'center'; ctx.fillText(sub, 0, h / 2 + 30); ctx.textAlign = 'left'; }
+      break;
+    }
     case 'globe': {
       const r = R * 1.05;
       ctx.fillStyle = '#0B1220'; ctx.beginPath(); ctx.arc(0, 0, r, 0, 6.3); ctx.fill(); glowStroke(2.5);
       ctx.save(); ctx.beginPath(); ctx.arc(0, 0, r, 0, 6.3); ctx.clip(); ctx.strokeStyle = hexA(col, 0.4); ctx.lineWidth = 1.5;
       for (let j = 0; j < 6; j++) { const ph = ((j / 6 + age * 0.08) % 1) * Math.PI; ctx.beginPath(); ctx.ellipse(0, 0, Math.abs(Math.cos(ph)) * r, r, 0, 0, 6.3); ctx.stroke(); }
       for (let j = 1; j < 4; j++) { ctx.beginPath(); ctx.moveTo(-r, (j - 2) * r * 0.45); ctx.lineTo(r, (j - 2) * r * 0.45); ctx.stroke(); }
-      ctx.restore(); label(r + 38);
+      ctx.restore();
+      const arcs = Math.max(0, Math.min(6, Number(e.count) || 3));      // glowing arcs between regions, with packets
+      const bez = (u: number, p0: number[], m: number[], p1: number[]) => [(1 - u) * (1 - u) * p0[0]! + 2 * (1 - u) * u * m[0]! + u * u * p1[0]!, (1 - u) * (1 - u) * p0[1]! + 2 * (1 - u) * u * m[1]! + u * u * p1[1]!];
+      for (let j = 0; j < arcs; j++) {
+        const a0 = -2.4 + j * 0.9, a1 = a0 + 1.6 + (j % 2) * 0.6, p0 = [Math.cos(a0) * r * 0.75, Math.sin(a0 * 1.3) * r * 0.5], p1 = [Math.cos(a1) * r * 0.75, Math.sin(a1 * 1.1) * r * 0.5];
+        const m = [(p0[0]! + p1[0]!) / 2, (p0[1]! + p1[1]!) / 2 - r * 0.55], kk = clamp((age - 0.2 - j * 0.2) / 0.6);
+        if (kk <= 0) continue;
+        ctx.save(); ctx.shadowColor = col; ctx.shadowBlur = 12; ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.beginPath();
+        for (let q = 0; q <= 24 * kk; q++) { const [x, y] = bez(q / 24, p0, m, p1); if (q) ctx.lineTo(x!, y!); else ctx.moveTo(x!, y!); }
+        ctx.stroke();
+        if (kk >= 1) { const [x, y] = bez((age * 0.7 + j * 0.3) % 1, p0, m, p1); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x!, y!, 5, 0, 6.3); ctx.fill(); }
+        ctx.restore();
+      }
+      label(r + 38);
       break;
     }
     case 'gauge': {
