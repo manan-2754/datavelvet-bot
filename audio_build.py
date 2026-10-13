@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parent
 SR = 48000
 VOICES = ["en-US-AndrewMultilingualNeural", "en-US-BrianMultilingualNeural", "en-US-ChristopherNeural", "en-US-EricNeural",
           "en-US-GuyNeural", "en-US-SteffanNeural", "en-GB-RyanNeural"]
-LEAD, IN_SCENE, BETWEEN, TAIL = 0.35, 0.28, 0.7, 1.8
+LEAD, IN_SCENE, BETWEEN, TAIL = 0.12, 0.28, 0.7, 1.8
 
 
 def ffmpeg():

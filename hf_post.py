@@ -6,8 +6,10 @@ top, and the 2 s result replaces that stretch of the video frame for frame, so n
 Needs Node >= 22 and `npm install` in hf/. Any failure leaves the original video untouched.
 """
 import hashlib
+import html
 import json
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -78,6 +80,49 @@ window.__timelines["chapter"] = tl;
 """
 
 
+OUTRO = 3.0                             # seconds of share card at the end
+
+PAGE_OUT = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<script src="gsap.min.js"></script>
+<style>
+@font-face {{ font-family: "Archivo"; src: url("Archivo-900.ttf"); font-weight: 900; }}
+@font-face {{ font-family: "Archivo"; src: url("Archivo-500.ttf"); font-weight: 500; }}
+html, body {{ margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #05070c; }}
+#root {{ position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Archivo", sans-serif; }}
+#v {{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }}
+#card {{ position: absolute; left: 70px; right: 70px; top: 1170px; height: 300px; }}
+#bg {{ position: absolute; inset: 0; border-radius: 40px; background: rgba(8,11,18,0.86);
+      border: 3px solid {tint}; box-shadow: 0 0 70px {tint}55, 0 30px 80px rgba(0,0,0,0.6); }}
+#icon {{ position: absolute; left: 52px; top: 62px; width: 120px; height: 120px; }}
+#ask {{ position: absolute; left: 210px; top: 52px; font-weight: 500; font-size: 34px; letter-spacing: 8px; color: {tint}; }}
+#line {{ position: absolute; left: 210px; right: 50px; top: 100px; font-weight: 900; font-size: {size}px; line-height: 1.08; color: #fff; }}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="outro" data-start="0" data-width="1080" data-height="1920" data-duration="{dur}" data-fps="{fps}">
+  <video id="v" class="clip" src="a.mp4" muted playsinline data-start="0" data-duration="{dur}"></video>
+  <div id="card">
+    <div id="bg"></div>
+    <svg id="icon" viewBox="0 0 24 24" fill="none" stroke="{tint}" stroke-width="1.8" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+    <div id="ask">SEND THIS</div><div id="line">{text}</div>
+  </div>
+</div>
+<script>
+const tl = gsap.timeline({{ paused: true }});
+tl.fromTo("#card", {{ y: 140, opacity: 0, scale: 0.9 }}, {{ y: 0, opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.8)" }}, 0.1);
+tl.fromTo("#icon", {{ x: -30, y: 30, rotation: -20, opacity: 0 }}, {{ x: 0, y: 0, rotation: 0, opacity: 1, duration: 0.5, ease: "power3.out" }}, 0.3);
+tl.fromTo("#line", {{ opacity: 0, x: 40 }}, {{ opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }}, 0.35);
+tl.to("#icon", {{ x: 14, y: -14, duration: 0.35, ease: "sine.inOut", yoyo: true, repeat: 3 }}, 1.0);
+window.__timelines["outro"] = tl;
+</script>
+</body>
+</html>
+"""
+
+
 def boundaries(lyrics):
     """(time, chapter index, chapter name) wherever the narration moves to a new stage."""
     out, prev = [], None
@@ -135,13 +180,37 @@ def _segment(raw, work, fps, f0, fc, f1, num, name, tint, shader):
     return work / "seg.mp4"
 
 
+def _outro(raw, work, fps, f0, f1, text, tint):
+    """Frames [f0, f1) of raw with the share card on top."""
+    work, raw = Path(work).resolve(), Path(raw).resolve()
+    work.mkdir(parents=True, exist_ok=True)
+    n = f1 - f0
+    _ff("-i", raw, "-vf", f"trim=start_frame={f0}:end_frame={f1},setpts=PTS-STARTPTS", "-an", "-c:v", "libx264", "-crf", "12",
+        "-preset", "veryfast", "-pix_fmt", "yuv420p", work / "a.mp4")
+    for src, dst in [(HF / "node_modules/gsap/dist/gsap.min.js", "gsap.min.js"),
+                     (ROOT / "app/public/fonts/Archivo-w1000-900.ttf", "Archivo-900.ttf"),
+                     (ROOT / "app/public/fonts/Archivo-w1000-500.ttf", "Archivo-500.ttf")]:
+        shutil.copy(src, work / dst)
+    text = html.escape(re.sub(r"^send this to\s*", "to ", text.strip(), flags=re.I))
+    (work / "index.html").write_text(PAGE_OUT.format(tint=tint, dur=f"{n / fps:.4f}", fps=fps, text=text,
+                                                     size=62 if len(text) <= 32 else 52), encoding="utf-8")
+    env = {**os.environ, "HYPERFRAMES_NO_TELEMETRY": "1", "DO_NOT_TRACK": "1"}
+    subprocess.run([shutil.which("npx") or "npx", "--no-install", "hyperframes", "render", str(work), "-o", str(work / "seg.mp4"),
+                    "--fps", str(fps), "--quality", "looks", "--quiet"], check=True, env=env, cwd=str(HF),
+                   capture_output=True, text=True, timeout=900)
+    if _probe(work / "seg.mp4")[1] != n:
+        raise RuntimeError("outro frame count changed")
+    return work / "seg.mp4"
+
+
 def apply(raw, script, lyrics_path=ROOT / "data" / "lyrics.json"):
     """Return a new silent video with HyperFrames chapter transitions, or the original on any failure."""
     raw = Path(raw)
     try:
         lyrics = json.loads(Path(lyrics_path).read_text(encoding="utf-8"))
         cuts = boundaries(lyrics)
-        if not cuts or not (HF / "node_modules" / "hyperframes").exists():
+        share = str(script.get("share_line") or "").strip()
+        if not (cuts or share) or not (HF / "node_modules" / "hyperframes").exists():
             return raw
         fps, total = _probe(raw)
         tint = next((s.get("data", {}).get("tint") for s in script.get("scenes", []) if s.get("data", {}).get("tint")), "#22D3EE")
@@ -159,9 +228,20 @@ def apply(raw, script, lyrics_path=ROOT / "data" / "lyrics.json"):
             print(f"  ✨ chapter {st + 1} '{name}' at {t:.1f}s: {shader}")
             pieces += [("raw", at, f0), ("seg", seg)]
             at = f1
-        if not pieces:
+        tail = total
+        if share and total - round(OUTRO * fps) > at:
+            try:
+                tail = total - round(OUTRO * fps)
+                end = _outro(raw, work / "outro", fps, tail, total, share, tint)
+                print(f"  📤 share card: {share}")
+            except Exception as e:
+                tail = total
+                print(f"  share card skipped ({str(e)[:120]})")
+        if not pieces and tail == total:
             return raw
-        pieces.append(("raw", at, total))
+        pieces.append(("raw", at, tail))
+        if tail < total:
+            pieces.append(("seg", end))
         ins, chains, labels, n_in = ["-i", str(raw)], [], [], 1
         for i, p in enumerate(pieces):
             if p[0] == "raw":

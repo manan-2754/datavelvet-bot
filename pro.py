@@ -33,12 +33,11 @@ KINDS = ["scene", "terminal", "code", "browser", "table", "chat", "phone", "requ
 VLC = r"C:\Program Files\VideoLAN\VLC\vlc.exe"
 MAX_SECONDS = 178                     # deep dives: 2-3 min, never over the 3:00 Shorts/Reels limit
 MAX_WORDS = 390                       # ~140 words a minute (the live bot's pace) + pauses
-PROMPT = """You write a 2-3 minute vertical deep-dive for developers on "DataVelvet": "How does {topic} really work under
-the hood?" Explain the REAL mechanism, like a senior engineer whiteboarding it - not a beginner overview.
-{facts}
-DO NOT use a fixed template or a fixed scene order. Derive the sequence from the real architecture of the topic: start from
-what the developer/user touches, peel back each real layer, then rebuild the whole system. Keep this SHAPE (rename freely):
-1. HOOK (1-2 beats): beat 1 MUST be the single most surprising TRUE fact about the system (a number, a contrast or a
+# Length A/B: quick 45-60 s (completion rate) vs deep 2-3 min; analytics learns which one the algorithm pushes further.
+MODES = {
+    "deep": {"length": "2-3 minute", "stages": "5-7", "min_stages": 4, "count": "26-34 BEATS, 330-390 words total.",
+             "beats": (22, 34), "words": MAX_WORDS, "seconds": MAX_SECONDS, "keep": 20, "ask": "26-34 beats",
+             "shape": """1. HOOK (1-2 beats): beat 1 MUST be the single most surprising TRUE fact about the system (a number, a contrast or a
    myth it breaks) - never a slow intro. Beat 2 may say "Let's design <the system>."
 2. USER VIEW (2-4 beats): the simplest thing a developer touches (a checkout call, a sign-in form, a deploy command) with a
    few lines of real code, and what they would normally have to build themselves around it.
@@ -49,11 +48,26 @@ what the developer/user touches, peel back each real layer, then rebuild the who
    blocked / times out, and how the system handles it).
 5. SCALE (3-5 beats): what happens at real scale - limits, the bottleneck hitting its ceiling, and the real fix.
 6. REASSEMBLE (2-3 beats): the layers stack back into one system; replay the running example end to end.
-7. END (1 beat): one-line recap + "Follow for more breakdowns."
+7. END (1 beat): the one-line payoff that loops back into beat 1 (see LOOP)."""},
+    "quick": {"length": "45-60 second", "stages": "3-4", "min_stages": 3, "count": "9-12 BEATS, 100-135 words total.",
+              "beats": (8, 12), "words": 140, "seconds": 60, "keep": 7, "ask": "9-12 beats",
+              "shape": """1. HOOK (1 beat): the single most surprising TRUE fact about the system (a number, a contrast or a myth it
+   breaks) - never a slow intro.
+2. REVEAL (1 beat): what is actually underneath.
+3. LAYERS (5-8 beats): the 2-3 REAL layers that explain the hook, in order: the mechanism ("it does X, so Y happens") with
+   the running example travelling through it; ONE failure case in total.
+4. PAYOFF (1-2 beats): the aha that answers the hook, ending on the loop line (see LOOP). Every second must earn its place."""},
+}
+PROMPT = """You write a {length} vertical deep-dive for developers on "DataVelvet": "How does {topic} really work under
+the hood?" Explain the REAL mechanism, like a senior engineer whiteboarding it - not a beginner overview.
+{facts}
+DO NOT use a fixed template or a fixed scene order. Derive the sequence from the real architecture of the topic: start from
+what the developer/user touches, peel back each real layer, then rebuild the whole system. Keep this SHAPE (rename freely):
+{shape}
 Rules:
 - ONE running example through everything (e.g. "Maya pays $24 for sneakers", "a push to main at 9:41").
-- 5-7 STAGES = the real layers' short names (max 12 chars), in order. Every beat belongs to one stage.
-- 26-34 BEATS, 330-390 words total. Each beat = ONE spoken sentence of 9-15 words: short, direct, one idea, the mechanism.
+- {stages} STAGES = the real layers' short names (max 12 chars), in order. Every beat belongs to one stage.
+- {count} Each beat = ONE spoken sentence of 9-15 words: short, direct, one idea, the mechanism.
   Use the same key nouns every time they reappear so viewers can track them.
 - Use real terms (idempotency key, WAL, consensus, edge cache, TLS handshake...) and explain them in plain words.
 - Numbers must come from the reference facts or official docs; otherwise describe without a number. Never invent metrics.
@@ -86,6 +100,9 @@ Rules:
 - Failure cases: use color "rose", a badge like "BLOCKED"/"TIMEOUT"/"402 DECLINED", table "marks": false, or a slots grid filling red.
 - "object": a 3D object for the beat's stage, one of {objects}.
 - A running "counter" that grows along the journey (e.g. elapsed ms, km travelled, bytes) - give its value per beat.
+- LOOP: the final beat's sentence must end on words that lead straight back into beat 1's sentence, so when the Short
+  replays the two lines read as one continuous thought (e.g. last: "...and that is why" -> first: "ChatGPT never knows its
+  answer."). No "follow for more", no goodbye - the loop is the ending.
 Accurate facts only; never invent statistics; no emojis; no "in this video".
 Return ONLY JSON:
 {{"title": max 60 chars, "example": the running example (max 34 chars), "stages": [...], "counter": {{"label": e.g. "T+",
@@ -95,7 +112,8 @@ Return ONLY JSON:
  "titles": {{"curiosity": max 70 chars ending " #shorts", brand first + curiosity gap, "direct": max 70 chars ending " #shorts",
  a plain "How <brand> <does X> under the hood" title}},
  "youtube": {{"title": the curiosity title, "description": 2 sentences + 5
- hashtags, "tags": [6-8]}}, "instagram_caption": 2 lines + "Save this for later." + 6 hashtags, "comment": one question}}
+ hashtags, "tags": [6-8]}}, "share_line": max 48 chars, a specific "Send this to the dev who..." / "Send this to a friend who..." ask that fits this topic,
+ "instagram_caption": line 1 = the share_line, then 2 lines + 6 hashtags, "comment": one either/or question that is easy to answer}}
 {feedback}"""
 
 
@@ -138,7 +156,7 @@ def _review(sc):
     return {"score": int(data.get("score", 0)), "critical": crit, "minor": [str(x) for x in data.get("minor_issues") or []]}
 
 
-DEEP_REVIEW = """You are a staff engineer fact-checking a 2-3 minute developer deep-dive about "{topic}" before it is published.
+DEEP_REVIEW = """You are a staff engineer fact-checking a short developer deep-dive about "{topic}" before it is published.
 Each numbered beat is one spoken sentence plus what is on screen.
 {script}
 Classify problems carefully:
@@ -170,18 +188,20 @@ def _fix_lines(st, beats, errors):
     return [fixed[i] for i in sorted(fixed)]
 
 
-def write_story(topic, facts=None, banned=()):
+def write_story(topic, facts=None, banned=(), mode="deep"):
+    m = MODES[mode]
     facts = facts or research.gather(topic, llm=writer.llm)
     ftxt = (f"REFERENCE FACTS (from {', '.join(facts['sources'][:3])}) - use their numbers:\n{facts['facts'][:3500]}") if facts.get("facts") else ""
     fb = ""
     for attempt in range(6):
         ban = ("- These scene layouts were already used in earlier videos - do NOT reproduce any of them:\n  " + "\n  ".join(list(banned)[-60:])) if banned else ""
-        st = json.loads(_story_llm(PROMPT.format(topic=topic, facts=ftxt, objects=", ".join(writer.OBJECTS), feedback=fb, banned=ban)))
+        st = json.loads(_story_llm(PROMPT.format(topic=topic, facts=ftxt, objects=", ".join(writer.OBJECTS), feedback=fb, banned=ban,
+                                                 length=m["length"], shape=m["shape"], stages=m["stages"], count=m["count"])))
         beats = [b for b in (st.get("beats") or []) if isinstance(b, dict) and len(str(b.get("line", "")).split()) >= 4]
         stages = [str(s)[:12] for s in (st.get("stages") or [])][:7]
         words = sum(len(str(b['line']).split()) for b in beats)
-        if len(beats) < 22 or len(stages) < 4 or words > MAX_WORDS:
-            fb = f"\nThe previous draft had {len(beats)} beats, {words} words and {len(stages)} stages - give 26-34 beats, at most {MAX_WORDS} words in total, and 5-7 stages." + ("\nPREVIOUS DRAFT (shorten it, keep the best beats):\n" + json.dumps(st, ensure_ascii=False)[:9000] if words > MAX_WORDS else "")
+        if len(beats) < m["beats"][0] or len(stages) < m["min_stages"] or words > m["words"]:
+            fb = f"\nThe previous draft had {len(beats)} beats, {words} words and {len(stages)} stages - give {m['ask']}, at most {m['words']} words in total, and {m['stages']} stages." + ("\nPREVIOUS DRAFT (shorten it, keep the best beats):\n" + json.dumps(st, ensure_ascii=False)[:9000] if words > m["words"] else "")
             continue
         sigs = [signature(b.get("widget")) for b in beats]
         seen, clash = set(banned), []
@@ -209,10 +229,10 @@ def write_story(topic, facts=None, banned=()):
             print(f"  fact-check after fix: {rv['score']}/10, {len(rv['critical'])} real error(s)")
             for c in rv["critical"]:
                 print(f"    - {c[:160]}")
-        if rv["critical"] and len(beats) > 24:                        # last resort: drop the beats that still carry a doubtful claim
+        if rv["critical"] and len(beats) > m["beats"][0] + 2:                        # last resort: drop the beats that still carry a doubtful claim
             bad = {int(n) for c in rv["critical"] for n in re.findall(r"beats?\s*(\d+)", c, re.I)}
             bad = {n for n in bad if 2 < n < len(beats)}               # never the hook or the ending
-            if bad and len(beats) - len(bad) >= 22:
+            if bad and len(beats) - len(bad) >= m["beats"][0]:
                 beats = [b for i, b in enumerate(beats, 1) if i not in bad]
                 sc = {"topic": topic, "scenes": [{"plate": "story", "title": stages[min(len(stages) - 1, int(b.get("stage") or 0))],
                                                   "lines": [b["line"]], "data": {"widget": b.get("widget")}} for b in beats]}
@@ -347,7 +367,7 @@ def to_script(st):
         elif b.get("pic"):
             data["widget"] = {"kind": "photo", "img": b["pic"], "credit": b.get("credit", "")}
         data["tint"], data["outfit"], data["look"] = tint, outfit, world
-        last = data["cam"] = look.choice([m for m in modes if m != last])          # engine camera move for this beat
+        last = data["cam"] = look.choice(["whip", "push", "dolly"] if i == 0 else [m for m in modes if m != last])   # beat 1 moves fast from frame 0
         data["gesture"] = gesture(i, len(st["beats"]), str(b["line"]), wd.get("kind"))
         data["swarm"] = False                                   # swarms are off (owner preference)
         if data["swarm"]:
@@ -359,7 +379,7 @@ def to_script(st):
         scenes[0]["data"]["hook_text"] = str(st["hook_text"])[:48]
     return {"title_variants": {k: str(v)[:100] for k, v in (st.get("titles") or {}).items() if k in ("curiosity", "direct") and v},
             "topic": st["title"], "scenes": scenes, "youtube": st.get("youtube", {}), "instagram_caption": st.get("instagram_caption", ""),
-            "comment": st.get("comment"), "sources": st.get("sources", [])}
+            "comment": st.get("comment"), "sources": st.get("sources", []), "share_line": str(st.get("share_line") or "")[:60]}
 
 
 def capture_sites(st):
@@ -465,25 +485,27 @@ if __name__ == "__main__":
     make(a.topic, a.show)
 
 
-def script_for(topic, facts=None, banned=()):
+def script_for(topic, facts=None, banned=(), mode="deep"):
     """For the main bot: fact-checked story -> live pages + photos -> engine script (plates 'world')."""
-    st = write_story(topic, facts, banned)
+    st = write_story(topic, facts, banned, mode)
     print(f"  {len(st['beats'])} beats · stages: {' > '.join(st['stages'])} · example: {st.get('example')}")
     capture_sites(st)
     capture_photos(st)
     sc = to_script(st)
     sc["format"] = "world: " + " > ".join(st["stages"])
+    sc["length_mode"] = mode
     sc["signatures"] = [g for g in (signature(b.get("widget")) for b in st["beats"]) if "@" in g]
     return sc
 
 
 def fit_narration(sc):
     """Narrate at the live bot's rhythm and drop middle beats until the Short is at most MAX_SECONDS."""
+    m = MODES[sc.get("length_mode") or "deep"]
     dur, voice = audio_build.narrate(sc)
-    while dur > MAX_SECONDS and len(sc["scenes"]) > 20:
+    while dur > m["seconds"] and len(sc["scenes"]) > m["keep"]:
         cut = next((i for i in range(len(sc["scenes"]) - 2, 1, -1)
                     if not sc["scenes"][i]["data"].get("swarm") and not (sc["scenes"][i]["data"].get("widget") or {}).get("img")), len(sc["scenes"]) - 2)
-        print(f"  {dur:.0f}s is over {MAX_SECONDS}s - dropping beat {cut + 1}")
+        print(f"  {dur:.0f}s is over {m['seconds']}s - dropping beat {cut + 1}")
         del sc["scenes"][cut]
         dur, voice = audio_build.narrate(sc)
     return dur, voice

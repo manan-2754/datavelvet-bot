@@ -13,6 +13,7 @@ One-time setup:
   4. GitHub secrets: IG_ACCESS_TOKEN, IG_USER_ID (python instagram_upload.py --whoami prints the id)
   The cloud job refreshes the token automatically (needs secret GH_PAT so it can save the new one).
 """
+import json
 import os
 from datetime import date, datetime, timedelta, timezone
 import subprocess
@@ -94,7 +95,7 @@ def host_on_github(path, ctype="video/mp4"):
     return asset["browser_download_url"], asset["url"]
 
 
-def upload_reel(video_path, caption, thumb_offset=None, cover=None):
+def upload_reel(video_path, caption, thumb_offset=None, cover=None, trial=False):
     token, uid = _token(), _user_id()
     small = to_1080(video_path)
     url, asset_api = host_on_github(small)
@@ -105,7 +106,15 @@ def upload_reel(video_path, caption, thumb_offset=None, cover=None):
                   **({"cover_url": cover_url} if cover_url else {"thumb_offset": str(int(thumb_offset))} if thumb_offset else {}),
                   "is_ai_generated": "true",   # Instagram's "AI info" self-disclosure label
                   "access_token": token}
+        if trial:
+            fields["trial_params"] = json.dumps({"graduation_strategy": "SS_PERFORMANCE"})
         r = requests.post(f"https://{HOST}/{VERSION}/{uid}/media", data=fields, timeout=60)
+        if trial and r.status_code >= 400 and "trial" in r.text.lower():
+            print(f"  ⚠️ Trial Reels not available for this account ({r.text[:160]}) - posting a normal Reel")
+            fields.pop("trial_params")
+            r = requests.post(f"https://{HOST}/{VERSION}/{uid}/media", data=fields, timeout=60)
+        elif trial:
+            print("  Instagram: Trial Reel (shown to non-followers first, shared to followers if it performs)")
         if r.status_code >= 400 and "is_ai_generated" in r.text:
             print(f"  ⚠️ Instagram rejected is_ai_generated ({r.text[:160]}) - posting with an AI note in the caption instead")
             fields.pop("is_ai_generated")

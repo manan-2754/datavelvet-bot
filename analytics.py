@@ -14,7 +14,7 @@ import requests
 
 WEIGHTS = {"yt_views": 1, "yt_likes": 25, "yt_comments": 60, "yt_avp": 5, "yt_subs": 150, "yt_shares": 60, "ig_views": 1, "ig_reach": 0.5, "ig_saved": 40, "ig_shares": 60,
            "ig_likes": 25, "ig_comments": 60}
-FEATURES = ["angle", "layouts", "types", "cams", "hue", "voice", "music", "length", "level", "trend", "cta", "fmt", "title", "cover"]
+FEATURES = ["angle", "layouts", "types", "cams", "hue", "voice", "music", "length", "level", "trend", "cta", "fmt", "title", "cover", "lmode", "trial"]
 
 
 def _now():

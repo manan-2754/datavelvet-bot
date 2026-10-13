@@ -104,6 +104,17 @@ def add_links(script, state):
     script["links_done"] = True
 
 
+def pick_length(state):
+    """A/B: quick 45-60 s vs deep 2-3 min, weighted by what the algorithm pushed further so far (35% exploration)."""
+    rnd = random.SystemRandom()
+    modes = ["quick", "deep"]
+    if os.getenv("LENGTH_MODE") in modes:          # forced (local samples)
+        return os.environ["LENGTH_MODE"]
+    mode = rnd.choice(modes) if rnd.random() < 0.35 else max(modes, key=lambda k: analytics.weight(state, "lmode", k) + rnd.random() * 0.01)
+    print(f"  A/B length: {mode}")
+    return mode
+
+
 def pick_variants(script, state):
     """A/B: choose the title style and cover style, weighted by what has performed best so far (25% exploration)."""
     rnd = random.SystemRandom()
@@ -152,7 +163,8 @@ def features(script, meta):
             "length": "short" if d < 50 else ("mid" if d < 75 else "long"), "level": script.get("level"),
             "trend": bool(script.get("trend")), "series": (script.get("series") or {}).get("name"), "cta": script.get("cta_kind"),
             "fmt": "viewer" if script.get("viewer_q") else script.get("format_kind"),
-            "title": script.get("title_style"), "cover": script.get("cover_style")}
+            "title": script.get("title_style"), "cover": script.get("cover_style"), "lmode": script.get("length_mode"),
+            "trial": bool(meta.get("ig_trial"))}
 
 
 def slugify(s):
@@ -279,7 +291,8 @@ def finish_video(script, ctx, raw, show=False):
             "duration": round(dur, 1), "voice": voice, "format": script.get("format"), "seed": script.get("seed"),
             "style_name": (script.get("style") or {}).get("name"), "angle": script.get("angle"),
             "review": script.get("review"), "music": script.get("music"), "sources": script.get("sources", []),
-            "cover_ms": cover_ms(), "title_alt": script.get("title_alt"), "title_style": script.get("title_style"), "comment": script.get("comment") or "Did you know this before watching? Yes or no 👇", "series_name": (script.get("series") or {}).get("name"), "qa": check}
+            "cover_ms": cover_ms(), "title_alt": script.get("title_alt"), "title_style": script.get("title_style"), "share_line": script.get("share_line"),
+            "ig_trial": os.getenv("IG_TRIAL_REELS", "1") != "0" and len(load_state().get("posts", [])) % 2 == 0, "comment": script.get("comment") or "Did you know this before watching? Yes or no 👇", "series_name": (script.get("series") or {}).get("name"), "qa": check}
     meta["features"] = features(script, meta)
     try:                                       # designed Reel cover + carousel slides, from this video
         meta["cover_path"], meta["carousel"] = covers.make_all(video, script, out_dir)
@@ -314,7 +327,9 @@ def upload(video, meta, state):
     if os.getenv("AUTO_POST_INSTAGRAM", "false").lower() == "true":
         try:
             from instagram_upload import upload_reel
-            rec["instagram_id"] = upload_reel(video, meta["instagram_caption"], meta.get("cover_ms"), cover=meta.get("cover_path"))   # AI-info label
+            rec["instagram_id"] = upload_reel(video, meta["instagram_caption"], meta.get("cover_ms"), cover=meta.get("cover_path"),   # AI-info label
+                                              trial=bool(meta.get("ig_trial")))
+            rec["ig_trial"] = bool(meta.get("ig_trial"))
             try:
                 from instagram_upload import post_comment as ig_comment
                 ig_comment(rec["instagram_id"], meta.get("comment"))
@@ -360,6 +375,10 @@ def main():
             print(f"⏭️ A video was already posted for the {os.environ['SLOT_TARGET']} ET slot - skipping to avoid a double post")
             gh_output(has_video="false", chunks="[]")
             return 0
+    if args.post and not args.long and os.getenv("SLOT_TARGET") and os.getenv("SLOT_TARGET") not in os.getenv("SHORTS_SLOTS", "13:00,17:00").split(","):
+        print(f"⏭️ {os.environ['SLOT_TARGET']} ET is not a Shorts slot any more (two a day: {os.getenv('SHORTS_SLOTS', '13:00,17:00')})")
+        gh_output(has_video="false", chunks="[]")
+        return 0
     if args.post and date.today().isoformat() > RUN_UNTIL:
         print(f"Posting window ended on {RUN_UNTIL}.")
         gh_output(has_video="false", chunks="[]")
@@ -403,7 +422,7 @@ def main():
             if trend:
                 topic = trend["topic"]
                 print(f"🔥 Trending topic: {topic}  ({trend['why']})")
-        if not args.topic and os.getenv("PRO_STYLE", "1") != "0" and (args.trend or (args.post and len(state["posts"]) % 3 == 1)):
+        if not args.topic and os.getenv("PRO_STYLE", "1") != "0" and (args.trend or (args.post and len(state["posts"]) % 2 == 1)):
             import pro
             trend = pro.trend_topic(set(state["used_topics"]) | set(json.loads((BASE / "topics_deep.json").read_text(encoding="utf-8"))))
             if trend:
@@ -435,7 +454,7 @@ def main():
             if os.getenv("PRO_STYLE", "1") != "0":     # pro story: one running example, real UI objects, live pages, 3D world
                 try:
                     import pro
-                    script = pro.script_for(topic, facts, banned=state.get("scene_signatures", []))
+                    script = pro.script_for(topic, facts, banned=state.get("scene_signatures", []), mode=pick_length(state))
                     pick_variants(script, state)
                     script.update(series=series, level=level, trend=trend, viewer_q=vq)
                     add_sources(script, facts["sources"] + ((trend or {}).get("sources") or []))
