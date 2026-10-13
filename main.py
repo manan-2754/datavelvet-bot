@@ -510,14 +510,14 @@ def run_long(args, state):
     """The 8-10 min landscape video: outline -> chapters composed from scratch -> fresh genome -> narration."""
     every = float(os.getenv("LONG_EVERY_DAYS") or 3)
     vids = longform.load_long()["videos"]
-    if args.post and not args.script and vids:       # one long video every N days (the workflow checks daily)
+    if args.post and not args.script and vids and not os.getenv("LONG_FORCE"):   # one long video every N days (the workflow checks daily)
         age = (datetime.now(timezone.utc) - datetime.fromisoformat(vids[-1]["time"])).total_seconds() / 86400
         if age < every - 0.5:
             print(f"Last long-form video was {age:.1f} days ago - the next one is due after {every:g} days")
             gh_output(has_video="false", chunks="[]")
             return 0
     art_director.prune(state)
-    script = json.loads(Path(args.script).read_text(encoding="utf-8")) if args.script else         longform.write(state, longform.load_long(), topic=args.topic)
+    script = json.loads(Path(args.script).read_text(encoding="utf-8")) if args.script else         longform.write(state, longform.load_long(), topic=args.topic or os.getenv("LONG_TOPIC") or None)
     script["long"] = True
     script["seed"] = script.get("seed") or pick_seed(state)
     script["style"] = script.get("style") or art_director.new_genome(state, len(script["scenes"]))
@@ -594,6 +594,17 @@ def publish(script, video, meta, state, topic, topic_override):
             add_to_playlist(vid, "Deep Dives: 8-10 Minute Explainers", "Full 3D deep dives, one big topic per video, with chapters.")
         except Exception as e:
             print(f"  YouTube comment/playlist skipped ({e})")
+        if os.getenv("AUTO_POST_INSTAGRAM", "false").lower() == "true":      # the full deep dive on Instagram too (landscape)
+            try:
+                from instagram_upload import upload_reel, post_comment as ig_comment
+                yt = script.get("youtube") or {}
+                about = str(yt.get("description") or "").split("\n\n")[0]
+                cap = (f"{yt.get('title') or script['topic']}\n\n{about}\n\nFull deep dive - save it for later.\n"
+                       "#tech #programming #softwareengineering #coding #computerscience #explained")[:2150]
+                ig = upload_reel(video, cap, meta.get("cover_ms"), landscape=True)
+                ig_comment(ig, script.get("comment") or "What should the next deep dive explain? 👇")
+            except Exception as e:
+                print(f"  Instagram long-form skipped ({str(e)[:200]})")
         ls = longform.load_long()
         longform.remember(ls, script, vid)
         longform.save_long(ls)

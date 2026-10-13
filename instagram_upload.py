@@ -50,10 +50,10 @@ def whoami():
     return _check(requests.get(f"https://{HOST}/{VERSION}/me", params={"fields": "id,username", "access_token": _token()}, timeout=30))
 
 
-def to_1080(video_path):
+def to_1080(video_path, landscape=False):
     from audio_build import ffmpeg as ffmpeg_exe
     out = Path(tempfile.gettempdir()) / f"ig_{Path(video_path).parent.name}.mp4"
-    subprocess.run([ffmpeg_exe(), "-y", "-loglevel", "error", "-i", str(video_path), "-vf", "scale=1080:1920:flags=lanczos",
+    subprocess.run([ffmpeg_exe(), "-y", "-loglevel", "error", "-i", str(video_path), "-vf", "scale=1920:1080:flags=lanczos" if landscape else "scale=1080:1920:flags=lanczos",
                     "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
                     "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", str(out)], check=True)
     return out
@@ -95,9 +95,9 @@ def host_on_github(path, ctype="video/mp4"):
     return asset["browser_download_url"], asset["url"]
 
 
-def upload_reel(video_path, caption, thumb_offset=None, cover=None, trial=False):
+def upload_reel(video_path, caption, thumb_offset=None, cover=None, trial=False, landscape=False):
     token, uid = _token(), _user_id()
-    small = to_1080(video_path)
+    small = to_1080(video_path, landscape)
     url, asset_api = host_on_github(small)
     print(f"  Instagram: video hosted at {url}")
     cover_url, cover_api = host_on_github(cover, "image/jpeg") if cover else (None, None)

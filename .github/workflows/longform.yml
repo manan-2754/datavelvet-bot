@@ -17,6 +17,14 @@ on:
         description: 'Post at this Eastern time (e.g. 15:00) - used by the external cron-job.org trigger'
         type: string
         default: ''
+      topic:
+        description: 'Topic for this video (empty = the bot picks a famous one)'
+        type: string
+        default: ''
+      force:
+        description: 'Make it now even if the last long-form video is under 3 days old'
+        type: boolean
+        default: false
 
 concurrency:
   group: longform-bot
@@ -68,6 +76,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           AFFILIATES_JSON: ${{ vars.AFFILIATES_JSON }}
           RUN_UNTIL: ${{ vars.RUN_UNTIL }}
+          LONG_TOPIC: ${{ inputs.topic }}
+          LONG_FORCE: ${{ inputs.force && '1' || '' }}
         run: |
           set -o pipefail
           python -u main.py --long --stage prepare $POST_FLAG 2>&1 | tee run.log
@@ -151,10 +161,14 @@ jobs:
       - name: Wait for 3:00 PM Eastern
         if: github.event_name == 'schedule' || inputs.at != ''
         run: python wait_until.py "${{ inputs.at || '15:00' }}"
-      - name: Stitch, mix, upload to YouTube
+      - name: Stitch, mix, upload to YouTube + Instagram
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           AUTO_POST_YOUTUBE: ${{ vars.AUTO_POST_YOUTUBE }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUTO_POST_INSTAGRAM: ${{ vars.AUTO_POST_INSTAGRAM }}
           YT_PRIVACY: ${{ vars.YT_PRIVACY }}
         run: |
           set -o pipefail
