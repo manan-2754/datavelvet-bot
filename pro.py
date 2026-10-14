@@ -517,7 +517,11 @@ Pick ONE that MANY people know about - prefer big, famous brands, products, laun
 AWS, Meta, Microsoft, Netflix, Tesla, a major outage) over niche hobby projects - and turn it into a deep-dive topic about how the real system behind it
 works under the hood (e.g. an outage -> "How AWS us-east-1 really works", a model launch -> "How <model> generates text").
 Only real, current events from the list; the topic must be explainable from public engineering docs. Not any of: {used}
-Return ONLY JSON: {{"topic": max 70 chars, a "how X works under the hood" subject (no "How does"), "why": one line, "source_index": n}}"""
+The topic MUST be about a household-name product or company that a non-programmer already uses or has heard of (ChatGPT, iPhone,
+WhatsApp, Netflix, Google, AWS, Tesla...). Programming languages, libraries, protocols and research papers do NOT count. If no story
+in the list is about such a brand, return {{"topic": "", "brand": null}} - do not settle for a niche story.
+Return ONLY JSON: {{"topic": max 70 chars, a "how X works under the hood" subject (no "How does"), "brand": the household-name brand
+it is about (it must appear in the topic), "why": one line, "source_index": n}}"""
 
 
 def trend_topic(used):
@@ -530,7 +534,11 @@ def trend_topic(used):
         res = json.loads(_story_llm(TREND.format(items="\n".join(f"{i}. [{x['src']}] {x['title']}" for i, x in enumerate(items)),
                                                  used=", ".join(list(used)[-80:]))))
         topic = str(res.get("topic", "")).strip()
+        brand = str(res.get("brand") or "").strip()
         if not topic or topic in used:
+            return None
+        if not brand or brand.lower() not in topic.lower():          # no famous brand -> the famous-topics list takes this slot
+            print(f"  trend skipped (no household-name brand in: {topic[:60]})")
             return None
         i = res.get("source_index")
         src = items[i]["url"] if isinstance(i, int) and 0 <= i < len(items) else None
