@@ -188,13 +188,14 @@ def _fix_lines(st, beats, errors):
     return [fixed[i] for i in sorted(fixed)]
 
 
-def write_story(topic, facts=None, banned=(), mode="deep"):
+def write_story(topic, facts=None, banned=(), mode="deep", angle=""):
     m = MODES[mode]
     facts = facts or research.gather(topic, llm=writer.llm)
     ftxt = (f"REFERENCE FACTS (from {', '.join(facts['sources'][:3])}) - use their numbers:\n{facts['facts'][:3500]}") if facts.get("facts") else ""
     fb = ""
     for attempt in range(6):
         ban = ("- These scene layouts were already used in earlier videos - do NOT reproduce any of them:\n  " + "\n  ".join(list(banned)[-60:])) if banned else ""
+        ban = (f"- STORY FORMAT for this video (overrides the SHAPE above where they differ): {angle}\n" if angle else "") + ban
         st = json.loads(_story_llm(PROMPT.format(topic=topic, facts=ftxt, objects=", ".join(writer.OBJECTS), feedback=fb, banned=ban,
                                                  length=m["length"], shape=m["shape"], stages=m["stages"], count=m["count"])))
         beats = [b for b in (st.get("beats") or []) if isinstance(b, dict) and len(str(b.get("line", "")).split()) >= 4]

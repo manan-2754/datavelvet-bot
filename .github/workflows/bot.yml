@@ -2,13 +2,8 @@ name: Motion-as-Code explainer - create + post (split render)
 
 # 3 premium videos a day. Each video: one job writes the script, narration, style and music; 10 free machines render
 # frame-exact slices in parallel (premium glass + holograms, CPU rendering); a final job stitches, mixes and posts.
+# Manual runs only: the scheduled Shorts are now made by flagship.yml (12:00 PM and 5:00 PM Eastern).
 on:
-  schedule:
-    # Posts at 7:00 AM, 12:00 PM and 5:00 PM Eastern. GitHub often starts scheduled jobs hours late, so each run starts
-    # ~4 h early (07:13 / 11:13 / 17:13 UTC), makes and renders the video, then waits and uploads exactly on the slot.
-    - cron: '13 7 * * *'
-    - cron: '13 11 * * *'
-    - cron: '13 17 * * *'
   workflow_dispatch:
     inputs:
       post:

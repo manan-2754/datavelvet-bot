@@ -1,0 +1,114 @@
+name: Flagship Short - one premium video per slot (HyperFrames)
+
+# Two flagship Shorts a day, at 12:00 PM and 5:00 PM Eastern. Each run picks the day's biggest household-name tech story,
+# writes two fact-checked drafts and keeps the stronger, designs a look never used before, writes every scene from scratch
+# in HTML/GSAP, reviews a frame of each scene, renders with HyperFrames, masters the audio, passes the QA gate, then waits
+# and posts exactly on the slot. GitHub often starts scheduled jobs hours late, so each run starts ~8 h early.
+on:
+  schedule:
+    - cron: '13 8 * * *'
+    - cron: '13 13 * * *'
+  workflow_dispatch:
+    inputs:
+      post:
+        description: 'Post after making it'
+        type: boolean
+        default: true
+      slot:
+        description: 'Post at this Eastern time (e.g. 12:00); empty = post as soon as it is ready'
+        type: string
+        default: ''
+      topic:
+        description: 'Topic (empty = the day''s biggest story)'
+        type: string
+        default: ''
+
+concurrency:
+  group: explainer-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  flagship:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+          cd hf && npm ci --no-audit --no-fund
+      - name: Cache the Kokoro voice model (backup voice)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/kokoro
+          key: kokoro-v1.0
+      - name: Which posting slot is this (Eastern time)
+        run: |
+          case "${{ github.event.schedule }}" in
+            "13 8 * * *") echo "SLOT_TARGET=12:00" >> "$GITHUB_ENV" ;;
+            "13 13 * * *") echo "SLOT_TARGET=17:00" >> "$GITHUB_ENV" ;;
+          esac
+          if [ -n "${{ inputs.slot }}" ]; then echo "SLOT_TARGET=${{ inputs.slot }}" >> "$GITHUB_ENV"; fi
+      - name: Make the flagship Short and post it on the slot
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AFFILIATES_JSON: ${{ vars.AFFILIATES_JSON }}
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUTO_POST_YOUTUBE: ${{ vars.AUTO_POST_YOUTUBE }}
+          AUTO_POST_INSTAGRAM: ${{ vars.AUTO_POST_INSTAGRAM }}
+          CHANNEL_HANDLE: ${{ vars.CHANNEL_HANDLE }}
+          YT_PRIVACY: ${{ vars.YT_PRIVACY }}
+          RUN_UNTIL: ${{ vars.RUN_UNTIL }}
+          PYTHONIOENCODING: utf-8
+          TOPIC: ${{ inputs.topic }}
+          POST: ${{ github.event_name != 'workflow_dispatch' || inputs.post }}
+        run: |
+          set -o pipefail
+          FLAGS=""
+          if [ "$POST" = "true" ]; then FLAGS="--post"; fi
+          if [ -n "$SLOT_TARGET" ]; then FLAGS="$FLAGS --at $SLOT_TARGET"; fi
+          if [ -n "$TOPIC" ]; then python -u flagship.py $FLAGS --topic "$TOPIC" 2>&1 | tee run.log
+          else python -u flagship.py $FLAGS 2>&1 | tee run.log; fi
+      - name: Email me if the video was not posted
+        if: failure() || cancelled()
+        env:
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: python notify.py --failed run.log
+      - name: Save topic progress
+        if: always()
+        run: |
+          git config user.name "explainer-bot"
+          git config user.email "explainer-bot@users.noreply.github.com"
+          git add state.json || true
+          git commit -m "bot: posted flagship [skip ci]" || exit 0
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done
+      - name: Keep a copy of the video and its composition (3 days)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flagship-${{ github.run_number }}
+          path: |
+            out/*_flagship_*/
+          retention-days: 3
