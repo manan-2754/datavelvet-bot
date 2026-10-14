@@ -15,7 +15,8 @@
     "How Shopify processes an online purchase",
     "ChatGPT generating a reply token by token",
     "WhatsApp end-to-end encryption",
-    "How Rust's borrow checker proves memory safety at compile time"
+    "How Rust's borrow checker proves memory safety at compile time",
+    "Netflix streaming adaptive video"
   ],
   "used_bank": [
     "dns_explained"
@@ -29,12 +30,12 @@
         "yt_views": 100,
         "yt_likes": 1,
         "yt_comments": 0,
-        "yt_avp": 48.0,
-        "yt_avd": 46.0,
+        "yt_avp": 50.1,
+        "yt_avd": 49.0,
         "yt_subs": 1,
         "yt_shares": 0,
-        "score": 515.0,
-        "fetched": "2026-10-13T12:03:01+00:00"
+        "score": 1026.5,
+        "fetched": "2026-10-14T12:53:25+00:00"
       }
     },
     {
@@ -43,21 +44,22 @@
       "youtube_id": "9P7QiMeIP9U",
       "instagram_id": "18126836476852213",
       "stats": {
-        "yt_views": 1332,
+        "yt_views": 1338,
         "yt_likes": 30,
         "yt_comments": 0,
-        "yt_avp": 44.4,
-        "yt_avd": 43.0,
+        "yt_avp": 44.5,
+        "yt_avd": 44.0,
         "yt_subs": 1,
         "yt_shares": 2,
-        "ig_reach": 202,
+        "ig_reach": 203,
         "ig_saved": 3,
         "ig_shares": 1,
-        "ig_views": 236,
+        "ig_views": 237,
         "ig_likes": 5,
         "ig_comments": 2,
-        "score": 3336.0,
-        "fetched": "2026-10-13T12:03:02+00:00"
+        "ig_avg_watch_s": 11.4,
+        "score": 3903.0,
+        "fetched": "2026-10-14T12:53:27+00:00"
       }
     },
     {
@@ -71,21 +73,22 @@
       "youtube_id": "lSAY6wbyT_A",
       "instagram_id": "18076383422549123",
       "stats": {
-        "yt_views": 284,
+        "yt_views": 287,
         "yt_likes": 3,
         "yt_comments": 0,
         "yt_avp": 37.5,
         "yt_avd": 40.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 458,
+        "ig_reach": 459,
         "ig_saved": 3,
         "ig_shares": 1,
-        "ig_views": 521,
+        "ig_views": 523,
         "ig_likes": 5,
         "ig_comments": 0,
-        "score": 1601.5,
-        "fetched": "2026-10-13T12:03:02+00:00"
+        "ig_avg_watch_s": 8.6,
+        "score": 2068.0,
+        "fetched": "2026-10-14T12:53:27+00:00"
       }
     },
     {
@@ -96,21 +99,22 @@
       "youtube_id": "sM8pNlXKfok",
       "instagram_id": "18117438377093748",
       "stats": {
-        "yt_views": 290,
+        "yt_views": 291,
         "yt_likes": 6,
         "yt_comments": 2,
-        "yt_avp": 35.7,
+        "yt_avp": 35.5,
         "yt_avd": 31.0,
         "yt_subs": 2,
         "yt_shares": 0,
-        "ig_reach": 361,
+        "ig_reach": 362,
         "ig_saved": 1,
         "ig_shares": 1,
-        "ig_views": 405,
+        "ig_views": 407,
         "ig_likes": 1,
         "ig_comments": 0,
-        "score": 1749.0,
-        "fetched": "2026-10-13T12:03:03+00:00"
+        "ig_avg_watch_s": 3.8,
+        "score": 2144.5,
+        "fetched": "2026-10-14T12:53:28+00:00"
       }
     },
     {
@@ -123,18 +127,19 @@
         "yt_views": 19,
         "yt_likes": 0,
         "yt_comments": 0,
-        "yt_avp": 16.8,
-        "yt_avd": 10.0,
+        "yt_avp": 24.3,
+        "yt_avd": 15.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 524,
+        "ig_reach": 525,
         "ig_saved": 5,
         "ig_shares": 3,
-        "ig_views": 584,
+        "ig_views": 588,
         "ig_likes": 8,
         "ig_comments": 0,
-        "score": 1529.0,
-        "fetched": "2026-10-13T12:03:03+00:00"
+        "ig_avg_watch_s": 5.6,
+        "score": 1870.0,
+        "fetched": "2026-10-14T12:53:29+00:00"
       }
     },
     {
@@ -145,21 +150,22 @@
       "youtube_id": "55r1NyCoiSs",
       "instagram_id": "18119557396949139",
       "stats": {
-        "yt_views": 66,
+        "yt_views": 68,
         "yt_likes": 1,
         "yt_comments": 0,
-        "yt_avp": 28.0,
-        "yt_avd": 19.0,
+        "yt_avp": 47.0,
+        "yt_avd": 32.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 207,
+        "ig_reach": 208,
         "ig_saved": 1,
         "ig_shares": 1,
-        "ig_views": 231,
+        "ig_views": 233,
         "ig_likes": 1,
         "ig_comments": 0,
-        "score": 690.5,
-        "fetched": "2026-10-13T12:03:03+00:00"
+        "ig_avg_watch_s": 6.7,
+        "score": 1327.0,
+        "fetched": "2026-10-14T12:53:29+00:00"
       }
     },
     {
@@ -170,21 +176,22 @@
       "youtube_id": "ru0fE5sd0NM",
       "instagram_id": "18076028366735422",
       "stats": {
-        "yt_views": 69,
+        "yt_views": 70,
         "yt_likes": 0,
         "yt_comments": 0,
-        "yt_avp": 35.8,
-        "yt_avd": 27.0,
+        "yt_avp": 46.0,
+        "yt_avd": 35.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 518,
+        "ig_reach": 519,
         "ig_saved": 9,
         "ig_shares": 1,
-        "ig_views": 586,
+        "ig_views": 587,
         "ig_likes": 15,
         "ig_comments": 0,
-        "score": 1888.0,
-        "fetched": "2026-10-13T12:03:03+00:00"
+        "ig_avg_watch_s": 7.5,
+        "score": 2476.5,
+        "fetched": "2026-10-14T12:53:30+00:00"
       }
     },
     {
@@ -195,21 +202,22 @@
       "youtube_id": "5U_rtc8oRHs",
       "instagram_id": "18114047927276016",
       "stats": {
-        "yt_views": 53,
+        "yt_views": 54,
         "yt_likes": 0,
         "yt_comments": 0,
-        "yt_avp": 39.9,
-        "yt_avd": 29.0,
+        "yt_avp": 39.2,
+        "yt_avd": 28.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 219,
+        "ig_reach": 220,
         "ig_saved": 1,
         "ig_shares": 0,
-        "ig_views": 237,
+        "ig_views": 238,
         "ig_likes": 1,
         "ig_comments": 0,
-        "score": 664.0,
-        "fetched": "2026-10-13T12:03:04+00:00"
+        "ig_avg_watch_s": 7.9,
+        "score": 1134.0,
+        "fetched": "2026-10-14T12:53:30+00:00"
       }
     },
     {
@@ -263,15 +271,15 @@
       },
       "youtube_id": "wAYl4q3sCwc",
       "stats": {
-        "yt_views": 646,
+        "yt_views": 648,
         "yt_likes": 6,
         "yt_comments": 0,
-        "yt_avp": 9.3,
-        "yt_avd": 5.0,
-        "yt_subs": 0,
+        "yt_avp": 36.8,
+        "yt_avd": 23.0,
+        "yt_subs": 3,
         "yt_shares": 0,
-        "score": 842.5,
-        "fetched": "2026-10-13T12:03:04+00:00"
+        "score": 1800.0,
+        "fetched": "2026-10-14T12:53:30+00:00"
       }
     },
     {
@@ -335,14 +343,15 @@
         "yt_avd": 12.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 739,
+        "ig_reach": 741,
         "ig_saved": 5,
         "ig_shares": 1,
-        "ig_views": 802,
+        "ig_views": 803,
         "ig_likes": 10,
         "ig_comments": 0,
-        "score": 2104.0,
-        "fetched": "2026-10-13T12:03:04+00:00"
+        "ig_avg_watch_s": 7.4,
+        "score": 2405.0,
+        "fetched": "2026-10-14T12:53:31+00:00"
       }
     },
     {
@@ -401,17 +410,22 @@
       "youtube_id": "sZQlLUJu54U",
       "instagram_id": "17907826107668662",
       "stats": {
-        "yt_views": 271,
+        "yt_views": 273,
         "yt_likes": 1,
         "yt_comments": 1,
-        "ig_reach": 381,
+        "yt_avp": 36.3,
+        "yt_avd": 17.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 382,
         "ig_saved": 3,
         "ig_shares": 0,
-        "ig_views": 428,
+        "ig_views": 429,
         "ig_likes": 2,
         "ig_comments": 1,
-        "score": 1204.5,
-        "fetched": "2026-10-13T12:03:04+00:00"
+        "ig_avg_watch_s": 7.1,
+        "score": 1823.5,
+        "fetched": "2026-10-14T12:53:32+00:00"
       }
     },
     {
@@ -468,17 +482,22 @@
       "youtube_id": "8hYtOJwJJxE",
       "instagram_id": "18178100578445939",
       "stats": {
-        "yt_views": 247,
+        "yt_views": 252,
         "yt_likes": 5,
         "yt_comments": 5,
-        "ig_reach": 1988,
+        "yt_avp": 33.4,
+        "yt_avd": 17.0,
+        "yt_subs": 1,
+        "yt_shares": 0,
+        "ig_reach": 1998,
         "ig_saved": 14,
         "ig_shares": 1,
-        "ig_views": 2227,
+        "ig_views": 2240,
         "ig_likes": 46,
         "ig_comments": 2,
-        "score": 5783.0,
-        "fetched": "2026-10-13T12:03:05+00:00"
+        "ig_avg_watch_s": 9.2,
+        "score": 6549.0,
+        "fetched": "2026-10-14T12:53:32+00:00"
       }
     },
     {
@@ -529,17 +548,22 @@
       "youtube_id": "S0YLDkabNOM",
       "instagram_id": "17948011797304068",
       "stats": {
-        "yt_views": 968,
+        "yt_views": 973,
         "yt_likes": 17,
         "yt_comments": 3,
-        "ig_reach": 2068,
+        "yt_avp": 36.2,
+        "yt_avd": 16.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 2077,
         "ig_saved": 12,
         "ig_shares": 2,
-        "ig_views": 2289,
+        "ig_views": 2295,
         "ig_likes": 33,
         "ig_comments": 3,
-        "score": 6501.0,
-        "fetched": "2026-10-13T12:03:05+00:00"
+        "ig_avg_watch_s": 10.1,
+        "score": 7160.5,
+        "fetched": "2026-10-14T12:53:33+00:00"
       }
     },
     {
@@ -597,17 +621,18 @@
       "youtube_id": "3VRDYCOh0cY",
       "instagram_id": "18425872588147385",
       "stats": {
-        "yt_views": 247,
+        "yt_views": 282,
         "yt_likes": 2,
         "yt_comments": 1,
-        "ig_reach": 1951,
+        "ig_reach": 1967,
         "ig_saved": 27,
         "ig_shares": 9,
-        "ig_views": 2251,
+        "ig_views": 2274,
         "ig_likes": 47,
         "ig_comments": 1,
-        "score": 6438.5,
-        "fetched": "2026-10-13T15:21:48+00:00"
+        "ig_avg_watch_s": 11.1,
+        "score": 6615.5,
+        "fetched": "2026-10-14T12:53:34+00:00"
       }
     },
     {
@@ -662,18 +687,18 @@
       "instagram_id": "18118387330971395",
       "carousel_id": "17865584778680226",
       "stats": {
-        "yt_views": 54,
+        "yt_views": 56,
         "yt_likes": 1,
         "yt_comments": 2,
-        "ig_reach": 149,
+        "ig_reach": 150,
         "ig_saved": 0,
         "ig_shares": 0,
-        "ig_views": 157,
+        "ig_views": 158,
         "ig_likes": 0,
         "ig_comments": 1,
         "ig_avg_watch_s": 5.2,
-        "score": 542.5,
-        "fetched": "2026-10-13T21:50:16+00:00"
+        "score": 546.0,
+        "fetched": "2026-10-14T12:53:34+00:00"
       }
     },
     {
@@ -708,7 +733,22 @@
       "title_alt": "ChatGPT never knows its whole answer. Here's what it does #shorts",
       "title_style": "direct",
       "youtube_id": "17ohiia63Hs",
-      "instagram_id": "17898777042608588"
+      "instagram_id": "17898777042608588",
+      "stats": {
+        "yt_views": 138,
+        "yt_likes": 1,
+        "yt_comments": 1,
+        "ig_reach": 168,
+        "ig_saved": 0,
+        "ig_shares": 0,
+        "ig_views": 195,
+        "ig_likes": 1,
+        "ig_comments": 1,
+        "ig_avg_watch_s": 5.3,
+        "score": 640.0,
+        "fetched": "2026-10-14T12:53:35+00:00"
+      },
+      "title_swapped": true
     },
     {
       "time": "2026-10-13T17:02:57+00:00",
@@ -782,6 +822,43 @@
       "youtube_id": "vT10aH2_xiU",
       "instagram_id": "18116646296018883",
       "ig_trial": false
+    },
+    {
+      "time": "2026-10-14T13:45:03+00:00",
+      "topic": "How Netflix Adaptive Streaming Really Works",
+      "format": "world: Play > Ladder > Manifest > ABR > Open Connect > Scale",
+      "seed": 2051273347,
+      "features": {
+        "angle": "question-chain",
+        "layouts": [
+          "world: Play",
+          "Ladder",
+          "Manifest",
+          "ABR",
+          "Open Connect",
+          "Scale"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Cyan",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "dorian",
+        "length": "long",
+        "level": "engineer",
+        "trend": false,
+        "series": "Tech Explained",
+        "cta": null,
+        "fmt": null,
+        "title": "direct",
+        "cover": "band",
+        "lmode": "deep",
+        "trial": true
+      },
+      "title_alt": "Netflix doesn't pick your video quality. Your player does #shorts",
+      "title_style": "direct",
+      "youtube_id": "gvVuz525mEk",
+      "instagram_id": "18251570797309330",
+      "ig_trial": true
     }
   ],
   "series_counts": {
@@ -802,7 +879,8 @@
     "depth > stack > grid > spiral > pyramid > scatter",
     "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
     "world: Prekeys > Handshake > Ratchet > Relay",
-    "world: Source > MIR > Regions > Loans > Threads > Limits > Recap"
+    "world: Source > MIR > Regions > Loans > Threads > Limits > Recap",
+    "world: Play > Ladder > Manifest > ABR > Open Connect > Scale"
   ],
   "used_palettes": [
     "0:0"
@@ -822,251 +900,263 @@
   "queued_scripts": [],
   "style_memory": [
     {
-      "posted_at": "2026-10-13T23:02:29+00:00",
+      "posted_at": "2026-10-14T13:52:00+00:00",
       "style": {
-        "name": "Cyan Signal / Amber signal",
-        "created": "2026-10-13T21:56:25+00:00",
+        "name": "Cyan Prism / Crimson signal",
+        "created": "2026-10-14T12:57:53+00:00",
         "hook": null,
-        "tag": "side",
-        "reflect": false,
+        "tag": "underline",
+        "reflect": true,
         "glass": {
           "on": true,
-          "roughness": 0.072,
-          "ior": 1.62,
-          "thickness": 0.84,
-          "dof": 8.0,
-          "key": 1.95,
-          "rim": "#C065EE"
+          "roughness": 0.104,
+          "ior": 1.61,
+          "thickness": 0.62,
+          "dof": 7.9,
+          "key": 2.25,
+          "rim": "#50A1F7"
         },
         "mascot": {
           "on": true,
           "side": -1,
-          "kind": "chip"
+          "kind": "globe"
         },
         "_h": {
-          "bg": 179.5,
-          "signal": 32.9,
-          "holo": 238.5
+          "bg": 165.9,
+          "signal": 353.6,
+          "holo": 180.6
         },
         "palette": {
-          "ink": "#081111",
-          "ink2": "#112020",
-          "graphite": "#4E605F",
-          "ash": "#97A7A7",
-          "bone": "#E9F0EF",
-          "signal": "#FE9719",
-          "ember": "#FFDC5F",
-          "blood": "#BA5C0F"
+          "ink": "#0A1613",
+          "ink2": "#122521",
+          "graphite": "#546662",
+          "ash": "#90A19D",
+          "bone": "#E6F0EE",
+          "signal": "#FC1932",
+          "ember": "#FF654E",
+          "blood": "#AD0E2F"
         },
         "holo": [
-          "#484CF0",
-          "#C065EE"
+          "#5BEEEF",
+          "#50A1F7"
         ],
         "type": {
-          "wscale": 0.91,
-          "wtadd": -200,
+          "wscale": 1.12,
+          "wtadd": -100,
           "case": "lower"
         },
         "grid": {
-          "minor": 16,
-          "major": 80
+          "minor": 20,
+          "major": 60
         },
         "caption": {
-          "size": 50,
-          "dy": -24
+          "size": 47,
+          "dy": 36
         },
         "post": {
-          "bloom": 1.03,
-          "bloomThreshold": 0.74,
-          "vignette": 0.33,
-          "grain": 0.025,
-          "ca": 0.28,
-          "halation": 0.1
+          "bloom": 0.9,
+          "bloomThreshold": 0.75,
+          "vignette": 0.27,
+          "grain": 0.065,
+          "ca": 0.83,
+          "halation": 0.33
         },
         "cam2d": {
-          "zoom": 1.045,
-          "roll": 0.0075,
-          "hand": 1.51
+          "zoom": 1.056,
+          "roll": 0.0182,
+          "hand": 1.12
         },
         "cam3d": {
-          "fov": 4.4,
-          "roll": 0.011,
-          "dist": 0.89,
-          "hand": 0.49
+          "fov": 2.2,
+          "roll": -0.032,
+          "dist": 1.0,
+          "hand": 1.5
         },
         "scenes": [
           {
-            "cam": "dutch",
-            "reveal": "draw",
-            "floor": "hex",
-            "spin": 1
-          },
-          {
-            "cam": "push",
-            "reveal": "glitch",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "whip",
-            "reveal": "assemble",
-            "floor": "hex",
-            "spin": 1
-          },
-          {
-            "cam": "dolly",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "orbit",
-            "reveal": "glitch",
-            "floor": "hex",
-            "spin": 1
-          },
-          {
-            "cam": "whip",
-            "reveal": "draw",
-            "floor": "grid",
-            "spin": 1
-          },
-          {
-            "cam": "orbit",
-            "reveal": "glitch",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "draw",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "push",
-            "reveal": "assemble",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "dutch",
+            "cam": "top",
             "reveal": "scan",
-            "floor": "grid",
-            "spin": 1
-          },
-          {
-            "cam": "crane",
-            "reveal": "draw",
             "floor": "hex",
             "spin": 1
           },
           {
             "cam": "low",
-            "reveal": "scan",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "dolly",
-            "reveal": "draw",
-            "floor": "hex",
-            "spin": 1
-          },
-          {
-            "cam": "whip",
-            "reveal": "scan",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "assemble",
-            "floor": "hex",
-            "spin": 1
-          },
-          {
-            "cam": "fly",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "whip",
-            "reveal": "glitch",
-            "floor": "grid",
-            "spin": 1
-          },
-          {
-            "cam": "fly",
-            "reveal": "assemble",
-            "floor": "polar",
-            "spin": 1
-          },
-          {
-            "cam": "whip",
             "reveal": "glitch",
             "floor": "grid",
             "spin": -1
-          },
-          {
-            "cam": "dutch",
-            "reveal": "assemble",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "crane",
-            "reveal": "draw",
-            "floor": "dots",
-            "spin": -1
-          },
-          {
-            "cam": "low",
-            "reveal": "glitch",
-            "floor": "hex",
-            "spin": -1
-          },
-          {
-            "cam": "fly",
-            "reveal": "draw",
-            "floor": "grid",
-            "spin": 1
           },
           {
             "cam": "push",
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "orbit",
+            "reveal": "glitch",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "low",
             "reveal": "assemble",
             "floor": "polar",
             "spin": -1
           },
           {
             "cam": "top",
-            "reveal": "scan",
-            "floor": "dots",
-            "spin": 1
-          },
-          {
-            "cam": "push",
             "reveal": "draw",
             "floor": "hex",
             "spin": -1
           },
           {
+            "cam": "fly",
+            "reveal": "glitch",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "low",
+            "reveal": "scan",
+            "floor": "hex",
+            "spin": -1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "draw",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "whip",
+            "reveal": "scan",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "crane",
+            "reveal": "assemble",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
             "cam": "orbit",
             "reveal": "glitch",
             "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "draw",
+            "floor": "polar",
             "spin": -1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "glitch",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "dolly",
+            "reveal": "assemble",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "scan",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "low",
+            "reveal": "glitch",
+            "floor": "dots",
+            "spin": -1
+          },
+          {
+            "cam": "whip",
+            "reveal": "scan",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "spiral",
+            "reveal": "scan",
+            "floor": "polar",
+            "spin": 1
+          },
+          {
+            "cam": "low",
+            "reveal": "assemble",
+            "floor": "dots",
+            "spin": 1
+          },
+          {
+            "cam": "orbit",
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "fly",
+            "reveal": "scan",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "draw",
+            "floor": "hex",
+            "spin": 1
+          },
+          {
+            "cam": "top",
+            "reveal": "glitch",
+            "floor": "grid",
+            "spin": 1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": 1
           },
           {
             "cam": "push",
             "reveal": "assemble",
             "floor": "hex",
             "spin": -1
+          },
+          {
+            "cam": "dutch",
+            "reveal": "scan",
+            "floor": "grid",
+            "spin": -1
+          },
+          {
+            "cam": "fly",
+            "reveal": "assemble",
+            "floor": "polar",
+            "spin": -1
+          },
+          {
+            "cam": "low",
+            "reveal": "draw",
+            "floor": "dots",
+            "spin": 1
           }
         ]
       },
-      "format": "world: Source > MIR > Regions > Loans > Threads > Limits > Recap",
-      "angle": "countdown"
+      "format": "world: Play > Ladder > Manifest > ABR > Open Connect > Scale",
+      "angle": "question-chain"
     }
   ],
   "scene_signatures": [
@@ -1189,7 +1279,37 @@
     "bars@1,1|chip@1,1|file@0,1|lock@2,1/L3",
     "badge@2,2|code@0,1/L1",
     "badge@0,0|badge@2,1/L0",
-    "badge@1,0|summary@1,2/L0"
+    "badge@1,0|summary@1,2/L0",
+    "tower@2,1|user@0,1/L1",
+    "badge@1,0|globe@1,1/L1",
+    "file@2,1|phone@0,1/L1",
+    "code@1,1/L0",
+    "badge@1,2|bars@0,1|node@1,0|queue@2,1/L2",
+    "stack@1,1/L0",
+    "phone@2,2|queue@1,0|stack@0,2/L2",
+    "bars@2,1|chip@1,1|file@0,1/L2",
+    "badge@2,1|bars@0,0|bars@0,1/L2",
+    "gauge@2,2|stack@0,1|user@2,0/L1",
+    "badge@0,2|file@0,0|file@2,1/L1",
+    "file@2,1|phone@0,1/L1",
+    "bars@2,1|code@0,1|file@1,0/L2",
+    "cloud@1,1|file@0,0|user@2,0/L2",
+    "badge@1,0|file@2,1|phone@0,1/L1",
+    "bars@1,0|bars@1,2|user@0,0/L1",
+    "gauge@0,1|metric@2,0|stack@2,2/L1",
+    "badge@2,1|chip@0,0|slots@0,2/L2",
+    "badge@2,1|chip@1,1|gauge@0,1|slots@1,0/L3",
+    "cloud@0,0|file@2,0|gauge@1,2/L2",
+    "cloud@2,0|code@0,0|file@1,2/L2",
+    "metric@2,2|phone@2,0|tower@0,1/L1",
+    "badge@1,0|globe@2,1|tower@0,1/L1",
+    "avatars@1,2|globe@1,1/L1",
+    "badge@1,2|orbit@1,1/L0",
+    "cylinder@2,0|cylinder@2,2|slots@0,0|tower@0,2/L2",
+    "bars@2,1|file@1,0|phone@0,1/L2",
+    "badge@2,2|gauge@2,0|stack@0,1/L1",
+    "phone@2,1|queue@1,0|tower@0,1/L2",
+    "summary@1,1/L0"
   ],
   "compose_formats": [
     "depth > stack > wave > timeline > radial > grid > pyramid > cluster > ring",
@@ -1202,18 +1322,19 @@
     "depth > stack > grid > spiral > pyramid > scatter",
     "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
     "world: Prekeys > Handshake > Ratchet > Relay",
-    "world: Source > MIR > Regions > Loans > Threads > Limits > Recap"
+    "world: Source > MIR > Regions > Loans > Threads > Limits > Recap",
+    "world: Play > Ladder > Manifest > ABR > Open Connect > Scale"
   ],
   "insights": {
-    "n": 7,
-    "updated": "2026-10-13T21:50:16+00:00",
+    "n": 8,
+    "updated": "2026-10-14T12:53:36+00:00",
     "best": {
       "angle": [
         "journey"
       ],
       "layouts": [
-        "radial",
         "timeline",
+        "radial",
         "cluster"
       ],
       "types": [
@@ -1222,9 +1343,9 @@
         "network"
       ],
       "cams": [
-        "dutch",
+        "push",
         "fly",
-        "push"
+        "dutch"
       ],
       "hue": [
         "Jade"
@@ -1243,23 +1364,17 @@
     "worst": {
       "angle": [],
       "layouts": [
-        "pyramid",
         "ring",
         "scatter"
       ],
       "types": [
-        "tunnel",
         "bars",
         "wave"
       ],
-      "cams": [
-        "low"
-      ],
+      "cams": [],
       "hue": [],
       "voice": [],
-      "music": [
-        "dorian"
-      ],
+      "music": [],
       "length": [],
       "level": [
         "engineer"
@@ -1269,82 +1384,82 @@
     },
     "lift": {
       "angle": {
-        "journey": 1.14,
-        "versus": 0.95
+        "journey": 1.23,
+        "versus": 1.03
       },
       "layouts": {
-        "stack": 1.02,
-        "row": 0.94,
-        "depth": 1.02,
-        "ring": 0.44,
-        "pyramid": 0.78,
-        "scatter": 0.21,
-        "wave": 1.09,
-        "spiral": 0.91,
-        "cluster": 1.32,
-        "tree": 0.91,
-        "diagonal": 1.16,
-        "grid": 0.82,
-        "radial": 1.34,
-        "timeline": 1.34
+        "ring": 0.61,
+        "scatter": 0.34,
+        "wave": 1.22,
+        "stack": 1.17,
+        "row": 1.1,
+        "depth": 1.17,
+        "pyramid": 0.87,
+        "diagonal": 1.26,
+        "cluster": 1.43,
+        "tree": 1.04,
+        "spiral": 0.98,
+        "grid": 0.92,
+        "timeline": 1.45,
+        "radial": 1.45
       },
       "types": {
-        "matrix": 0.98,
-        "stream": 1.0,
-        "text": 1.0,
-        "wave": 0.41,
-        "burst": 1.14,
-        "beam": 0.98,
-        "code": 1.24,
-        "panel": 0.98,
-        "particles": 0.84,
-        "ring": 1.0,
-        "tunnel": 0.78,
-        "object": 0.84,
-        "orbit": 0.99,
-        "link": 1.06,
-        "stack": 1.0,
-        "counter": 0.97,
-        "gauge": 0.97,
-        "cylinder": 0.84,
-        "network": 1.12,
-        "bars": 0.77,
-        "sphere": 0.82,
+        "tunnel": 0.99,
+        "ring": 1.12,
+        "object": 0.96,
+        "orbit": 1.21,
+        "wave": 0.58,
+        "matrix": 1.12,
+        "beam": 1.12,
+        "particles": 0.96,
+        "burst": 1.28,
+        "link": 1.19,
+        "text": 1.12,
+        "stream": 1.12,
+        "panel": 1.15,
+        "code": 1.39,
+        "bars": 0.83,
+        "cylinder": 0.92,
+        "gauge": 1.05,
+        "stack": 1.08,
+        "counter": 1.05,
+        "network": 1.22,
+        "sphere": 0.92,
         "donut": 1.04
       },
       "cams": {
-        "fly": 1.14,
-        "crane": 1.0,
-        "spiral": 0.99,
-        "push": 1.14,
-        "dolly": 1.0,
-        "low": 0.79,
-        "orbit": 1.0,
-        "dutch": 1.16
+        "push": 1.28,
+        "dolly": 1.12,
+        "orbit": 1.12,
+        "fly": 1.28,
+        "crane": 1.12,
+        "low": 0.92,
+        "spiral": 1.21,
+        "dutch": 1.26
       },
       "hue": {
-        "Jade": 1.14
+        "Jade": 1.23
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "dorian": 0.77
+        "dorian": 0.87
       },
       "length": {
-        "mid": 0.94,
-        "short": 1.15
+        "mid": 1.04,
+        "short": 1.3
       },
       "level": {
-        "beginner": 1.1,
-        "engineer": 0.77
+        "beginner": 0.93,
+        "engineer": 0.83
       },
       "trend": {
-        "False": 0.94,
-        "True": 1.14
+        "False": 0.92,
+        "True": 1.23
       },
       "cta": {
-        "save": 0.96
+        "save": 1.04
       }
     }
   },
@@ -1394,18 +1509,22 @@
     {
       "time": "2026-10-13T23:02:29+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-14T13:52:00+00:00",
+      "ok": true
     }
   ],
   "series": {
-    "name": "Under the Hood",
-    "ep": 2
+    "name": "Tech Explained",
+    "ep": 6
   },
   "seen_comments": [
+    "Ugw4ah4_eVwn_Y1DQ3N4AaABAg",
     "UgwvXGIuM76nR9CVH6V4AaABAg",
-    "UgzDh5eiRTJ-xa5YLRt4AaABAg",
     "UgygtUnX-LOvXYrahuZ4AaABAg",
     "UgwXfDTO4tfTrp_36cB4AaABAg",
-    "Ugw4ah4_eVwn_Y1DQ3N4AaABAg"
+    "UgzDh5eiRTJ-xa5YLRt4AaABAg"
   ],
   "viewer_questions": []
 }
