@@ -375,8 +375,8 @@ def main():
             print(f"⏭️ A video was already posted for the {os.environ['SLOT_TARGET']} ET slot - skipping to avoid a double post")
             gh_output(has_video="false", chunks="[]")
             return 0
-    if args.post and not args.long and os.getenv("SLOT_TARGET") and os.getenv("SLOT_TARGET") not in os.getenv("SHORTS_SLOTS", "13:00,17:00").split(","):
-        print(f"⏭️ {os.environ['SLOT_TARGET']} ET is not a Shorts slot any more (two a day: {os.getenv('SHORTS_SLOTS', '13:00,17:00')})")
+    if args.post and not args.long and os.getenv("SLOT_TARGET") and os.getenv("SLOT_TARGET") not in os.getenv("SHORTS_SLOTS", "07:00,12:00,17:00").split(","):
+        print(f"⏭️ {os.environ['SLOT_TARGET']} ET is not a Shorts slot (Shorts post at {os.getenv('SHORTS_SLOTS', '07:00,12:00,17:00')})")
         gh_output(has_video="false", chunks="[]")
         return 0
     if args.post and date.today().isoformat() > RUN_UNTIL:

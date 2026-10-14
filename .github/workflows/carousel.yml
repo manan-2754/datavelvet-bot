@@ -1,10 +1,10 @@
 name: Daily Instagram carousel
 
 # One standalone carousel a day, alternating 3D carousels (3D objects + real charts) and presentation decks, learning
-# from saves which style the audience prefers. Starts ~7:13 AM Eastern, makes the slides, posts at 11:00 AM Eastern.
+# from saves which style the audience prefers. Starts ~12:13 PM Eastern, makes the slides, posts at 8:00 PM Eastern.
 on:
   schedule:
-    - cron: '13 11 * * *'
+    - cron: '13 16 * * *'
   workflow_dispatch:
     inputs:
       post:
@@ -12,7 +12,7 @@ on:
         type: boolean
         default: false
       at:
-        description: 'Post at this Eastern time (e.g. 11:00) - used by the external cron-job.org trigger'
+        description: 'Post at this Eastern time (e.g. 20:00) - used by the external cron-job.org trigger'
         type: string
         default: ''
 
@@ -39,7 +39,7 @@ jobs:
           sudo apt-get update && sudo apt-get install -y ffmpeg
           pip install -r requirements.txt
           cd app && bun install --frozen-lockfile
-      - name: Make the carousel and post it at 11:00 AM Eastern
+      - name: Make the carousel and post it at 8:00 PM Eastern
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -54,7 +54,7 @@ jobs:
         run: |
           set -o pipefail
           if [ "$POST" = "true" ]; then FLAGS="--post"; fi
-          if [ "${{ github.event_name }}" = "schedule" ]; then FLAGS="$FLAGS --at 11:00"; fi
+          if [ "${{ github.event_name }}" = "schedule" ]; then FLAGS="$FLAGS --at 20:00"; fi
           if [ -n "${{ inputs.at }}" ]; then FLAGS="$FLAGS --at ${{ inputs.at }}"; fi
           python -u carousel_lane.py $FLAGS 2>&1 | tee run.log
       - name: Keep the slides (3 days)
