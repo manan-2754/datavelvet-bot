@@ -16,7 +16,8 @@
     "ChatGPT generating a reply token by token",
     "WhatsApp end-to-end encryption",
     "How Rust's borrow checker proves memory safety at compile time",
-    "Netflix streaming adaptive video"
+    "Netflix streaming adaptive video",
+    "How Starlink's satellite network connects users and serves militaries"
   ],
   "used_bank": [
     "dns_explained"
@@ -783,7 +784,21 @@
       "title_style": "direct",
       "youtube_id": "S12biz7lwLI",
       "instagram_id": "18110985320062631",
-      "ig_trial": true
+      "ig_trial": true,
+      "stats": {
+        "yt_views": 133,
+        "yt_likes": 0,
+        "yt_comments": 1,
+        "ig_reach": 179,
+        "ig_saved": 0,
+        "ig_shares": 0,
+        "ig_views": 212,
+        "ig_likes": 1,
+        "ig_comments": 1,
+        "ig_avg_watch_s": 5.3,
+        "score": 632.5,
+        "fetched": "2026-10-14T16:36:40+00:00"
+      }
     },
     {
       "time": "2026-10-13T22:56:10+00:00",
@@ -859,6 +874,38 @@
       "youtube_id": "gvVuz525mEk",
       "instagram_id": "18251570797309330",
       "ig_trial": true
+    },
+    {
+      "time": "2026-10-14T21:00:00+00:00",
+      "topic": "How Starlink Really Connects Users and Militaries",
+      "format": "flagship: versus",
+      "seed": 758955526,
+      "features": {
+        "angle": "versus",
+        "layouts": [
+          "flagship: versus"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Orbital",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "major",
+        "length": "mid",
+        "level": null,
+        "trend": true,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "curiosity",
+        "cover": "bold",
+        "lmode": "quick",
+        "trial": false
+      },
+      "title_alt": "How Starlink connects users and militaries under the hood #shorts",
+      "title_style": "curiosity",
+      "youtube_id": "qODWEYrVg9k",
+      "instagram_id": "17985541182260874",
+      "ig_trial": false
     }
   ],
   "series_counts": {
@@ -880,7 +927,8 @@
     "world: Prompt > Tokens > Attention > Sampling > KV Cache > Scale",
     "world: Prekeys > Handshake > Ratchet > Relay",
     "world: Source > MIR > Regions > Loans > Threads > Limits > Recap",
-    "world: Play > Ladder > Manifest > ABR > Open Connect > Scale"
+    "world: Play > Ladder > Manifest > ABR > Open Connect > Scale",
+    "flagship: versus"
   ],
   "used_palettes": [
     "0:0"
@@ -1157,6 +1205,20 @@
       },
       "format": "world: Play > Ladder > Manifest > ABR > Open Connect > Scale",
       "angle": "question-chain"
+    },
+    {
+      "posted_at": "2026-10-14T21:01:00+00:00",
+      "style": {
+        "name": "Orbital Paper Atlas",
+        "palette": {
+          "ink": "#F3E6CF",
+          "bone": "#1E1B2E",
+          "signal": "#FF5A36",
+          "ash": "#B9A98A"
+        }
+      },
+      "format": "flagship: versus",
+      "angle": "versus"
     }
   ],
   "scene_signatures": [
@@ -1326,11 +1388,11 @@
     "world: Play > Ladder > Manifest > ABR > Open Connect > Scale"
   ],
   "insights": {
-    "n": 8,
-    "updated": "2026-10-14T12:53:36+00:00",
+    "n": 9,
+    "updated": "2026-10-14T16:36:40+00:00",
     "best": {
       "angle": [
-        "journey"
+        "versus"
       ],
       "layouts": [
         "timeline",
@@ -1359,7 +1421,10 @@
       "trend": [
         "True"
       ],
-      "cta": []
+      "cta": [
+        "save"
+      ],
+      "title": []
     },
     "worst": {
       "angle": [],
@@ -1368,98 +1433,105 @@
         "scatter"
       ],
       "types": [
-        "bars",
         "wave"
       ],
       "cams": [],
       "hue": [],
       "voice": [],
-      "music": [],
+      "music": [
+        "dorian"
+      ],
       "length": [],
       "level": [
-        "engineer"
+        "beginner"
       ],
       "trend": [],
-      "cta": []
+      "cta": [],
+      "title": [
+        "direct"
+      ]
     },
     "lift": {
       "angle": {
-        "journey": 1.23,
-        "versus": 1.03
+        "journey": 0.97,
+        "versus": 1.13
       },
       "layouts": {
-        "ring": 0.61,
-        "scatter": 0.34,
-        "wave": 1.22,
-        "stack": 1.17,
-        "row": 1.1,
-        "depth": 1.17,
-        "pyramid": 0.87,
-        "diagonal": 1.26,
-        "cluster": 1.43,
-        "tree": 1.04,
-        "spiral": 0.98,
-        "grid": 0.92,
-        "timeline": 1.45,
-        "radial": 1.45
+        "wave": 1.34,
+        "depth": 1.28,
+        "row": 1.21,
+        "pyramid": 0.95,
+        "ring": 0.67,
+        "scatter": 0.37,
+        "stack": 1.28,
+        "spiral": 1.08,
+        "diagonal": 1.39,
+        "cluster": 1.57,
+        "tree": 1.15,
+        "grid": 1.01,
+        "timeline": 1.6,
+        "radial": 1.6
       },
       "types": {
-        "tunnel": 0.99,
-        "ring": 1.12,
-        "object": 0.96,
-        "orbit": 1.21,
-        "wave": 0.58,
-        "matrix": 1.12,
-        "beam": 1.12,
-        "particles": 0.96,
-        "burst": 1.28,
-        "link": 1.19,
-        "text": 1.12,
-        "stream": 1.12,
-        "panel": 1.15,
-        "code": 1.39,
-        "bars": 0.83,
-        "cylinder": 0.92,
-        "gauge": 1.05,
-        "stack": 1.08,
-        "counter": 1.05,
-        "network": 1.22,
-        "sphere": 0.92,
-        "donut": 1.04
+        "object": 1.05,
+        "link": 1.3,
+        "wave": 0.64,
+        "tunnel": 1.08,
+        "burst": 1.4,
+        "beam": 1.23,
+        "panel": 1.26,
+        "orbit": 1.33,
+        "stream": 1.23,
+        "ring": 1.23,
+        "particles": 1.05,
+        "code": 1.53,
+        "text": 1.23,
+        "matrix": 1.23,
+        "bars": 0.91,
+        "gauge": 1.15,
+        "counter": 1.15,
+        "network": 1.34,
+        "stack": 1.19,
+        "cylinder": 1.01,
+        "sphere": 1.01,
+        "donut": 1.14
       },
       "cams": {
-        "push": 1.28,
-        "dolly": 1.12,
-        "orbit": 1.12,
-        "fly": 1.28,
-        "crane": 1.12,
-        "low": 0.92,
-        "spiral": 1.21,
-        "dutch": 1.26
+        "spiral": 1.33,
+        "low": 1.01,
+        "orbit": 1.23,
+        "dolly": 1.23,
+        "push": 1.4,
+        "crane": 1.23,
+        "fly": 1.4,
+        "dutch": 1.39
       },
       "hue": {
-        "Jade": 1.23
+        "Jade": 1.35
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "dorian": 0.87
+        "dorian": 0.8
       },
       "length": {
-        "mid": 1.04,
-        "short": 1.3
+        "mid": 0.99,
+        "short": 1.44
       },
       "level": {
-        "beginner": 0.93,
-        "engineer": 0.83
+        "beginner": 0.82,
+        "engineer": 0.91
       },
       "trend": {
-        "False": 0.92,
-        "True": 1.23
+        "False": 0.9,
+        "True": 1.35
       },
       "cta": {
-        "save": 1.04
+        "save": 1.15
+      },
+      "title": {
+        "direct": 0.2
       }
     }
   },
@@ -1513,6 +1585,10 @@
     {
       "time": "2026-10-14T13:52:00+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-14T21:01:00+00:00",
+      "ok": true
     }
   ],
   "series": {
@@ -1526,5 +1602,24 @@
     "UgwXfDTO4tfTrp_36cB4AaABAg",
     "UgzDh5eiRTJ-xa5YLRt4AaABAg"
   ],
-  "viewer_questions": []
+  "viewer_questions": [],
+  "flagship_styles": [
+    {
+      "family": "paper cut-out",
+      "fonts": {
+        "display": "DMSerifDisplay",
+        "body": "Fraunces",
+        "mono": "SpaceMono"
+      },
+      "palette": {
+        "bg": "#F3E6CF",
+        "ink": "#1E1B2E",
+        "accent": "#FF5A36",
+        "accent2": "#2E6F9E",
+        "muted": "#B9A98A"
+      },
+      "name": "Orbital Paper Atlas",
+      "story_format": "versus"
+    }
+  ]
 }
