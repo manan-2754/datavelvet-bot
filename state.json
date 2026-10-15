@@ -17,7 +17,8 @@
     "WhatsApp end-to-end encryption",
     "How Rust's borrow checker proves memory safety at compile time",
     "Netflix streaming adaptive video",
-    "How Starlink's satellite network connects users and serves militaries"
+    "How Starlink's satellite network connects users and serves militaries",
+    "How WhatsApp lets you call people who don't have WhatsApp"
   ],
   "used_bank": [
     "dns_explained"
@@ -36,7 +37,7 @@
         "yt_subs": 1,
         "yt_shares": 0,
         "score": 1026.5,
-        "fetched": "2026-10-14T12:53:25+00:00"
+        "fetched": "2026-10-15T13:22:41+00:00"
       }
     },
     {
@@ -45,22 +46,22 @@
       "youtube_id": "9P7QiMeIP9U",
       "instagram_id": "18126836476852213",
       "stats": {
-        "yt_views": 1338,
+        "yt_views": 1302,
         "yt_likes": 30,
         "yt_comments": 0,
-        "yt_avp": 44.5,
+        "yt_avp": 44.6,
         "yt_avd": 44.0,
         "yt_subs": 1,
         "yt_shares": 2,
-        "ig_reach": 203,
+        "ig_reach": 204,
         "ig_saved": 3,
         "ig_shares": 1,
-        "ig_views": 237,
-        "ig_likes": 5,
+        "ig_views": 238,
+        "ig_likes": 6,
         "ig_comments": 2,
         "ig_avg_watch_s": 11.4,
-        "score": 3903.0,
-        "fetched": "2026-10-14T12:53:27+00:00"
+        "score": 3895.0,
+        "fetched": "2026-10-15T13:22:42+00:00"
       }
     },
     {
@@ -74,10 +75,10 @@
       "youtube_id": "lSAY6wbyT_A",
       "instagram_id": "18076383422549123",
       "stats": {
-        "yt_views": 287,
+        "yt_views": 288,
         "yt_likes": 3,
         "yt_comments": 0,
-        "yt_avp": 37.5,
+        "yt_avp": 37.3,
         "yt_avd": 40.0,
         "yt_subs": 0,
         "yt_shares": 0,
@@ -88,8 +89,8 @@
         "ig_likes": 5,
         "ig_comments": 0,
         "ig_avg_watch_s": 8.6,
-        "score": 2068.0,
-        "fetched": "2026-10-14T12:53:27+00:00"
+        "score": 2066.0,
+        "fetched": "2026-10-15T13:22:42+00:00"
       }
     },
     {
@@ -115,7 +116,7 @@
         "ig_comments": 0,
         "ig_avg_watch_s": 3.8,
         "score": 2144.5,
-        "fetched": "2026-10-14T12:53:28+00:00"
+        "fetched": "2026-10-15T13:22:43+00:00"
       }
     },
     {
@@ -125,22 +126,22 @@
       "youtube_id": "pTc0yF47i1A",
       "instagram_id": "18372281464244099",
       "stats": {
-        "yt_views": 19,
+        "yt_views": 20,
         "yt_likes": 0,
         "yt_comments": 0,
         "yt_avp": 24.3,
         "yt_avd": 15.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 525,
+        "ig_reach": 526,
         "ig_saved": 5,
         "ig_shares": 3,
-        "ig_views": 588,
+        "ig_views": 589,
         "ig_likes": 8,
         "ig_comments": 0,
         "ig_avg_watch_s": 5.6,
-        "score": 1870.0,
-        "fetched": "2026-10-14T12:53:29+00:00"
+        "score": 1872.5,
+        "fetched": "2026-10-15T13:22:44+00:00"
       }
     },
     {
@@ -154,9 +155,9 @@
         "yt_views": 68,
         "yt_likes": 1,
         "yt_comments": 0,
-        "yt_avp": 47.0,
-        "yt_avd": 32.0,
-        "yt_subs": 0,
+        "yt_avp": 48.6,
+        "yt_avd": 33.0,
+        "yt_subs": 1,
         "yt_shares": 0,
         "ig_reach": 208,
         "ig_saved": 1,
@@ -165,8 +166,8 @@
         "ig_likes": 1,
         "ig_comments": 0,
         "ig_avg_watch_s": 6.7,
-        "score": 1327.0,
-        "fetched": "2026-10-14T12:53:29+00:00"
+        "score": 1501.0,
+        "fetched": "2026-10-15T13:22:45+00:00"
       }
     },
     {
@@ -180,19 +181,19 @@
         "yt_views": 70,
         "yt_likes": 0,
         "yt_comments": 0,
-        "yt_avp": 46.0,
-        "yt_avd": 35.0,
+        "yt_avp": 45.5,
+        "yt_avd": 34.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 519,
+        "ig_reach": 520,
         "ig_saved": 9,
         "ig_shares": 1,
-        "ig_views": 587,
+        "ig_views": 588,
         "ig_likes": 15,
         "ig_comments": 0,
         "ig_avg_watch_s": 7.5,
-        "score": 2476.5,
-        "fetched": "2026-10-14T12:53:30+00:00"
+        "score": 2470.5,
+        "fetched": "2026-10-15T13:22:46+00:00"
       }
     },
     {
@@ -218,7 +219,7 @@
         "ig_comments": 0,
         "ig_avg_watch_s": 7.9,
         "score": 1134.0,
-        "fetched": "2026-10-14T12:53:30+00:00"
+        "fetched": "2026-10-15T13:22:47+00:00"
       }
     },
     {
@@ -272,15 +273,15 @@
       },
       "youtube_id": "wAYl4q3sCwc",
       "stats": {
-        "yt_views": 648,
+        "yt_views": 649,
         "yt_likes": 6,
         "yt_comments": 0,
         "yt_avp": 36.8,
         "yt_avd": 23.0,
         "yt_subs": 3,
         "yt_shares": 0,
-        "score": 1800.0,
-        "fetched": "2026-10-14T12:53:30+00:00"
+        "score": 1801.0,
+        "fetched": "2026-10-15T13:22:47+00:00"
       }
     },
     {
@@ -340,19 +341,19 @@
         "yt_views": 285,
         "yt_likes": 1,
         "yt_comments": 0,
-        "yt_avp": 22.5,
-        "yt_avd": 12.0,
+        "yt_avp": 27.6,
+        "yt_avd": 14.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 741,
+        "ig_reach": 743,
         "ig_saved": 5,
         "ig_shares": 1,
-        "ig_views": 803,
-        "ig_likes": 10,
+        "ig_views": 807,
+        "ig_likes": 11,
         "ig_comments": 0,
         "ig_avg_watch_s": 7.4,
-        "score": 2405.0,
-        "fetched": "2026-10-14T12:53:31+00:00"
+        "score": 2511.5,
+        "fetched": "2026-10-15T13:22:48+00:00"
       }
     },
     {
@@ -414,19 +415,19 @@
         "yt_views": 273,
         "yt_likes": 1,
         "yt_comments": 1,
-        "yt_avp": 36.3,
-        "yt_avd": 17.0,
+        "yt_avp": 38.1,
+        "yt_avd": 18.0,
         "yt_subs": 0,
         "yt_shares": 0,
-        "ig_reach": 382,
+        "ig_reach": 384,
         "ig_saved": 3,
         "ig_shares": 0,
-        "ig_views": 429,
+        "ig_views": 433,
         "ig_likes": 2,
         "ig_comments": 1,
-        "ig_avg_watch_s": 7.1,
-        "score": 1823.5,
-        "fetched": "2026-10-14T12:53:32+00:00"
+        "ig_avg_watch_s": 7.0,
+        "score": 1854.5,
+        "fetched": "2026-10-15T13:22:49+00:00"
       }
     },
     {
@@ -483,22 +484,22 @@
       "youtube_id": "8hYtOJwJJxE",
       "instagram_id": "18178100578445939",
       "stats": {
-        "yt_views": 252,
+        "yt_views": 251,
         "yt_likes": 5,
         "yt_comments": 5,
-        "yt_avp": 33.4,
-        "yt_avd": 17.0,
+        "yt_avp": 34.9,
+        "yt_avd": 18.0,
         "yt_subs": 1,
         "yt_shares": 0,
-        "ig_reach": 1998,
-        "ig_saved": 14,
+        "ig_reach": 2001,
+        "ig_saved": 13,
         "ig_shares": 1,
-        "ig_views": 2240,
+        "ig_views": 2241,
         "ig_likes": 46,
         "ig_comments": 2,
         "ig_avg_watch_s": 9.2,
-        "score": 6549.0,
-        "fetched": "2026-10-14T12:53:32+00:00"
+        "score": 6533.0,
+        "fetched": "2026-10-15T13:22:50+00:00"
       }
     },
     {
@@ -552,19 +553,19 @@
         "yt_views": 973,
         "yt_likes": 17,
         "yt_comments": 3,
-        "yt_avp": 36.2,
-        "yt_avd": 16.0,
+        "yt_avp": 32.7,
+        "yt_avd": 15.0,
         "yt_subs": 0,
-        "yt_shares": 0,
-        "ig_reach": 2077,
+        "yt_shares": 1,
+        "ig_reach": 2079,
         "ig_saved": 12,
         "ig_shares": 2,
-        "ig_views": 2295,
-        "ig_likes": 33,
+        "ig_views": 2297,
+        "ig_likes": 34,
         "ig_comments": 3,
         "ig_avg_watch_s": 10.1,
-        "score": 7160.5,
-        "fetched": "2026-10-14T12:53:33+00:00"
+        "score": 7196.0,
+        "fetched": "2026-10-15T13:22:50+00:00"
       }
     },
     {
@@ -622,18 +623,22 @@
       "youtube_id": "3VRDYCOh0cY",
       "instagram_id": "18425872588147385",
       "stats": {
-        "yt_views": 282,
+        "yt_views": 287,
         "yt_likes": 2,
         "yt_comments": 1,
-        "ig_reach": 1967,
-        "ig_saved": 27,
+        "yt_avp": 39.8,
+        "yt_avd": 21.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 1972,
+        "ig_saved": 28,
         "ig_shares": 9,
-        "ig_views": 2274,
-        "ig_likes": 47,
+        "ig_views": 2280,
+        "ig_likes": 49,
         "ig_comments": 1,
-        "ig_avg_watch_s": 11.1,
-        "score": 6615.5,
-        "fetched": "2026-10-14T12:53:34+00:00"
+        "ig_avg_watch_s": 11.0,
+        "score": 7315.0,
+        "fetched": "2026-10-15T13:22:51+00:00"
       }
     },
     {
@@ -690,16 +695,20 @@
       "stats": {
         "yt_views": 56,
         "yt_likes": 1,
-        "yt_comments": 2,
-        "ig_reach": 150,
+        "yt_comments": 3,
+        "yt_avp": 15.1,
+        "yt_avd": 9.0,
+        "yt_subs": 0,
+        "yt_shares": 0,
+        "ig_reach": 152,
         "ig_saved": 0,
         "ig_shares": 0,
-        "ig_views": 158,
-        "ig_likes": 0,
+        "ig_views": 159,
+        "ig_likes": 1,
         "ig_comments": 1,
         "ig_avg_watch_s": 5.2,
-        "score": 546.0,
-        "fetched": "2026-10-14T12:53:34+00:00"
+        "score": 859.5,
+        "fetched": "2026-10-15T13:22:52+00:00"
       }
     },
     {
@@ -736,18 +745,18 @@
       "youtube_id": "17ohiia63Hs",
       "instagram_id": "17898777042608588",
       "stats": {
-        "yt_views": 138,
+        "yt_views": 158,
         "yt_likes": 1,
         "yt_comments": 1,
-        "ig_reach": 168,
+        "ig_reach": 171,
         "ig_saved": 0,
         "ig_shares": 0,
-        "ig_views": 195,
+        "ig_views": 197,
         "ig_likes": 1,
         "ig_comments": 1,
-        "ig_avg_watch_s": 5.3,
-        "score": 640.0,
-        "fetched": "2026-10-14T12:53:35+00:00"
+        "ig_avg_watch_s": 5.2,
+        "score": 662.5,
+        "fetched": "2026-10-15T13:22:54+00:00"
       },
       "title_swapped": true
     },
@@ -786,18 +795,18 @@
       "instagram_id": "18110985320062631",
       "ig_trial": true,
       "stats": {
-        "yt_views": 133,
+        "yt_views": 141,
         "yt_likes": 0,
         "yt_comments": 1,
-        "ig_reach": 179,
+        "ig_reach": 180,
         "ig_saved": 0,
         "ig_shares": 0,
-        "ig_views": 212,
-        "ig_likes": 1,
+        "ig_views": 215,
+        "ig_likes": 2,
         "ig_comments": 1,
         "ig_avg_watch_s": 5.3,
-        "score": 632.5,
-        "fetched": "2026-10-14T16:36:40+00:00"
+        "score": 669.0,
+        "fetched": "2026-10-15T13:22:55+00:00"
       }
     },
     {
@@ -836,7 +845,21 @@
       "title_style": "curiosity",
       "youtube_id": "vT10aH2_xiU",
       "instagram_id": "18116646296018883",
-      "ig_trial": false
+      "ig_trial": false,
+      "stats": {
+        "yt_views": 120,
+        "yt_likes": 0,
+        "yt_comments": 1,
+        "ig_reach": 190,
+        "ig_saved": 0,
+        "ig_shares": 0,
+        "ig_views": 212,
+        "ig_likes": 3,
+        "ig_comments": 1,
+        "ig_avg_watch_s": 8.0,
+        "score": 702.0,
+        "fetched": "2026-10-15T13:22:56+00:00"
+      }
     },
     {
       "time": "2026-10-14T13:45:03+00:00",
@@ -873,7 +896,21 @@
       "title_style": "direct",
       "youtube_id": "gvVuz525mEk",
       "instagram_id": "18251570797309330",
-      "ig_trial": true
+      "ig_trial": true,
+      "stats": {
+        "yt_views": 70,
+        "yt_likes": 0,
+        "yt_comments": 1,
+        "ig_reach": 4,
+        "ig_saved": 0,
+        "ig_shares": 0,
+        "ig_views": 8,
+        "ig_likes": 1,
+        "ig_comments": 1,
+        "ig_avg_watch_s": 8.4,
+        "score": 309.0,
+        "fetched": "2026-10-15T13:22:56+00:00"
+      }
     },
     {
       "time": "2026-10-14T21:00:00+00:00",
@@ -906,6 +943,39 @@
       "youtube_id": "qODWEYrVg9k",
       "instagram_id": "17985541182260874",
       "ig_trial": false
+    },
+    {
+      "time": "2026-10-15T16:00:00+00:00",
+      "topic": "WhatsApp can't call a phone without WhatsApp",
+      "format": "flagship: myth",
+      "seed": 1250966577,
+      "features": {
+        "angle": "myth",
+        "layouts": [
+          "flagship: myth"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Switchboard",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "major",
+        "length": "mid",
+        "level": null,
+        "trend": true,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "curiosity",
+        "cover": "bold",
+        "lmode": "quick",
+        "trial": true
+      },
+      "title_alt": "How WhatsApp calls work under the hood: VoIP vs PSTN #shorts",
+      "title_style": "curiosity",
+      "youtube_id": "JxzkE4XQbdY",
+      "instagram_id": "18163967293491734",
+      "ig_trial": true,
+      "carousel_id": "18333289636302466"
     }
   ],
   "series_counts": {
@@ -928,7 +998,8 @@
     "world: Prekeys > Handshake > Ratchet > Relay",
     "world: Source > MIR > Regions > Loans > Threads > Limits > Recap",
     "world: Play > Ladder > Manifest > ABR > Open Connect > Scale",
-    "flagship: versus"
+    "flagship: versus",
+    "flagship: myth"
   ],
   "used_palettes": [
     "0:0"
@@ -1219,6 +1290,20 @@
       },
       "format": "flagship: versus",
       "angle": "versus"
+    },
+    {
+      "posted_at": "2026-10-15T16:02:02+00:00",
+      "style": {
+        "name": "Switchboard Blueprint",
+        "palette": {
+          "ink": "#0A2A5E",
+          "bone": "#F2F8FF",
+          "signal": "#4DE3FF",
+          "ash": "#7F9CCB"
+        }
+      },
+      "format": "flagship: myth",
+      "angle": "myth"
     }
   ],
   "scene_signatures": [
@@ -1388,15 +1473,16 @@
     "world: Play > Ladder > Manifest > ABR > Open Connect > Scale"
   ],
   "insights": {
-    "n": 9,
-    "updated": "2026-10-14T16:36:40+00:00",
+    "n": 11,
+    "updated": "2026-10-15T13:22:56+00:00",
     "best": {
       "angle": [
-        "versus"
+        "versus",
+        "journey"
       ],
       "layouts": [
-        "timeline",
         "radial",
+        "timeline",
         "cluster"
       ],
       "types": [
@@ -1405,9 +1491,9 @@
         "network"
       ],
       "cams": [
+        "dutch",
         "push",
-        "fly",
-        "dutch"
+        "fly"
       ],
       "hue": [
         "Jade"
@@ -1415,7 +1501,8 @@
       "voice": [],
       "music": [],
       "length": [
-        "short"
+        "short",
+        "mid"
       ],
       "level": [],
       "trend": [
@@ -1424,114 +1511,145 @@
       "cta": [
         "save"
       ],
-      "title": []
+      "title": [],
+      "cover": [],
+      "lmode": [],
+      "trial": []
     },
     "worst": {
       "angle": [],
       "layouts": [
         "ring",
-        "scatter"
+        "scatter",
+        "Scale"
       ],
       "types": [
         "wave"
       ],
       "cams": [],
-      "hue": [],
+      "hue": [
+        "Cyan"
+      ],
       "voice": [],
       "music": [
-        "dorian"
+        "dorian",
+        "phrygian"
       ],
-      "length": [],
+      "length": [
+        "long"
+      ],
       "level": [
-        "beginner"
+        "engineer"
       ],
       "trend": [],
       "cta": [],
       "title": [
         "direct"
+      ],
+      "cover": [
+        "band"
+      ],
+      "lmode": [
+        "deep"
+      ],
+      "trial": [
+        "True"
       ]
     },
     "lift": {
       "angle": {
-        "journey": 0.97,
-        "versus": 1.13
+        "journey": 1.19,
+        "versus": 1.34
       },
       "layouts": {
-        "wave": 1.34,
-        "depth": 1.28,
-        "row": 1.21,
-        "pyramid": 0.95,
-        "ring": 0.67,
-        "scatter": 0.37,
-        "stack": 1.28,
-        "spiral": 1.08,
-        "diagonal": 1.39,
-        "cluster": 1.57,
-        "tree": 1.15,
-        "grid": 1.01,
-        "timeline": 1.6,
-        "radial": 1.6
+        "scatter": 0.48,
+        "row": 1.39,
+        "ring": 0.78,
+        "depth": 1.48,
+        "pyramid": 1.2,
+        "stack": 1.48,
+        "wave": 1.65,
+        "tree": 1.31,
+        "diagonal": 1.65,
+        "spiral": 1.27,
+        "cluster": 1.84,
+        "radial": 1.89,
+        "timeline": 1.89,
+        "grid": 1.19,
+        "Scale": 0.18
       },
       "types": {
-        "object": 1.05,
-        "link": 1.3,
-        "wave": 0.64,
-        "tunnel": 1.08,
-        "burst": 1.4,
-        "beam": 1.23,
-        "panel": 1.26,
-        "orbit": 1.33,
-        "stream": 1.23,
-        "ring": 1.23,
-        "particles": 1.05,
-        "code": 1.53,
-        "text": 1.23,
-        "matrix": 1.23,
-        "bars": 0.91,
-        "gauge": 1.15,
-        "counter": 1.15,
-        "network": 1.34,
-        "stack": 1.19,
-        "cylinder": 1.01,
-        "sphere": 1.01,
-        "donut": 1.14
+        "code": 1.79,
+        "burst": 1.64,
+        "particles": 1.26,
+        "wave": 0.74,
+        "stream": 1.45,
+        "ring": 1.45,
+        "link": 1.54,
+        "tunnel": 1.23,
+        "text": 1.45,
+        "matrix": 1.45,
+        "beam": 1.45,
+        "panel": 1.44,
+        "orbit": 1.51,
+        "object": 1.26,
+        "counter": 1.41,
+        "bars": 1.13,
+        "gauge": 1.41,
+        "cylinder": 1.19,
+        "network": 1.58,
+        "stack": 1.43,
+        "sphere": 1.19,
+        "donut": 1.48
       },
       "cams": {
-        "spiral": 1.33,
-        "low": 1.01,
-        "orbit": 1.23,
-        "dolly": 1.23,
-        "push": 1.4,
-        "crane": 1.23,
-        "fly": 1.4,
-        "dutch": 1.39
+        "low": 1.19,
+        "dolly": 1.45,
+        "push": 1.64,
+        "crane": 1.45,
+        "spiral": 1.51,
+        "fly": 1.64,
+        "orbit": 1.45,
+        "dutch": 1.65
       },
       "hue": {
-        "Jade": 1.35
+        "Cyan": 0.42,
+        "Jade": 1.66
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "dorian": 0.8
+        "dorian": 0.81,
+        "phrygian": 0.25
       },
       "length": {
-        "mid": 0.99,
-        "short": 1.44
+        "mid": 1.19,
+        "short": 1.64,
+        "long": 0.2
       },
       "level": {
-        "beginner": 0.82,
-        "engineer": 0.91
+        "beginner": 0.93,
+        "engineer": 0.82
       },
       "trend": {
-        "False": 0.9,
-        "True": 1.35
+        "False": 0.93,
+        "True": 1.19
       },
       "cta": {
-        "save": 1.15
+        "save": 1.38
       },
       "title": {
         "direct": 0.2
+      },
+      "cover": {
+        "band": 0.2
+      },
+      "lmode": {
+        "deep": 0.18
+      },
+      "trial": {
+        "True": 0.18
       }
     }
   },
@@ -1589,6 +1707,10 @@
     {
       "time": "2026-10-14T21:01:00+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-15T16:02:02+00:00",
+      "ok": true
     }
   ],
   "series": {
@@ -1620,6 +1742,23 @@
       },
       "name": "Orbital Paper Atlas",
       "story_format": "versus"
+    },
+    {
+      "family": "engineering blueprint",
+      "fonts": {
+        "display": "BebasNeue",
+        "body": "IBMPlexSans",
+        "mono": "JetBrainsMono"
+      },
+      "palette": {
+        "bg": "#0A2A5E",
+        "ink": "#F2F8FF",
+        "accent": "#4DE3FF",
+        "accent2": "#FFC857",
+        "muted": "#7F9CCB"
+      },
+      "name": "Switchboard Blueprint",
+      "story_format": "myth"
     }
   ]
 }
