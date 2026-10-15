@@ -18,7 +18,8 @@
     "How Rust's borrow checker proves memory safety at compile time",
     "Netflix streaming adaptive video",
     "How Starlink's satellite network connects users and serves militaries",
-    "How WhatsApp lets you call people who don't have WhatsApp"
+    "How WhatsApp lets you call people who don't have WhatsApp",
+    "How Nvidia's RTX Spark lets Windows PCs run on Arm chips"
   ],
   "used_bank": [
     "dns_explained"
@@ -942,7 +943,21 @@
       "title_style": "curiosity",
       "youtube_id": "qODWEYrVg9k",
       "instagram_id": "17985541182260874",
-      "ig_trial": false
+      "ig_trial": false,
+      "stats": {
+        "yt_views": 35,
+        "yt_likes": 0,
+        "yt_comments": 1,
+        "ig_reach": 151,
+        "ig_saved": 0,
+        "ig_shares": 0,
+        "ig_views": 163,
+        "ig_likes": 0,
+        "ig_comments": 1,
+        "ig_avg_watch_s": 4.6,
+        "score": 439.5,
+        "fetched": "2026-10-15T17:47:18+00:00"
+      }
     },
     {
       "time": "2026-10-15T16:00:00+00:00",
@@ -976,6 +991,38 @@
       "instagram_id": "18163967293491734",
       "ig_trial": true,
       "carousel_id": "18333289636302466"
+    },
+    {
+      "time": "2026-10-15T21:00:00+00:00",
+      "topic": "How Windows on Arm runs x86 games with an RTX GPU",
+      "format": "flagship: inside",
+      "seed": 1071875349,
+      "features": {
+        "angle": "inside",
+        "layouts": [
+          "flagship: inside"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Neon",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "lydian",
+        "length": "mid",
+        "level": null,
+        "trend": true,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "curiosity",
+        "cover": "band",
+        "lmode": "quick",
+        "trial": false
+      },
+      "title_alt": "How Windows on Arm runs x86 games with RTX under the hood #shorts",
+      "title_style": "curiosity",
+      "youtube_id": "wV3W00YNt3o",
+      "instagram_id": "18084425102706371",
+      "ig_trial": false
     }
   ],
   "series_counts": {
@@ -999,7 +1046,8 @@
     "world: Source > MIR > Regions > Loans > Threads > Limits > Recap",
     "world: Play > Ladder > Manifest > ABR > Open Connect > Scale",
     "flagship: versus",
-    "flagship: myth"
+    "flagship: myth",
+    "flagship: inside"
   ],
   "used_palettes": [
     "0:0"
@@ -1304,6 +1352,20 @@
       },
       "format": "flagship: myth",
       "angle": "myth"
+    },
+    {
+      "posted_at": "2026-10-15T21:01:15+00:00",
+      "style": {
+        "name": "Neon Silicon Nocturne",
+        "palette": {
+          "ink": "#07060F",
+          "bone": "#F2F0FF",
+          "signal": "#FF2E9A",
+          "ash": "#6F6A94"
+        }
+      },
+      "format": "flagship: inside",
+      "angle": "inside"
     }
   ],
   "scene_signatures": [
@@ -1473,16 +1535,15 @@
     "world: Play > Ladder > Manifest > ABR > Open Connect > Scale"
   ],
   "insights": {
-    "n": 11,
-    "updated": "2026-10-15T13:22:56+00:00",
+    "n": 12,
+    "updated": "2026-10-15T17:47:18+00:00",
     "best": {
       "angle": [
-        "versus",
         "journey"
       ],
       "layouts": [
-        "radial",
         "timeline",
+        "radial",
         "cluster"
       ],
       "types": [
@@ -1499,15 +1560,15 @@
         "Jade"
       ],
       "voice": [],
-      "music": [],
+      "music": [
+        "major"
+      ],
       "length": [
         "short",
         "mid"
       ],
       "level": [],
-      "trend": [
-        "True"
-      ],
+      "trend": [],
       "cta": [
         "save"
       ],
@@ -1532,124 +1593,130 @@
       ],
       "voice": [],
       "music": [
-        "dorian",
         "phrygian"
       ],
       "length": [
         "long"
       ],
-      "level": [
-        "engineer"
-      ],
+      "level": [],
       "trend": [],
       "cta": [],
       "title": [
+        "curiosity",
         "direct"
       ],
       "cover": [
-        "band"
+        "band",
+        "bold"
       ],
       "lmode": [
+        "quick",
         "deep"
       ],
       "trial": [
+        "False",
         "True"
       ]
     },
     "lift": {
       "angle": {
-        "journey": 1.19,
-        "versus": 1.34
+        "journey": 1.28,
+        "versus": 1.02
       },
       "layouts": {
-        "scatter": 0.48,
-        "row": 1.39,
-        "ring": 0.78,
-        "depth": 1.48,
-        "pyramid": 1.2,
-        "stack": 1.48,
-        "wave": 1.65,
-        "tree": 1.31,
-        "diagonal": 1.65,
-        "spiral": 1.27,
-        "cluster": 1.84,
-        "radial": 1.89,
-        "timeline": 1.89,
-        "grid": 1.19,
-        "Scale": 0.18
+        "depth": 1.59,
+        "pyramid": 1.29,
+        "wave": 1.77,
+        "stack": 1.59,
+        "ring": 0.84,
+        "scatter": 0.52,
+        "row": 1.49,
+        "cluster": 1.98,
+        "tree": 1.41,
+        "diagonal": 1.77,
+        "spiral": 1.37,
+        "timeline": 2.04,
+        "radial": 2.04,
+        "grid": 1.28,
+        "Scale": 0.19
       },
       "types": {
-        "code": 1.79,
-        "burst": 1.64,
-        "particles": 1.26,
-        "wave": 0.74,
-        "stream": 1.45,
-        "ring": 1.45,
-        "link": 1.54,
-        "tunnel": 1.23,
-        "text": 1.45,
-        "matrix": 1.45,
-        "beam": 1.45,
-        "panel": 1.44,
-        "orbit": 1.51,
-        "object": 1.26,
-        "counter": 1.41,
-        "bars": 1.13,
-        "gauge": 1.41,
-        "cylinder": 1.19,
-        "network": 1.58,
-        "stack": 1.43,
-        "sphere": 1.19,
-        "donut": 1.48
+        "burst": 1.76,
+        "tunnel": 1.32,
+        "orbit": 1.62,
+        "panel": 1.55,
+        "matrix": 1.56,
+        "beam": 1.56,
+        "link": 1.66,
+        "wave": 0.8,
+        "object": 1.35,
+        "stream": 1.56,
+        "code": 1.92,
+        "text": 1.56,
+        "particles": 1.35,
+        "ring": 1.56,
+        "counter": 1.51,
+        "bars": 1.22,
+        "network": 1.7,
+        "gauge": 1.51,
+        "stack": 1.54,
+        "cylinder": 1.28,
+        "sphere": 1.28,
+        "donut": 1.59
       },
       "cams": {
-        "low": 1.19,
-        "dolly": 1.45,
-        "push": 1.64,
-        "crane": 1.45,
-        "spiral": 1.51,
-        "fly": 1.64,
-        "orbit": 1.45,
-        "dutch": 1.65
+        "orbit": 1.56,
+        "dolly": 1.56,
+        "low": 1.28,
+        "crane": 1.56,
+        "push": 1.76,
+        "fly": 1.76,
+        "spiral": 1.62,
+        "dutch": 1.77
       },
       "hue": {
-        "Cyan": 0.42,
-        "Jade": 1.66
+        "Cyan": 0.46,
+        "Jade": 1.78
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "dorian": 0.81,
-        "phrygian": 0.25
+        "dorian": 0.87,
+        "major": 1.51,
+        "phrygian": 0.27
       },
       "length": {
-        "mid": 1.19,
-        "short": 1.64,
-        "long": 0.2
+        "mid": 1.12,
+        "short": 1.76,
+        "long": 0.22
       },
       "level": {
-        "beginner": 0.93,
-        "engineer": 0.82
+        "beginner": 1.0,
+        "engineer": 0.88
       },
       "trend": {
-        "False": 0.93,
-        "True": 1.19
+        "False": 1.0,
+        "True": 1.0
       },
       "cta": {
-        "save": 1.38
+        "save": 1.48
       },
       "title": {
-        "direct": 0.2
+        "direct": 0.21,
+        "curiosity": 0.22
       },
       "cover": {
-        "band": 0.2
+        "band": 0.22,
+        "bold": 0.22
       },
       "lmode": {
-        "deep": 0.18
+        "quick": 0.22,
+        "deep": 0.2
       },
       "trial": {
-        "True": 0.18
+        "True": 0.19,
+        "False": 0.22
       }
     }
   },
@@ -1711,6 +1778,10 @@
     {
       "time": "2026-10-15T16:02:02+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-15T21:01:15+00:00",
+      "ok": true
     }
   ],
   "series": {
@@ -1759,6 +1830,23 @@
       },
       "name": "Switchboard Blueprint",
       "story_format": "myth"
+    },
+    {
+      "family": "neon night city",
+      "fonts": {
+        "display": "Unbounded",
+        "body": "SpaceGrotesk",
+        "mono": "MajorMonoDisplay"
+      },
+      "palette": {
+        "bg": "#07060F",
+        "ink": "#F2F0FF",
+        "accent": "#FF2E9A",
+        "accent2": "#19E3D0",
+        "muted": "#6F6A94"
+      },
+      "name": "Neon Silicon Nocturne",
+      "story_format": "inside"
     }
   ]
 }
