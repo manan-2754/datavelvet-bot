@@ -257,6 +257,20 @@ def scene_windows(lyrics, total):
     return out
 
 
+def js_error(js):
+    """'' if the scene's js parses as the body of function(tl, S, D, rand, A), else Node's error message."""
+    if "</script" in js.lower():
+        return "contains </script>"
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False, encoding="utf-8") as f:
+        f.write(f"(function(tl, S, D, rand, A) {{\n{js}\n}});\n")
+    try:
+        r = subprocess.run(["node", "--check", f.name], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
+        return "" if r.returncode == 0 else (r.stderr.strip().splitlines() or ["syntax error"])[-1]
+    finally:
+        os.unlink(f.name)
+
+
 def write_scene(i, n, win, beat, art, script_txt, used, feedback=""):
     s0, s1, line, words = win
     cap0, cap1 = caption_band(art)
@@ -267,8 +281,13 @@ def write_scene(i, n, win, beat, art, script_txt, used, feedback=""):
                 kind=kind(), w=W, h=H, xmax=W - 60, ymax=H - 40, art=json.dumps(art, ensure_ascii=False), script=script_txt, i=i + 1, n=n, dur=s1 - s0, line=line,
                 words=json.dumps(words, ensure_ascii=False), key=beat.get("key", ""), idea=idea, used="; ".join(used) or "(none yet)",
                 cap0=cap0, cap1=cap1, feedback=feedback)))
-            if all(isinstance(sc.get(k), str) and sc[k].strip() for k in ("html", "css", "js")) and "<script" not in sc["html"].lower():
+            if not (all(isinstance(sc.get(k), str) and sc[k].strip() for k in ("html", "css", "js")) and "<script" not in sc["html"].lower()):
+                continue
+            err = js_error(sc["js"])                             # one broken scene would break the whole page's timeline
+            if not err:
                 return sc
+            log(f"  scene {i + 1} attempt {attempt + 1}: JS does not parse ({err[:100]})")
+            feedback = f"Your previous js did not parse: {err[:300]}. Return valid JavaScript (no </script>, balanced braces)."
         except Exception as e:
             log(f"  scene {i + 1} attempt {attempt + 1} failed ({str(e)[:100]})")
     raise RuntimeError(f"scene {i + 1} could not be written")
