@@ -266,7 +266,12 @@ def js_error(js):
         f.write(f"(function(tl, S, D, rand, A) {{\n{js}\n}});\n")
     try:
         r = subprocess.run(["node", "--check", f.name], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
-        return "" if r.returncode == 0 else (r.stderr.strip().splitlines() or ["syntax error"])[-1]
+        if r.returncode == 0:
+            return ""
+        lines = r.stderr.strip().splitlines()                   # Node prints: file:line, the code, a caret, then SyntaxError
+        where = next((ln for ln in lines if "Error" in ln), "SyntaxError")
+        code = lines[1].strip() if len(lines) > 1 else ""
+        return f"{where} near: {code[:160]}"
     finally:
         os.unlink(f.name)
 
@@ -290,7 +295,23 @@ def write_scene(i, n, win, beat, art, script_txt, used, feedback=""):
             feedback = f"Your previous js did not parse: {err[:300]}. Return valid JavaScript (no </script>, balanced braces)."
         except Exception as e:
             log(f"  scene {i + 1} attempt {attempt + 1} failed ({str(e)[:100]})")
-    raise RuntimeError(f"scene {i + 1} could not be written")
+    log(f"  scene {i + 1}: using a simple title card (3 attempts failed)")
+    return fallback_scene(beat.get("key") or line.split()[0])
+
+
+def fallback_scene(word):
+    """Safe animated title card in the video's own fonts/colours, so one hard scene never sinks a whole video."""
+    w = html.escape(str(word)[:24])
+    return {"layout": f"title card: {w}",
+            "html": f'<div class="bar"></div><div class="word">{w}</div><div class="rule"></div>',
+            "css": "#S .word { position: absolute; left: 80px; right: 80px; top: 34%; text-align: center; font-size: 150px; line-height: 1;"
+                   " font-weight: 900; color: var(--ink); }\n"
+                   "#S .bar { position: absolute; left: 0; top: 0; bottom: 0; width: 26px; background: var(--a); }\n"
+                   "#S .rule { position: absolute; left: 30%; right: 30%; top: 55%; height: 10px; background: var(--a2); }",
+            "js": 'tl.fromTo(S + " .word", {y: 60, opacity: 0}, {y: 0, opacity: 1, duration: 0.5, ease: "power3.out"}, 0.05);\n'
+                  'tl.fromTo(S + " .rule", {scaleX: 0}, {scaleX: 1, duration: 0.6, ease: "power2.inOut"}, 0.25);\n'
+                  'tl.fromTo(S + " .bar", {scaleY: 0}, {scaleY: 1, duration: 0.5, ease: "power2.out", transformOrigin: "top"}, 0);\n'
+                  'tl.to(S + " .word", {scale: 1.04, duration: Math.max(0.5, D - 0.8), ease: "none"}, 0.6);'}
 
 
 def font_faces(art):
