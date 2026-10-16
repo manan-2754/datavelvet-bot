@@ -20,7 +20,8 @@
     "How Starlink's satellite network connects users and serves militaries",
     "How WhatsApp lets you call people who don't have WhatsApp",
     "How Nvidia's RTX Spark lets Windows PCs run on Arm chips",
-    "How ChatGPT can see and control your Chrome tabs"
+    "How ChatGPT can see and control your Chrome tabs",
+    "Why the new iPhone Duo preorders sold out so fast"
   ],
   "used_bank": [
     "dns_explained"
@@ -1082,6 +1083,38 @@
       "youtube_id": "Cxk4J_tjhR4",
       "instagram_id": "18152353228536053",
       "ig_trial": true
+    },
+    {
+      "time": "2026-10-16T16:36:51+00:00",
+      "topic": "Why iPhone Duo Preorders Sold Out So Fast",
+      "format": "flagship: news-what",
+      "seed": 1073749528,
+      "features": {
+        "angle": "news-what",
+        "layouts": [
+          "flagship: news-what"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Glass",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "dorian",
+        "length": "short",
+        "level": null,
+        "trend": false,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "curiosity",
+        "cover": "band",
+        "lmode": "short",
+        "trial": false
+      },
+      "title_alt": "How iPhone Duo preorders sell out under the hood #shorts",
+      "title_style": "curiosity",
+      "youtube_id": "24g1AEonDGc",
+      "instagram_id": "17885635917506014",
+      "ig_trial": false
     }
   ],
   "series_counts": {
@@ -1107,7 +1140,8 @@
     "flagship: versus",
     "flagship: myth",
     "flagship: inside",
-    "flagship: follow"
+    "flagship: follow",
+    "flagship: news-what"
   ],
   "used_palettes": [
     "0:0"
@@ -1440,6 +1474,20 @@
       },
       "format": "flagship: follow",
       "angle": "follow"
+    },
+    {
+      "posted_at": "2026-10-16T16:37:56+00:00",
+      "style": {
+        "name": "Glass Checkout Interface",
+        "palette": {
+          "ink": "#E9EEF5",
+          "bone": "#101828",
+          "signal": "#0A84FF",
+          "ash": "#8A94A6"
+        }
+      },
+      "format": "flagship: news-what",
+      "angle": "news-what"
     }
   ],
   "scene_signatures": [
@@ -1610,7 +1658,7 @@
   ],
   "insights": {
     "n": 13,
-    "updated": "2026-10-16T13:13:35+00:00",
+    "updated": "2026-10-16T16:30:24+00:00",
     "best": {
       "angle": [
         "journey"
@@ -1627,8 +1675,8 @@
       ],
       "cams": [
         "dutch",
-        "push",
-        "fly"
+        "fly",
+        "push"
       ],
       "hue": [
         "Jade"
@@ -1696,54 +1744,54 @@
         "versus": 1.06
       },
       "layouts": {
-        "scatter": 0.56,
+        "row": 1.51,
         "ring": 0.86,
         "depth": 1.63,
         "stack": 1.63,
-        "wave": 1.81,
-        "row": 1.51,
         "pyramid": 1.34,
-        "tree": 1.44,
-        "spiral": 1.4,
+        "scatter": 0.56,
+        "wave": 1.81,
         "cluster": 2.01,
+        "spiral": 1.4,
+        "tree": 1.44,
         "diagonal": 1.81,
+        "grid": 1.32,
         "radial": 2.08,
         "timeline": 2.08,
-        "grid": 1.32,
         "Scale": 0.29
       },
       "types": {
-        "code": 1.95,
+        "tunnel": 1.35,
+        "ring": 1.59,
+        "link": 1.69,
+        "panel": 1.57,
+        "beam": 1.59,
         "matrix": 1.59,
+        "burst": 1.79,
         "object": 1.39,
         "stream": 1.59,
-        "ring": 1.59,
         "text": 1.59,
-        "panel": 1.57,
-        "tunnel": 1.35,
-        "wave": 0.82,
-        "particles": 1.39,
-        "beam": 1.59,
         "orbit": 1.66,
-        "link": 1.69,
-        "burst": 1.79,
-        "bars": 1.26,
-        "gauge": 1.54,
+        "wave": 0.82,
+        "code": 1.95,
+        "particles": 1.39,
         "cylinder": 1.33,
+        "counter": 1.54,
+        "gauge": 1.54,
         "network": 1.74,
         "stack": 1.57,
-        "counter": 1.54,
+        "bars": 1.26,
         "sphere": 1.32,
         "donut": 1.65
       },
       "cams": {
         "dolly": 1.59,
-        "push": 1.79,
         "spiral": 1.66,
-        "orbit": 1.59,
-        "crane": 1.59,
         "low": 1.31,
         "fly": 1.79,
+        "crane": 1.59,
+        "orbit": 1.59,
+        "push": 1.79,
         "dutch": 1.81
       },
       "hue": {
@@ -1858,6 +1906,10 @@
     {
       "time": "2026-10-16T16:01:05+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-16T16:37:56+00:00",
+      "ok": true
     }
   ],
   "series": {
@@ -1940,6 +1992,23 @@
       },
       "name": "Swiss Signal Red",
       "story_format": "follow"
+    },
+    {
+      "family": "product interface",
+      "fonts": {
+        "display": "Syne",
+        "body": "PlayfairDisplay",
+        "mono": "SpaceMono"
+      },
+      "palette": {
+        "bg": "#E9EEF5",
+        "ink": "#101828",
+        "accent": "#0A84FF",
+        "accent2": "#FF453A",
+        "muted": "#8A94A6"
+      },
+      "name": "Glass Checkout Interface",
+      "story_format": "news-what"
     }
   ]
 }
