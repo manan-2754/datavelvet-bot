@@ -37,6 +37,16 @@
       "lane": "dev",
       "source_topic": "Why Chrome eats all your RAM",
       "instagram_id": "18346634029252134"
+    },
+    {
+      "time": "2026-10-16T00:00:53+00:00",
+      "topic": "How browser fingerprinting tracks you without cookies",
+      "format": "cheatsheet",
+      "theme": "lime",
+      "style": "deck",
+      "lane": "dev",
+      "source_topic": "How browser fingerprinting tracks you without cookies",
+      "instagram_id": "18011142545967483"
     }
   ]
 }
