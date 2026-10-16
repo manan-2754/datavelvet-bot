@@ -49,6 +49,12 @@ MODES = {
 5. SCALE (3-5 beats): what happens at real scale - limits, the bottleneck hitting its ceiling, and the real fix.
 6. REASSEMBLE (2-3 beats): the layers stack back into one system; replay the running example end to end.
 7. END (1 beat): the one-line payoff that loops back into beat 1 (see LOOP)."""},
+    "short": {"length": "25-40 second", "stages": "2-3", "min_stages": 2, "count": "6-8 BEATS, 70-95 words total.",
+              "beats": (6, 8), "words": 100, "seconds": 40, "keep": 5, "ask": "6-8 beats",
+              "shape": """1. HOOK (1 beat): the single most surprising TRUE fact about it - a claim a viewer would forward to a friend.
+2. MECHANISM (4-6 beats): the ONE real mechanism that explains the hook, shown with the running example. Nothing else -
+   cut every side point; a 30-second Short watched to the end beats a longer one watched halfway.
+3. PAYOFF (1 beat): the aha that answers the hook, ending on the loop line (see LOOP)."""},
     "quick": {"length": "45-60 second", "stages": "3-4", "min_stages": 3, "count": "9-12 BEATS, 100-135 words total.",
               "beats": (8, 12), "words": 140, "seconds": 60, "keep": 7, "ask": "9-12 beats",
               "shape": """1. HOOK (1 beat): the single most surprising TRUE fact about the system (a number, a contrast or a myth it
@@ -514,7 +520,8 @@ def fit_narration(sc):
 
 TREND = """Here are today's top tech stories:
 {items}
-Pick ONE that MANY people know about - prefer big, famous brands, products, launches or outages (OpenAI, Apple, Google,
+Pick ONE that MANY people know about AND would forward to a friend ("did you know your phone...", a surprising
+hidden mechanism, a big outage everyone felt) - prefer big, famous brands, products, launches or outages (OpenAI, Apple, Google,
 AWS, Meta, Microsoft, Netflix, Tesla, a major outage) over niche hobby projects - and turn it into a deep-dive topic about how the real system behind it
 works under the hood (e.g. an outage -> "How AWS us-east-1 really works", a model launch -> "How <model> generates text").
 Only real, current events from the list; the topic must be explainable from public engineering docs. Not any of: {used}

@@ -69,7 +69,7 @@ FAMILIES = ["engineering blueprint (white/cyan line work on deep blue, measureme
             "neon night city (dark, glowing signs and wires, reflections)",
             "infographic comic (panels, speech bubbles, bold outlines)"]
 
-ART = """You are the art director of a premium 45-60 second vertical (1080x1920) tech explainer Short.
+ART = """You are the art director of a premium short vertical (1080x1920) tech explainer Short.
 Topic: "{topic}"
 Story: {story}
 Design a look that has NEVER been used on this channel. Recent looks (do NOT reuse their family, fonts or background
@@ -95,6 +95,8 @@ Layouts ALREADY used in this video (do NOT repeat their composition, framing or 
 Canvas: 1080x1920. Keep everything inside x 60..1020. The caption band y {cap0}..{cap1} is reserved for subtitles - put
 NO important content there. Do not write the narration as body text (subtitles already show it); on-screen text is
 labels, numbers and short headings only (max 6 words each, min 34px).
+NUMBERS: only show a specific number, percentage or time if it appears in the WHOLE SCRIPT above. Anything else must be
+a shape without a value (bars, dots, a gauge) or be visibly marked as an example ("e.g.", "~"). Never invent statistics.
 Make it unmistakably about THIS sentence: show the actual thing (a real UI, a chip, a packet, a server rack, a phone, a
 map, numbers counting, a diagram that builds itself) drawn with HTML/CSS/inline SVG - no external images or fonts.
 Motion: something new happens at least every ~1 s, timed to the word timings; an entrance in the first 0.4 s; never a
@@ -113,7 +115,7 @@ Technical rules (a violation breaks the render):
 Return ONLY JSON: {{"layout": one line naming this scene's composition, "html": "...", "css": "...", "js": "..."}}
 {feedback}"""
 
-JUDGE = """Two drafts of a 45-60 s tech Short about "{topic}". Which one will more viewers watch to the end and share?
+JUDGE = """Two drafts of a short vertical tech video about "{topic}". Which one will more viewers watch to the end AND send to a friend?
 Judge the first sentence (does it stop the scroll?), clarity, surprise, and whether every line earns its place.
 A: {a}
 B: {b}
@@ -159,13 +161,22 @@ def pick_topic(state):
     return next(t for t in deep if t not in state["used_topics"] and failed.get(t, 0) < 2), None
 
 
-def best_story(topic, facts, state):
+def pick_length(state):
+    """A/B: 25-40 s ("short") vs 45-60 s ("quick"), learned from what gets watched and pushed (40% exploration)."""
+    if os.getenv("LENGTH_MODE") in ("short", "quick"):          # forced (local samples)
+        return os.environ["LENGTH_MODE"]
+    rnd = random.SystemRandom()
+    modes = ["short", "quick"]
+    return rnd.choice(modes) if rnd.random() < 0.4 else max(modes, key=lambda k: analytics.weight(state, "lmode", k) + rnd.random() * 0.01)
+
+
+def best_story(topic, facts, state, mode="quick"):
     recent = [f.get("story_format") for f in state.get("flagship_styles", [])[-3:]]
     fmts = random.sample([k for k in STORY_FORMATS if k not in recent], 2)
     drafts = []
     for f in fmts:
         try:
-            drafts.append((f, pro.write_story(topic, facts, (), "quick", STORY_FORMATS[f])))
+            drafts.append((f, pro.write_story(topic, facts, (), mode, STORY_FORMATS[f])))
             log(f"  draft '{f}': {len(drafts[-1][1]['beats'])} beats")
         except Exception as e:
             log(f"  draft '{f}' failed ({str(e)[:100]})")
@@ -401,9 +412,11 @@ def make(state, topic=None):
     log(f"📌 Flagship topic: {topic}")
     facts = research.gather(topic, llm=writer.llm)
     log(f"📚 Research: {len(facts['sources'])} source(s)")
-    fmt, st = best_story(topic, facts, state)
+    mode = pick_length(state)
+    log(f"  A/B length: {mode} ({pro.MODES[mode]['length']})")
+    fmt, st = best_story(topic, facts, state, mode)
     script = pro.to_script(st)
-    script["length_mode"], script["format"] = "quick", f"flagship: {fmt}"
+    script["length_mode"], script["format"] = mode, f"flagship: {fmt}"
     main.pick_variants(script, state)
     main.add_sources(script, facts["sources"] + ((trend or {}).get("sources") or []))
     script.update(topic=script.get("topic") or topic, trend=trend, seed=random.randrange(1, 2 ** 31), angle=fmt, story_format=fmt)
