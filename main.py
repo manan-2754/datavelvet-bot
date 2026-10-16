@@ -508,7 +508,7 @@ def main():
 
 def run_long(args, state):
     """The 8-10 min landscape video: outline -> chapters composed from scratch -> fresh genome -> narration."""
-    every = float(os.getenv("LONG_EVERY_DAYS") or 3)
+    every = float(os.getenv("LONG_EVERY_DAYS") or 2)
     vids = longform.load_long()["videos"]
     if args.post and not args.script and vids and not os.getenv("LONG_FORCE"):   # one long video every N days (the workflow checks daily)
         age = (datetime.now(timezone.utc) - datetime.fromisoformat(vids[-1]["time"])).total_seconds() / 86400

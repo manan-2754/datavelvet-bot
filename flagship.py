@@ -43,6 +43,7 @@ import writer  # noqa: E402
 
 HF = BASE / "hf"
 FPS = 30
+W, H = 1080, 1920                       # set_canvas(True) switches to the 1920x1080 long-form canvas
 FONTS = {p.stem: p for p in sorted((HF / "fonts").glob("*.ttf"))}
 STORY_FORMATS = {
     "what-if": "WHAT IF IT STOPPED: open on what the viewer would lose if this system vanished for one minute, then show the "
@@ -69,7 +70,7 @@ FAMILIES = ["engineering blueprint (white/cyan line work on deep blue, measureme
             "neon night city (dark, glowing signs and wires, reflections)",
             "infographic comic (panels, speech bubbles, bold outlines)"]
 
-ART = """You are the art director of a premium short vertical (1080x1920) tech explainer Short.
+ART = """You are the art director of a premium {kind} ({w}x{h}).
 Topic: "{topic}"
 Story: {story}
 Design a look that has NEVER been used on this channel. Recent looks (do NOT reuse their family, fonts or background
@@ -85,17 +86,17 @@ Return ONLY JSON: {{"name": 2-4 word name for this look, "family": the family yo
  "motion": one sentence describing the motion language (speed, easing, what moves),
  "rules": [5 short, concrete design rules every scene must follow so the video feels designed as one piece]}}"""
 
-SCENE = """You design ONE scene of a premium vertical tech-explainer Short, rendered by HyperFrames (HTML + CSS + GSAP).
+SCENE = """You design ONE scene of a premium {kind}, rendered by HyperFrames (HTML + CSS + GSAP).
 LOOK (follow it exactly): {art}
-WHOLE SCRIPT (for context): {script}
+SCRIPT AROUND THIS SCENE (for context): {script}
 THIS IS SCENE {i} of {n}. It lasts {dur:.2f} s. The narrator says: "{line}"
 Word timings (seconds from the scene start): {words}
 Key idea / term: "{key}"   Visual idea from the writer: {idea}
 Layouts ALREADY used in this video (do NOT repeat their composition, framing or main shape): {used}
-Canvas: 1080x1920. Keep everything inside x 60..1020. The caption band y {cap0}..{cap1} is reserved for subtitles - put
+Canvas: {w}x{h}. Keep everything inside x 60..{xmax} and y 40..{ymax}. The caption band y {cap0}..{cap1} is reserved for subtitles - put
 NO important content there. Do not write the narration as body text (subtitles already show it); on-screen text is
 labels, numbers and short headings only (max 6 words each, min 34px).
-NUMBERS: only show a specific number, percentage or time if it appears in the WHOLE SCRIPT above. Anything else must be
+NUMBERS: only show a specific number, percentage or time if it appears in the SCRIPT above. Anything else must be
 a shape without a value (bars, dots, a gauge) or be visibly marked as an example ("e.g.", "~"). Never invent statistics.
 Make it unmistakably about THIS sentence: show the actual thing (a real UI, a chip, a packet, a server rack, a phone, a
 map, numbers counting, a diagram that builds itself) drawn with HTML/CSS/inline SVG - no external images or fonts.
@@ -121,11 +122,20 @@ A: {a}
 B: {b}
 Return ONLY JSON: {{"pick": "A" or "B", "why": one line}}"""
 
-REVIEW = """These are frames from the scenes of a vertical tech Short (one frame per scene, in order). Subtitles are added
-later in the band y {cap0}..{cap1} (out of 1920), so ignore that band being empty.
+REVIEW = """These are frames from the scenes of a tech video (one frame per scene, in order). Subtitles are added
+later in the band y {cap0}..{cap1} (out of {h}), so ignore that band being empty.
 For each frame, flag ONLY real problems: blank or nearly empty frame, text cut off or overflowing the canvas,
 overlapping / unreadable text, broken layout (elements piled in a corner), or a frame that does not show anything
 specific. Return ONLY JSON: {{"bad": [{{"scene": number from 1, "problem": "..."}}]}}"""
+
+
+def set_canvas(land):
+    global W, H
+    W, H = (1920, 1080) if land else (1080, 1920)
+
+
+def kind():
+    return "8-10 minute landscape YouTube deep dive" if W > H else "short vertical tech explainer"
 
 
 def log(msg):
@@ -139,7 +149,7 @@ def claude_vision(images, prompt):
     content = []
     for k, png in enumerate(images, 1):
         im = Image.open(io.BytesIO(png)).convert("RGB")
-        im.thumbnail((540, 960))
+        im.thumbnail((960, 960))
         buf = io.BytesIO()
         im.save(buf, "JPEG", quality=80)
         content += [{"type": "text", "text": f"Scene {k}:"},
@@ -198,7 +208,7 @@ def art_direction(topic, st, state):
                      for r in recent) or "(none yet)"
     fams = [f for f in FAMILIES if not any(f.split(" (")[0] in str(r.get("family")) for r in recent[-4:])]
     for _ in range(3):
-        a = json.loads(pro._story_llm(ART.format(topic=topic, story=" ".join(b["line"] for b in st["beats"])[:1500], recent=rtxt,
+        a = json.loads(pro._story_llm(ART.format(kind=kind(), w=W, h=H, topic=topic, story=" ".join(b["line"] for b in st["beats"])[:1500], recent=rtxt,
                                                  families="; ".join(fams), fonts=", ".join(FONTS))))
         f, p = a.get("fonts") or {}, a.get("palette") or {}
         if all(f.get(k) in FONTS for k in ("display", "body", "mono")) and \
@@ -210,6 +220,8 @@ def art_direction(topic, st, state):
 
 def caption_band(art):
     pos = (art.get("caption") or {}).get("position", "bottom")
+    if W > H:
+        return {"top": (50, 230), "center": (430, 650), "bottom": (840, 1030)}.get(pos, (840, 1030))
     return {"top": (200, 520), "center": (800, 1120), "bottom": (1380, 1700)}.get(pos, (1380, 1700))
 
 
@@ -232,11 +244,11 @@ def scene_windows(lyrics, total):
 def write_scene(i, n, win, beat, art, script_txt, used, feedback=""):
     s0, s1, line, words = win
     cap0, cap1 = caption_band(art)
-    idea = json.dumps(beat.get("widget") or {}, ensure_ascii=False)[:700]
+    idea = json.dumps(beat.get("widget") or {k: beat[k] for k in ("elements", "layout", "key") if k in beat}, ensure_ascii=False)[:700]
     for attempt in range(3):
         try:
             sc = json.loads(pro._story_llm(SCENE.format(
-                art=json.dumps(art, ensure_ascii=False), script=script_txt, i=i + 1, n=n, dur=s1 - s0, line=line,
+                kind=kind(), w=W, h=H, xmax=W - 60, ymax=H - 40, art=json.dumps(art, ensure_ascii=False), script=script_txt, i=i + 1, n=n, dur=s1 - s0, line=line,
                 words=json.dumps(words, ensure_ascii=False), key=beat.get("key", ""), idea=idea, used="; ".join(used) or "(none yet)",
                 cap0=cap0, cap1=cap1, feedback=feedback)))
             if all(isinstance(sc.get(k), str) and sc[k].strip() for k in ("html", "css", "js")) and "<script" not in sc["html"].lower():
@@ -261,7 +273,7 @@ TEXTURE = {"grid": "background-image: linear-gradient(var(--m) 1px, transparent 
 def build_page(art, wins, scenes, lyrics, total, seed):
     pal, cap, fonts = art["palette"], art.get("caption") or {}, art["fonts"]
     cap0, cap1 = caption_band(art)
-    size = max(48, min(78, int(cap.get("size") or 62)))
+    size = int(max(48, min(78, int(cap.get("size") or 62))) * (0.8 if W > H else 1))
     hl = cap.get("highlight", "color")
     css, body, js = [], [], []
     for i, ((s0, s1, _, _), sc) in enumerate(zip(wins, scenes)):
@@ -299,7 +311,7 @@ def build_page(art, wins, scenes, lyrics, total, seed):
 <script src="gsap.min.js"></script>
 <style>
 {font_faces(art)}
-html, body {{ margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: {pal["bg"]}; }}
+html, body {{ margin: 0; width: {W}px; height: {H}px; overflow: hidden; background: {pal["bg"]}; }}
 #root {{ position: relative; width: 100%; height: 100%; overflow: hidden; background: {pal["bg"]}; color: {pal["ink"]};
         font-family: "{fonts["body"]}", sans-serif; --bg: {pal["bg"]}; --ink: {pal["ink"]}; --a: {pal["accent"]}; --a2: {pal["accent2"]}; --m: {pal["muted"]}; }}
 #tex {{ position: absolute; inset: 0; pointer-events: none; {TEXTURE.get(art.get("texture"), TEXTURE["none"])} }}
@@ -315,7 +327,7 @@ html, body {{ margin: 0; width: 1080px; height: 1920px; overflow: hidden; backgr
 </style>
 </head>
 <body>
-<div id="root" data-composition-id="flagship" data-start="0" data-width="1080" data-height="1920" data-duration="{total:.3f}" data-fps="{FPS}">
+<div id="root" data-composition-id="flagship" data-start="0" data-width="{W}" data-height="{H}" data-duration="{total:.3f}" data-fps="{FPS}">
   <div id="tex" class="clip" data-start="0" data-duration="{total:.3f}" data-track-index="0"></div>
   {chr(10).join(body)}
   <div id="caps" class="clip" data-start="0" data-duration="{total:.3f}" data-track-index="3">{"".join(caps)}</div>
@@ -363,10 +375,11 @@ def snapshots(work, times):
 
 
 def make_page(art, wins, beats, lyrics, total, work, seed):
-    script_txt = " / ".join(w[2] for w in wins)
+    def context(i):
+        return " / ".join(w[2] for w in (wins if len(wins) <= 16 else wins[max(0, i - 3):i + 4]))
     scenes, used = [], []
     for i, (win, beat) in enumerate(zip(wins, beats)):
-        sc = write_scene(i, len(wins), win, beat, art, script_txt, used)
+        sc = write_scene(i, len(wins), win, beat, art, context(i), used[-12:])
         scenes.append(sc)
         used.append(str(sc.get("layout", ""))[:80])
         log(f"  🎨 scene {i + 1}/{len(wins)}: {used[-1]}")
@@ -385,8 +398,11 @@ def make_page(art, wins, beats, lyrics, total, work, seed):
                 raise RuntimeError("composition does not pass lint: " + "; ".join(errs)[:300])
         else:
             cap0, cap1 = caption_band(art)
-            rv = claude_vision(snapshots(work, [(w[0] + w[1]) / 2 for w in wins]), REVIEW.format(cap0=cap0, cap1=cap1))
-            for b in rv.get("bad") or []:
+            shots, found = snapshots(work, [(w[0] + w[1]) / 2 for w in wins]), []
+            for b0 in range(0, len(shots), 14):                  # the reviewer sees at most 14 frames at a time
+                rv = claude_vision(shots[b0:b0 + 14], REVIEW.format(cap0=cap0, cap1=cap1, h=H))
+                found += [{**b, "scene": int(b.get("scene", 0)) + b0} for b in rv.get("bad") or []]
+            for b in found:
                 k = int(b.get("scene", 0)) - 1
                 if 0 <= k < len(scenes):
                     bad[k] = "A reviewer looked at a frame of your previous version and found: " + str(b.get("problem"))[:300]
@@ -394,7 +410,7 @@ def make_page(art, wins, beats, lyrics, total, work, seed):
         if not bad:
             return scenes
         for k, why in bad.items():
-            scenes[k] = write_scene(k, len(wins), wins[k], beats[k], art, script_txt, used[:k] + used[k + 1:],
+            scenes[k] = write_scene(k, len(wins), wins[k], beats[k], art, context(k), (used[:k] + used[k + 1:])[-12:],
                                     f"PREVIOUS ATTEMPT WAS REJECTED - {why}\nPrevious attempt: {json.dumps(scenes[k], ensure_ascii=False)[:3000]}")
             used[k] = str(scenes[k].get("layout", ""))[:80]
     (work / "index.html").write_text(build_page(art, wins, scenes, lyrics, total, seed), encoding="utf-8")
@@ -404,6 +420,67 @@ def make_page(art, wins, beats, lyrics, total, work, seed):
 
 
 # ------------------------------------------------------------------ the whole run
+def design_and_render(art, script, lyrics, dur, out_dir):
+    """Every scene designed from scratch for this look, reviewed, then rendered silent to out/raw.mp4."""
+    wins = scene_windows(lyrics, dur)
+    beats = [s.get("data") or {} for s in script["scenes"]][:len(wins)]
+    work = BASE / "out" / "flagship_build"
+    shutil.rmtree(work, ignore_errors=True)
+    (work / "fonts").mkdir(parents=True)
+    shutil.copy(HF / "node_modules/gsap/dist/gsap.min.js", work / "gsap.min.js")
+    for name in set(art["fonts"].values()):
+        shutil.copy(FONTS[name], work / "fonts" / FONTS[name].name)
+    make_page(art, wins, beats, lyrics, dur, work, script["seed"])
+    shutil.copy(work / "index.html", Path(out_dir) / "composition.html")
+    log(f"🎞️ Rendering {len(wins)} scenes with HyperFrames ({W}x{H}, {dur:.0f}s)")
+    raw = main.OUT / "raw.mp4"
+    r = npx("render", work, "-o", raw, "--fps", FPS, "--quality", "looks", "--quiet", timeout=5 * 3600)
+    if r.returncode != 0 or not raw.exists():
+        raise RuntimeError(f"render failed: {(r.stderr or r.stdout)[-400:]}")
+    return raw
+
+
+def next_long_topic(long_st, script):
+    done = set(long_st.get("used_topics", [])) | set(long_st.get("done_queue", [])) | {script["topic"], script.get("queue_topic")}
+    queue = [t for t in long_st.get("next_topics", []) if t not in done]
+    deep = [t for t in json.loads((BASE / "topics_deep.json").read_text(encoding="utf-8")) if t not in done]
+    return (queue or deep or ["how the internet really works"])[0]
+
+
+def make_long(state, topic=None):
+    """The 8-10 minute landscape deep dive, built like the flagship Shorts: fresh look, every scene designed from scratch."""
+    import audio_build
+    import longform
+    t0 = time.time()
+    set_canvas(True)
+    long_st = longform.load_long()
+    script = longform.write(state, long_st, topic=topic)
+    nxt = next_long_topic(long_st, script)
+    last = script["scenes"][-1]
+    script["scenes"].append({"plate": "compose", "title": "", "chapter": last.get("chapter"),
+                             "lines": [f"Next deep dive: {nxt}. Subscribe so it lands in your feed."],
+                             "data": {"chapter": dict((last.get("data") or {}).get("chapter") or {}), "key": "Subscribe"}})
+    yt = script["youtube"]
+    yt["description"] = yt.get("description", "") + f"\n\nNext deep dive: {nxt} - subscribe so you do not miss it."
+    script.update(long=True, seed=random.randrange(1, 2 ** 31), format="flagship long")
+    main.add_links(script, state)
+    out_dir = main.OUT / f"{time.strftime('%Y%m%d-%H%M%S')}_long_{main.slugify(script['topic'])}"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    log("🔊 Narration")
+    dur, voice = audio_build.narrate(script)
+    log(f"  {voice}, {dur:.0f}s, {len(script['scenes'])} scenes")
+    lyrics = json.loads((BASE / "data" / "lyrics.json").read_text(encoding="utf-8"))
+    recent = {"flagship_styles": state.get("flagship_styles", []) + long_st.get("styles", [])}
+    art = art_direction(script["topic"], {"beats": [{"line": " ".join(s["lines"])} for s in script["scenes"]]}, recent)
+    log(f"🎨 Look: {art.get('name')} - {art.get('family')} | fonts {', '.join(art['fonts'].values())} | bg {art['palette']['bg']}")
+    p = art["palette"]
+    script["style"] = {"name": art.get("name"), "palette": {"ink": p["bg"], "bone": p["ink"], "signal": p["accent"], "ash": p["muted"]}}
+    raw = design_and_render(art, script, lyrics, dur, out_dir)
+    video, meta = main.finish_video(script, {"out_dir": str(out_dir), "dur": dur, "voice": voice}, raw)
+    log(f"✅ Long-form ready in {(time.time() - t0) / 60:.0f} min: {video}")
+    return script, video, meta, {"family": art.get("family"), "fonts": art["fonts"], "palette": art["palette"], "name": art.get("name")}
+
+
 def make(state, topic=None):
     t0 = time.time()
     trend = None
@@ -430,21 +507,7 @@ def make(state, topic=None):
     log(f"🎨 Look: {art.get('name')} - {art.get('family')} | fonts {', '.join(art['fonts'].values())} | bg {art['palette']['bg']}")
     p = art["palette"]
     script["style"] = {"name": art.get("name"), "palette": {"ink": p["bg"], "bone": p["ink"], "signal": p["accent"], "ash": p["muted"]}}
-    wins = scene_windows(lyrics, dur)
-    beats = [s.get("data") or {} for s in script["scenes"]][:len(wins)]
-    work = BASE / "out" / "flagship_build"
-    shutil.rmtree(work, ignore_errors=True)
-    (work / "fonts").mkdir(parents=True)
-    shutil.copy(HF / "node_modules/gsap/dist/gsap.min.js", work / "gsap.min.js")
-    for name in set(art["fonts"].values()):
-        shutil.copy(FONTS[name], work / "fonts" / FONTS[name].name)
-    make_page(art, wins, beats, lyrics, dur, work, script["seed"])
-    shutil.copy(work / "index.html", out_dir / "composition.html")
-    log("🎞️ Rendering with HyperFrames")
-    raw = main.OUT / "raw.mp4"
-    r = npx("render", work, "-o", raw, "--fps", FPS, "--quality", "looks", "--quiet", timeout=4 * 3600)
-    if r.returncode != 0 or not raw.exists():
-        raise RuntimeError(f"render failed: {(r.stderr or r.stdout)[-400:]}")
+    raw = design_and_render(art, script, lyrics, dur, out_dir)
     os.environ["HF_POST"] = "0"                      # the flagship is designed end to end - no generic chapter/share cards
     video, meta = main.finish_video(script, {"out_dir": str(out_dir), "dur": dur, "voice": voice}, raw)
     state.setdefault("flagship_styles", []).append({"family": art.get("family"), "fonts": art["fonts"], "palette": art["palette"],
@@ -468,7 +531,10 @@ def run():
     ap.add_argument("--at", help="post at this Eastern time (HH:MM)")
     ap.add_argument("--topic")
     ap.add_argument("--show", action="store_true")
+    ap.add_argument("--long", action="store_true", help="the 8-10 min landscape deep dive")
     a = ap.parse_args()
+    if a.long:
+        return run_long(a)
     if a.post and datetime.now().date().isoformat() > main.RUN_UNTIL:
         log(f"Posting window ended on {main.RUN_UNTIL}.")
         return 0
@@ -491,6 +557,35 @@ def run():
     if a.at:
         subprocess.run([sys.executable, str(BASE / "wait_until.py"), a.at], check=False)
     return main.publish(script, video, meta, state, topic, False)
+
+
+def run_long(a):
+    import longform
+    if a.post and datetime.now().date().isoformat() > main.RUN_UNTIL:
+        log(f"Posting window ended on {main.RUN_UNTIL}.")
+        return 0
+    every = float(os.getenv("LONG_EVERY_DAYS") or 2)
+    vids = longform.load_long()["videos"]
+    if a.post and vids and not os.getenv("LONG_FORCE"):           # one long video every N days (the workflow checks daily)
+        age = (datetime.now().astimezone() - datetime.fromisoformat(vids[-1]["time"])).total_seconds() / 86400
+        if age < every - 0.5:
+            log(f"Last long-form video was {age:.1f} days ago - the next one is due after {every:g} days")
+            return 0
+    state = main.load_state()
+    script, video, meta, look = make_long(state, a.topic or os.getenv("LONG_TOPIC") or None)
+    if a.show and Path(main.VLC).exists():
+        subprocess.Popen([main.VLC, str(video)])
+    if not a.post:
+        log("(local run - nothing posted)")
+        return 0
+    if a.at:
+        subprocess.run([sys.executable, str(BASE / "wait_until.py"), a.at], check=False)
+    rc = main.publish(script, video, meta, state, None, True)
+    ls = longform.load_long()                                     # publish saved the video; remember its look too
+    ls.setdefault("styles", []).append(look)
+    ls["styles"] = ls["styles"][-30:]
+    longform.save_long(ls)
+    return rc
 
 
 if __name__ == "__main__":

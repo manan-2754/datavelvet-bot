@@ -1,11 +1,12 @@
-name: Long-form 8-10 min YouTube video (landscape, split render)
+name: Long-form 8-10 min YouTube video (landscape, HyperFrames)
 
-# Every 3 days: one job plans the chapters, writes and composes every scene from scratch, narrates and critiques;
-# 20 free machines render frame-exact slices of the 1920x1080 video in parallel; a final job stitches, mixes, uploads.
+# Every 2 days: the bot plans fact-checked chapters, picks a look never used before on the channel, designs every scene
+# from scratch in HTML/GSAP, reviews a frame of each, renders the 1920x1080 video with HyperFrames, masters the audio,
+# passes the QA gate, and posts at 3:00 PM Eastern on YouTube and Instagram. Posting stops after RUN_UNTIL.
 on:
   schedule:
-    # Checked daily; a video is made only when the last one is 3+ days old (repo variable LONG_EVERY_DAYS). It starts at
-    # 12:13 UTC (~8 AM Eastern), plans/renders, then posts at exactly 3:00 PM Eastern. Posting stops after RUN_UNTIL.
+    # Checked daily; a video is made only when the last one is 2+ days old (repo variable LONG_EVERY_DAYS overrides).
+    # Starts at 12:13 UTC (~8 AM Eastern) so GitHub's late starts still leave time to make it before 3:00 PM.
     - cron: '13 12 * * *'
   workflow_dispatch:
     inputs:
@@ -14,7 +15,7 @@ on:
         type: boolean
         default: true
       at:
-        description: 'Post at this Eastern time (e.g. 15:00) - used by the external cron-job.org trigger'
+        description: 'Post at this Eastern time (e.g. 15:00); empty = post as soon as it is ready'
         type: string
         default: ''
       topic:
@@ -22,7 +23,7 @@ on:
         type: string
         default: ''
       force:
-        description: 'Make it now even if the last long-form video is under 3 days old'
+        description: 'Make it now even if the last long-form video is under 2 days old'
         type: boolean
         default: false
 
@@ -33,39 +34,30 @@ concurrency:
 permissions:
   contents: write
 
-env:
-  RENDER_FPS: '30'
-  RENDER_SAMPLES: '2'
-  RENDER_CHUNKS: '20'
-  PYTHONIOENCODING: utf-8
-  POST_FLAG: ${{ (github.event_name != 'workflow_dispatch' || inputs.post) && '--post' || '' }}
-
 jobs:
-  prepare:
+  longform:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
-    outputs:
-      has_video: ${{ steps.prep.outputs.has_video }}
-      chunks: ${{ steps.prep.outputs.chunks }}
+    timeout-minutes: 345
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: pip
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Install deps
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg
           pip install -r requirements.txt
-          cd app && bun install --frozen-lockfile
+          cd hf && npm ci --no-audit --no-fund
       - name: Cache the Kokoro voice model (backup voice)
         uses: actions/cache@v4
         with:
           path: ~/.cache/kokoro
           key: kokoro-v1.0
-      - name: Outline, chapters, research, narration, style, critic
-        id: prep
+      - name: Make the long-form video and post it
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
@@ -76,93 +68,9 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           AFFILIATES_JSON: ${{ vars.AFFILIATES_JSON }}
           RUN_UNTIL: ${{ vars.RUN_UNTIL }}
+          LONG_EVERY_DAYS: ${{ vars.LONG_EVERY_DAYS }}
           LONG_TOPIC: ${{ inputs.topic }}
           LONG_FORCE: ${{ inputs.force && '1' || '' }}
-        run: |
-          set -o pipefail
-          python -u main.py --long --stage prepare $POST_FLAG 2>&1 | tee run.log
-      - name: Hand the bundle to the render machines
-        if: steps.prep.outputs.has_video == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: long-bundle-${{ github.run_number }}
-          path: |
-            out/bundle.json
-            data/lyrics.json
-            data/audio.json
-            audio/voiceover.mp3
-          retention-days: 1
-      - name: Email me if the video was not prepared
-        if: failure() || cancelled()
-        env:
-          SMTP_USER: ${{ vars.SMTP_USER }}
-          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-        run: python notify.py --failed run.log
-
-  render:
-    needs: prepare
-    if: needs.prepare.outputs.has_video == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 180
-    strategy:
-      fail-fast: false
-      max-parallel: 14   # leaves 6 of the 20 free job slots for a Short rendering at the same time
-      matrix:
-        chunk: ${{ fromJSON(needs.prepare.outputs.chunks) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: pip
-      - uses: oven-sh/setup-bun@v2
-      - name: Install deps
-        run: |
-          sudo apt-get update && sudo apt-get install -y ffmpeg
-          pip install -r requirements.txt
-          cd app && bun install --frozen-lockfile
-      - uses: actions/download-artifact@v4
-        with:
-          name: long-bundle-${{ github.run_number }}
-          path: .
-      - name: Render slice ${{ matrix.chunk }} (retried once)
-        run: python -u main.py --stage render --chunk ${{ matrix.chunk }} || python -u main.py --stage render --chunk ${{ matrix.chunk }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: long-chunk-${{ github.run_number }}-${{ matrix.chunk }}
-          path: out/chunks/*.mp4
-          retention-days: 1
-
-  finish:
-    needs: [prepare, render]
-    if: needs.prepare.outputs.has_video == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 340
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: pip
-      - name: Install deps
-        run: |
-          sudo apt-get update && sudo apt-get install -y ffmpeg
-          pip install -r requirements.txt
-      - uses: actions/download-artifact@v4
-        with:
-          name: long-bundle-${{ github.run_number }}
-          path: .
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: long-chunk-${{ github.run_number }}-*
-          path: out/chunks
-          merge-multiple: true
-      - name: Wait for 3:00 PM Eastern
-        if: github.event_name == 'schedule' || inputs.at != ''
-        run: python wait_until.py "${{ inputs.at || '15:00' }}"
-      - name: Stitch, mix, upload to YouTube + Instagram
-        env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           AUTO_POST_YOUTUBE: ${{ vars.AUTO_POST_YOUTUBE }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
@@ -170,9 +78,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AUTO_POST_INSTAGRAM: ${{ vars.AUTO_POST_INSTAGRAM }}
           YT_PRIVACY: ${{ vars.YT_PRIVACY }}
+          PYTHONIOENCODING: utf-8
+          POST: ${{ github.event_name != 'workflow_dispatch' || inputs.post }}
+          AT: ${{ inputs.at || (github.event_name == 'schedule' && '15:00' || '') }}
         run: |
           set -o pipefail
-          python -u main.py --stage finish $POST_FLAG 2>&1 | tee run.log
+          FLAGS="--long"
+          if [ "$POST" = "true" ]; then FLAGS="$FLAGS --post"; fi
+          if [ -n "$AT" ]; then FLAGS="$FLAGS --at $AT"; fi
+          python -u flagship.py $FLAGS 2>&1 | tee run.log
       - name: Email me if the video was not posted
         if: failure() || cancelled()
         env:
@@ -188,10 +102,12 @@ jobs:
           git add long_state.json || true
           git commit -m "bot: long-form video [skip ci]" || exit 0
           for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done
-      - name: Keep a copy of the video (3 days)
+      - name: Keep a copy of the video and its composition (3 days)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: long-video-${{ github.run_number }}
-          path: out/*/video.mp4
+          path: |
+            out/*_long_*/video.mp4
+            out/*_long_*/composition.html
           retention-days: 3
