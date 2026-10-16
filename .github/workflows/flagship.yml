@@ -1,6 +1,6 @@
 name: Flagship Short - one premium video per slot (HyperFrames)
 
-# Two flagship Shorts a day, at 12:00 PM and 5:00 PM Eastern. Each run picks the day's biggest household-name tech story,
+# Two flagship Shorts a day, at 12:00 PM and 6:00 PM Eastern. Each run picks the day's biggest household-name tech story,
 # writes two fact-checked drafts and keeps the stronger, designs a look never used before, writes every scene from scratch
 # in HTML/GSAP, reviews a frame of each scene, renders with HyperFrames, masters the audio, passes the QA gate, then waits
 # and posts exactly on the slot. GitHub often starts scheduled jobs hours late, so each run starts ~8 h early.
@@ -65,7 +65,7 @@ jobs:
         run: |
           case "${{ github.event.schedule }}" in
             "13 8 * * *") echo "SLOT_TARGET=12:00" >> "$GITHUB_ENV" ;;
-            "13 13 * * *") echo "SLOT_TARGET=17:00" >> "$GITHUB_ENV" ;;
+            "13 13 * * *") echo "SLOT_TARGET=18:00" >> "$GITHUB_ENV" ;;
           esac
           if [ -n "${{ inputs.slot }}" ]; then echo "SLOT_TARGET=${{ inputs.slot }}" >> "$GITHUB_ENV"; fi
       - name: Make the flagship Short and post it on the slot

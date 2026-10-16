@@ -2,9 +2,9 @@ name: Watchdog - email if no video was posted
 
 on:
   schedule:
-    # ~2h30 after each flagship slot (12:00 and 17:00 ET = 16:00 and 21:00 UTC)
+    # ~2h30 after each flagship slot (12:00 and 18:00 ET = 16:00 and 22:00 UTC)
     - cron: '30 18 * * *'
-    - cron: '30 23 * * *'
+    - cron: '30 0 * * *'
   workflow_dispatch:
     inputs:
       test:
