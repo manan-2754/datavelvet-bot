@@ -21,7 +21,8 @@
     "How WhatsApp lets you call people who don't have WhatsApp",
     "How Nvidia's RTX Spark lets Windows PCs run on Arm chips",
     "How ChatGPT can see and control your Chrome tabs",
-    "Why the new iPhone Duo preorders sold out so fast"
+    "Why the new iPhone Duo preorders sold out so fast",
+    "How Google Play vets apps and ranks search results"
   ],
   "used_bank": [
     "dns_explained"
@@ -1115,6 +1116,38 @@
       "youtube_id": "24g1AEonDGc",
       "instagram_id": "17885635917506014",
       "ig_trial": false
+    },
+    {
+      "time": "2026-10-16T22:00:00+00:00",
+      "topic": "How Google Play Vets Apps and Ranks Search",
+      "format": "flagship: countdown",
+      "seed": 509580044,
+      "features": {
+        "angle": "countdown",
+        "layouts": [
+          "flagship: countdown"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Phosphor",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "lydian",
+        "length": "short",
+        "level": null,
+        "trend": true,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "direct",
+        "cover": "bold",
+        "lmode": "short",
+        "trial": true
+      },
+      "title_alt": "DataVelvet: Why Google Play never finishes ranking your app #shorts",
+      "title_style": "direct",
+      "youtube_id": "4_oCb-2T_RI",
+      "instagram_id": "18131482954773624",
+      "ig_trial": true
     }
   ],
   "series_counts": {
@@ -1141,7 +1174,8 @@
     "flagship: myth",
     "flagship: inside",
     "flagship: follow",
-    "flagship: news-what"
+    "flagship: news-what",
+    "flagship: countdown"
   ],
   "used_palettes": [
     "0:0"
@@ -1488,6 +1522,20 @@
       },
       "format": "flagship: news-what",
       "angle": "news-what"
+    },
+    {
+      "posted_at": "2026-10-16T22:01:03+00:00",
+      "style": {
+        "name": "Phosphor Ranking Console",
+        "palette": {
+          "ink": "#0B0F0A",
+          "bone": "#D8FFD0",
+          "signal": "#FFB000",
+          "ash": "#4A6B49"
+        }
+      },
+      "format": "flagship: countdown",
+      "angle": "countdown"
     }
   ],
   "scene_signatures": [
@@ -1658,7 +1706,7 @@
   ],
   "insights": {
     "n": 13,
-    "updated": "2026-10-16T16:30:24+00:00",
+    "updated": "2026-10-16T16:55:03+00:00",
     "best": {
       "angle": [
         "journey"
@@ -1744,16 +1792,16 @@
         "versus": 1.06
       },
       "layouts": {
-        "row": 1.51,
-        "ring": 0.86,
-        "depth": 1.63,
-        "stack": 1.63,
         "pyramid": 1.34,
         "scatter": 0.56,
+        "row": 1.51,
+        "stack": 1.63,
         "wave": 1.81,
+        "depth": 1.63,
+        "ring": 0.86,
         "cluster": 2.01,
-        "spiral": 1.4,
         "tree": 1.44,
+        "spiral": 1.4,
         "diagonal": 1.81,
         "grid": 1.32,
         "radial": 2.08,
@@ -1761,36 +1809,36 @@
         "Scale": 0.29
       },
       "types": {
-        "tunnel": 1.35,
-        "ring": 1.59,
         "link": 1.69,
-        "panel": 1.57,
+        "orbit": 1.66,
+        "particles": 1.39,
+        "text": 1.59,
+        "stream": 1.59,
+        "wave": 0.82,
         "beam": 1.59,
         "matrix": 1.59,
-        "burst": 1.79,
         "object": 1.39,
-        "stream": 1.59,
-        "text": 1.59,
-        "orbit": 1.66,
-        "wave": 0.82,
         "code": 1.95,
-        "particles": 1.39,
+        "burst": 1.79,
+        "ring": 1.59,
+        "tunnel": 1.35,
+        "panel": 1.57,
+        "bars": 1.26,
         "cylinder": 1.33,
-        "counter": 1.54,
+        "stack": 1.57,
         "gauge": 1.54,
         "network": 1.74,
-        "stack": 1.57,
-        "bars": 1.26,
+        "counter": 1.54,
         "sphere": 1.32,
         "donut": 1.65
       },
       "cams": {
-        "dolly": 1.59,
-        "spiral": 1.66,
-        "low": 1.31,
-        "fly": 1.79,
-        "crane": 1.59,
         "orbit": 1.59,
+        "crane": 1.59,
+        "spiral": 1.66,
+        "fly": 1.79,
+        "low": 1.31,
+        "dolly": 1.59,
         "push": 1.79,
         "dutch": 1.81
       },
@@ -1910,6 +1958,10 @@
     {
       "time": "2026-10-16T16:37:56+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-16T22:01:03+00:00",
+      "ok": true
     }
   ],
   "series": {
@@ -2009,6 +2061,23 @@
       },
       "name": "Glass Checkout Interface",
       "story_format": "news-what"
+    },
+    {
+      "family": "retro terminal",
+      "fonts": {
+        "display": "JetBrainsMono",
+        "body": "IBMPlexSans",
+        "mono": "JetBrainsMono"
+      },
+      "palette": {
+        "bg": "#0B0F0A",
+        "ink": "#D8FFD0",
+        "accent": "#FFB000",
+        "accent2": "#3DFF7A",
+        "muted": "#4A6B49"
+      },
+      "name": "Phosphor Ranking Console",
+      "story_format": "countdown"
     }
   ]
 }
