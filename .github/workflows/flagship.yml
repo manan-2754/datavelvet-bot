@@ -22,6 +22,14 @@ on:
         description: 'Topic (empty = the day''s biggest story)'
         type: string
         default: ''
+      frame:
+        description: 'Breaking news story frame (news-what / news-how / news-story); empty = normal flagship'
+        type: string
+        default: ''
+      source:
+        description: 'Breaking news: URL of the announcement / article to build on'
+        type: string
+        default: ''
 
 concurrency:
   group: explainer-bot
@@ -81,6 +89,8 @@ jobs:
           RUN_UNTIL: ${{ vars.RUN_UNTIL }}
           PYTHONIOENCODING: utf-8
           TOPIC: ${{ inputs.topic }}
+          FRAME: ${{ inputs.frame }}
+          BREAKING_URL: ${{ inputs.source }}
           POST: ${{ github.event_name != 'workflow_dispatch' || inputs.post }}
         run: |
           set -o pipefail

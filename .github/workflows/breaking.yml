@@ -1,0 +1,47 @@
+name: Breaking-news watcher (big tech launches -> video within hours)
+
+# Every 30 minutes: read fast tech sources; when a big, confirmed story about a household-name company appears, start a
+# flagship Short at once (and a long-form "story behind it" for the biggest moments). Max 1 a day, quiet 11 PM - 7 AM ET.
+# GitHub's own timer can run late - an external trigger (cron-job.org -> workflow_dispatch) every 30 min is more exact.
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: breaking-watch
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install deps
+        run: pip install requests python-dotenv anthropic
+      - name: Watch the news
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_UNTIL: ${{ vars.RUN_UNTIL }}
+          PYTHONIOENCODING: utf-8
+        run: |
+          if [ -n "$RUN_UNTIL" ] && [ "$(date -u +%F)" \> "$RUN_UNTIL" ]; then echo "Posting window is over."; exit 0; fi
+          python -u breaking.py
+      - name: Remember what was seen
+        if: always()
+        run: |
+          git config user.name "explainer-bot"
+          git config user.email "explainer-bot@users.noreply.github.com"
+          git add breaking_state.json || true
+          git commit -m "bot: breaking-news watch [skip ci]" || exit 0
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done

@@ -57,6 +57,15 @@ STORY_FORMATS = {
     "versus": "WHAT YOU SEE vs WHAT HAPPENS: alternate between the simple thing on screen and the enormous system behind it.",
     "inside": "INSIDE THE MACHINE: shrink the viewer down and fly through the system's real components as if they were places.",
 }
+BREAKING_FORMATS = {          # breaking-news runs (FRAME=...): only what the announcement and reference facts say
+    "news-what": "WHAT JUST HAPPENED: beat 1 states the news itself in one punchy sentence (who launched / broke what). Then "
+                 "explain what it actually is and how it works in plain words, and end on why it matters to the viewer. "
+                 "Frame anything unconfirmed as 'what we know so far'; never invent specs, prices, dates or benchmarks.",
+    "news-how": "HOW IT ACTUALLY WORKS: beat 1 names the news, then the real mechanism behind it, step by step, with the "
+                "running example. Only claims the announcement or reference facts support; no invented numbers.",
+    "news-story": "THE STORY BEHIND IT: beat 1 names today's news, then the short history that led to this moment "
+                  "(the earlier versions, the turning points), ending back on today's news and why it matters.",
+}
 FAMILIES = ["engineering blueprint (white/cyan line work on deep blue, measurement marks)",
             "isometric miniature city (tiny buildings and roads as the system's parts, soft shadows)",
             "editorial magazine (huge serif headlines, grid columns, paper tones, bold accent)",
@@ -175,6 +184,8 @@ def pick_length(state):
     """A/B: 25-40 s ("short") vs 45-60 s ("quick"), learned from what gets watched and pushed (40% exploration)."""
     if os.getenv("LENGTH_MODE") in ("short", "quick"):          # forced (local samples)
         return os.environ["LENGTH_MODE"]
+    if os.getenv("FRAME") in BREAKING_FORMATS:                  # breaking news goes out fast and short
+        return "short"
     rnd = random.SystemRandom()
     modes = ["short", "quick"]
     return rnd.choice(modes) if rnd.random() < 0.4 else max(modes, key=lambda k: analytics.weight(state, "lmode", k) + rnd.random() * 0.01)
@@ -182,6 +193,11 @@ def pick_length(state):
 
 def best_story(topic, facts, state, mode="quick"):
     recent = [f.get("story_format") for f in state.get("flagship_styles", [])[-3:]]
+    frame = os.getenv("FRAME", "")
+    if frame in BREAKING_FORMATS:                                # breaking news: one draft in the requested frame (speed)
+        st = pro.write_story(topic, facts, (), mode, BREAKING_FORMATS[frame])
+        log(f"  breaking draft '{frame}': {len(st['beats'])} beats")
+        return frame, st
     fmts = random.sample([k for k in STORY_FORMATS if k not in recent], 2)
     drafts = []
     for f in fmts:

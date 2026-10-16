@@ -4,6 +4,7 @@ Real sources for every script: before writing, the bot asks the LLM which Englis
 description lists the sources it was checked against.
 """
 import json
+import os
 import re
 import time
 
@@ -48,6 +49,17 @@ def _titles_from_llm(topic, llm):
         return []
 
 
+def article(url, chars=3500):
+    """Readable paragraphs of a news article / announcement page (best effort, '' on failure)."""
+    try:
+        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (DataVelvetBot)"}, timeout=20)
+        page = re.sub(r"(?is)<(script|style|nav|footer|header|aside)[^>]*>.*?</\1>", " ", r.text)
+        paras = [re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", p)).strip() for p in re.findall(r"(?is)<p[^>]*>(.*?)</p>", page)]
+        return "\n".join(p for p in paras if len(p) > 60)[:chars]
+    except Exception:
+        return ""
+
+
 def gather(topic, max_pages=2, llm=None):
     """Returns {"facts": text block for the prompt, "sources": [urls]} - empty on any failure (never blocks a post)."""
     keys = [w for w in re.findall(r"[a-z0-9+#]+", topic.lower()) if len(w) >= 3 and w not in STOP]
@@ -66,4 +78,10 @@ def gather(topic, max_pages=2, llm=None):
             time.sleep(0.5)
     except Exception as e:
         print(f"  research unavailable ({e})")
-    return {"facts": "\n\n".join(out)[:5000], "sources": sources}
+    news = os.getenv("BREAKING_URL", "").strip()                 # breaking-news run: the announcement itself comes first
+    if news:
+        txt = article(news)
+        if len(txt) > 300:
+            out.insert(0, f"[Announcement / news article: {news}]\n{txt}")
+            sources.insert(0, news)
+    return {"facts": "\n\n".join(out)[:7000 if news else 5000], "sources": sources}

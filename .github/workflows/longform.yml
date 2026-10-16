@@ -26,6 +26,10 @@ on:
         description: 'Make it now even if the last long-form video is under 2 days old'
         type: boolean
         default: false
+      source:
+        description: 'Breaking news: URL of the announcement / article to build on'
+        type: string
+        default: ''
 
 concurrency:
   group: longform-bot
@@ -71,6 +75,7 @@ jobs:
           LONG_EVERY_DAYS: ${{ vars.LONG_EVERY_DAYS }}
           LONG_TOPIC: ${{ inputs.topic }}
           LONG_FORCE: ${{ inputs.force && '1' || '' }}
+          BREAKING_URL: ${{ inputs.source }}
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           AUTO_POST_YOUTUBE: ${{ vars.AUTO_POST_YOUTUBE }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
