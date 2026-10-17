@@ -36,7 +36,13 @@
       "style": "3d",
       "lane": "dev",
       "source_topic": "Why Chrome eats all your RAM",
-      "instagram_id": "18346634029252134"
+      "instagram_id": "18346634029252134",
+      "stats": {
+        "reach": 5,
+        "saved": 1,
+        "shares": 0,
+        "likes": 2
+      }
     },
     {
       "time": "2026-10-16T00:00:53+00:00",
@@ -47,6 +53,16 @@
       "lane": "dev",
       "source_topic": "How browser fingerprinting tracks you without cookies",
       "instagram_id": "18011142545967483"
+    },
+    {
+      "time": "2026-10-17T00:00:42+00:00",
+      "topic": "What actually happens when you type google.com",
+      "format": "steps",
+      "theme": "-",
+      "style": "3d",
+      "lane": "dev",
+      "source_topic": "What actually happens when you type google.com",
+      "instagram_id": "17913090813517624"
     }
   ]
 }
