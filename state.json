@@ -23,7 +23,8 @@
     "How ChatGPT can see and control your Chrome tabs",
     "Why the new iPhone Duo preorders sold out so fast",
     "How Google Play vets apps and ranks search results",
-    "How Apple Handoff transfers active session state across devices"
+    "How Apple Handoff transfers active session state across devices",
+    "How the PS5 upscales games with machine learning (PSSR) under the hood"
   ],
   "used_bank": [
     "dns_explained"
@@ -51,22 +52,15 @@
       "youtube_id": "9P7QiMeIP9U",
       "instagram_id": "18126836476852213",
       "stats": {
-        "yt_views": 1305,
-        "yt_likes": 30,
-        "yt_comments": 0,
-        "yt_avp": 45.1,
-        "yt_avd": 44.0,
-        "yt_subs": 1,
-        "yt_shares": 2,
-        "ig_reach": 205,
+        "ig_reach": 206,
         "ig_saved": 3,
         "ig_shares": 1,
-        "ig_views": 240,
+        "ig_views": 241,
         "ig_likes": 6,
         "ig_comments": 2,
         "ig_avg_watch_s": 12.0,
-        "score": 3914.0,
-        "fetched": "2026-10-17T20:01:25+00:00"
+        "score": 914.0,
+        "fetched": "2026-10-18T12:35:53+00:00"
       }
     },
     {
@@ -80,13 +74,6 @@
       "youtube_id": "lSAY6wbyT_A",
       "instagram_id": "18076383422549123",
       "stats": {
-        "yt_views": 289,
-        "yt_likes": 3,
-        "yt_comments": 0,
-        "yt_avp": 37.1,
-        "yt_avd": 40.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 459,
         "ig_saved": 3,
         "ig_shares": 1,
@@ -94,8 +81,8 @@
         "ig_likes": 5,
         "ig_comments": 0,
         "ig_avg_watch_s": 8.6,
-        "score": 2065.0,
-        "fetched": "2026-10-17T20:01:26+00:00"
+        "score": 1144.5,
+        "fetched": "2026-10-18T12:35:53+00:00"
       }
     },
     {
@@ -106,13 +93,6 @@
       "youtube_id": "sM8pNlXKfok",
       "instagram_id": "18117438377093748",
       "stats": {
-        "yt_views": 291,
-        "yt_likes": 6,
-        "yt_comments": 2,
-        "yt_avp": 34.7,
-        "yt_avd": 30.0,
-        "yt_subs": 2,
-        "yt_shares": 0,
         "ig_reach": 362,
         "ig_saved": 1,
         "ig_shares": 1,
@@ -120,8 +100,8 @@
         "ig_likes": 1,
         "ig_comments": 0,
         "ig_avg_watch_s": 3.8,
-        "score": 2132.5,
-        "fetched": "2026-10-17T20:01:27+00:00"
+        "score": 751.0,
+        "fetched": "2026-10-18T12:35:54+00:00"
       }
     },
     {
@@ -131,13 +111,6 @@
       "youtube_id": "pTc0yF47i1A",
       "instagram_id": "18372281464244099",
       "stats": {
-        "yt_views": 20,
-        "yt_likes": 0,
-        "yt_comments": 0,
-        "yt_avp": 24.3,
-        "yt_avd": 15.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 526,
         "ig_saved": 5,
         "ig_shares": 3,
@@ -145,8 +118,8 @@
         "ig_likes": 8,
         "ig_comments": 0,
         "ig_avg_watch_s": 5.6,
-        "score": 1872.5,
-        "fetched": "2026-10-17T20:01:28+00:00"
+        "score": 1488.0,
+        "fetched": "2026-10-18T12:35:55+00:00"
       }
     },
     {
@@ -157,13 +130,6 @@
       "youtube_id": "55r1NyCoiSs",
       "instagram_id": "18119557396949139",
       "stats": {
-        "yt_views": 69,
-        "yt_likes": 1,
-        "yt_comments": 0,
-        "yt_avp": 48.6,
-        "yt_avd": 33.0,
-        "yt_subs": 1,
-        "yt_shares": 0,
         "ig_reach": 208,
         "ig_saved": 1,
         "ig_shares": 1,
@@ -171,8 +137,8 @@
         "ig_likes": 1,
         "ig_comments": 0,
         "ig_avg_watch_s": 6.7,
-        "score": 1502.0,
-        "fetched": "2026-10-17T20:01:29+00:00"
+        "score": 529.0,
+        "fetched": "2026-10-18T12:35:56+00:00"
       }
     },
     {
@@ -183,13 +149,6 @@
       "youtube_id": "ru0fE5sd0NM",
       "instagram_id": "18076028366735422",
       "stats": {
-        "yt_views": 76,
-        "yt_likes": 0,
-        "yt_comments": 0,
-        "yt_avp": 44.3,
-        "yt_avd": 34.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 521,
         "ig_saved": 9,
         "ig_shares": 1,
@@ -197,8 +156,8 @@
         "ig_likes": 15,
         "ig_comments": 0,
         "ig_avg_watch_s": 7.5,
-        "score": 2460.0,
-        "fetched": "2026-10-17T20:01:31+00:00"
+        "score": 1719.5,
+        "fetched": "2026-10-18T12:35:56+00:00"
       }
     },
     {
@@ -209,13 +168,6 @@
       "youtube_id": "5U_rtc8oRHs",
       "instagram_id": "18114047927276016",
       "stats": {
-        "yt_views": 54,
-        "yt_likes": 0,
-        "yt_comments": 0,
-        "yt_avp": 39.2,
-        "yt_avd": 28.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 220,
         "ig_saved": 1,
         "ig_shares": 0,
@@ -223,8 +175,8 @@
         "ig_likes": 1,
         "ig_comments": 0,
         "ig_avg_watch_s": 7.9,
-        "score": 1134.0,
-        "fetched": "2026-10-17T20:01:32+00:00"
+        "score": 492.0,
+        "fetched": "2026-10-18T12:35:57+00:00"
       }
     },
     {
@@ -343,13 +295,6 @@
       "youtube_id": "4aZ5dipKfvI",
       "instagram_id": "18025092821863422",
       "stats": {
-        "yt_views": 285,
-        "yt_likes": 1,
-        "yt_comments": 0,
-        "yt_avp": 27.5,
-        "yt_avd": 14.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 743,
         "ig_saved": 5,
         "ig_shares": 1,
@@ -357,8 +302,8 @@
         "ig_likes": 11,
         "ig_comments": 0,
         "ig_avg_watch_s": 7.4,
-        "score": 2510.0,
-        "fetched": "2026-10-17T20:01:33+00:00"
+        "score": 1787.5,
+        "fetched": "2026-10-18T12:35:58+00:00"
       }
     },
     {
@@ -417,22 +362,15 @@
       "youtube_id": "sZQlLUJu54U",
       "instagram_id": "17907826107668662",
       "stats": {
-        "yt_views": 275,
-        "yt_likes": 1,
-        "yt_comments": 1,
-        "yt_avp": 38.1,
-        "yt_avd": 18.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 384,
         "ig_saved": 3,
         "ig_shares": 0,
-        "ig_views": 433,
+        "ig_views": 434,
         "ig_likes": 2,
         "ig_comments": 1,
         "ig_avg_watch_s": 7.0,
-        "score": 1856.5,
-        "fetched": "2026-10-17T20:01:34+00:00"
+        "score": 926.0,
+        "fetched": "2026-10-18T12:35:59+00:00"
       }
     },
     {
@@ -489,13 +427,6 @@
       "youtube_id": "8hYtOJwJJxE",
       "instagram_id": "18178100578445939",
       "stats": {
-        "yt_views": 251,
-        "yt_likes": 5,
-        "yt_comments": 5,
-        "yt_avp": 34.9,
-        "yt_avd": 18.0,
-        "yt_subs": 1,
-        "yt_shares": 0,
         "ig_reach": 2001,
         "ig_saved": 13,
         "ig_shares": 1,
@@ -503,8 +434,8 @@
         "ig_likes": 46,
         "ig_comments": 2,
         "ig_avg_watch_s": 9.2,
-        "score": 6533.0,
-        "fetched": "2026-10-17T20:01:35+00:00"
+        "score": 5183.5,
+        "fetched": "2026-10-18T12:36:00+00:00"
       }
     },
     {
@@ -555,13 +486,6 @@
       "youtube_id": "S0YLDkabNOM",
       "instagram_id": "17948011797304068",
       "stats": {
-        "yt_views": 973,
-        "yt_likes": 17,
-        "yt_comments": 3,
-        "yt_avp": 32.7,
-        "yt_avd": 15.0,
-        "yt_subs": 0,
-        "yt_shares": 1,
         "ig_reach": 2079,
         "ig_saved": 12,
         "ig_shares": 2,
@@ -569,8 +493,8 @@
         "ig_likes": 34,
         "ig_comments": 1,
         "ig_avg_watch_s": 10.1,
-        "score": 7076.0,
-        "fetched": "2026-10-17T20:01:37+00:00"
+        "score": 4947.5,
+        "fetched": "2026-10-18T12:36:00+00:00"
       }
     },
     {
@@ -628,13 +552,6 @@
       "youtube_id": "3VRDYCOh0cY",
       "instagram_id": "18425872588147385",
       "stats": {
-        "yt_views": 288,
-        "yt_likes": 2,
-        "yt_comments": 1,
-        "yt_avp": 225.9,
-        "yt_avd": 124.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 1972,
         "ig_saved": 28,
         "ig_shares": 9,
@@ -642,8 +559,8 @@
         "ig_likes": 49,
         "ig_comments": 1,
         "ig_avg_watch_s": 11.0,
-        "score": 10107.5,
-        "fetched": "2026-10-17T20:01:37+00:00"
+        "score": 6321.0,
+        "fetched": "2026-10-18T12:36:01+00:00"
       }
     },
     {
@@ -698,13 +615,6 @@
       "instagram_id": "18118387330971395",
       "carousel_id": "17865584778680226",
       "stats": {
-        "yt_views": 56,
-        "yt_likes": 1,
-        "yt_comments": 3,
-        "yt_avp": 24.5,
-        "yt_avd": 15.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 152,
         "ig_saved": 0,
         "ig_shares": 0,
@@ -712,8 +622,8 @@
         "ig_likes": 1,
         "ig_comments": 1,
         "ig_avg_watch_s": 5.2,
-        "score": 1000.5,
-        "fetched": "2026-10-17T20:01:38+00:00"
+        "score": 372.0,
+        "fetched": "2026-10-18T12:36:02+00:00"
       }
     },
     {
@@ -750,13 +660,6 @@
       "youtube_id": "17ohiia63Hs",
       "instagram_id": "17898777042608588",
       "stats": {
-        "yt_views": 166,
-        "yt_likes": 1,
-        "yt_comments": 1,
-        "yt_avp": 22.6,
-        "yt_avd": 38.0,
-        "yt_subs": 1,
-        "yt_shares": 0,
         "ig_reach": 171,
         "ig_saved": 0,
         "ig_shares": 0,
@@ -764,8 +667,8 @@
         "ig_likes": 1,
         "ig_comments": 1,
         "ig_avg_watch_s": 5.2,
-        "score": 1159.5,
-        "fetched": "2026-10-17T20:01:39+00:00"
+        "score": 419.5,
+        "fetched": "2026-10-18T12:36:03+00:00"
       },
       "title_swapped": true
     },
@@ -804,13 +707,6 @@
       "instagram_id": "18110985320062631",
       "ig_trial": true,
       "stats": {
-        "yt_views": 143,
-        "yt_likes": 0,
-        "yt_comments": 1,
-        "yt_avp": 27.0,
-        "yt_avd": 16.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 180,
         "ig_saved": 0,
         "ig_shares": 0,
@@ -818,8 +714,8 @@
         "ig_likes": 2,
         "ig_comments": 1,
         "ig_avg_watch_s": 5.3,
-        "score": 1076.0,
-        "fetched": "2026-10-17T20:01:40+00:00"
+        "score": 468.0,
+        "fetched": "2026-10-18T12:36:04+00:00"
       }
     },
     {
@@ -860,13 +756,6 @@
       "instagram_id": "18116646296018883",
       "ig_trial": false,
       "stats": {
-        "yt_views": 127,
-        "yt_likes": 0,
-        "yt_comments": 1,
-        "yt_avp": 14.9,
-        "yt_avd": 25.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 191,
         "ig_saved": 0,
         "ig_shares": 0,
@@ -874,8 +763,8 @@
         "ig_likes": 3,
         "ig_comments": 1,
         "ig_avg_watch_s": 7.9,
-        "score": 933.0,
-        "fetched": "2026-10-17T20:01:40+00:00"
+        "score": 522.5,
+        "fetched": "2026-10-18T12:36:04+00:00"
       }
     },
     {
@@ -915,13 +804,6 @@
       "instagram_id": "18251570797309330",
       "ig_trial": true,
       "stats": {
-        "yt_views": 95,
-        "yt_likes": 0,
-        "yt_comments": 1,
-        "yt_avp": 13.2,
-        "yt_avd": 21.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 5,
         "ig_saved": 0,
         "ig_shares": 0,
@@ -929,8 +811,8 @@
         "ig_likes": 1,
         "ig_comments": 1,
         "ig_avg_watch_s": 5.7,
-        "score": 506.5,
-        "fetched": "2026-10-17T20:01:41+00:00"
+        "score": 153.5,
+        "fetched": "2026-10-18T12:36:05+00:00"
       }
     },
     {
@@ -965,13 +847,6 @@
       "instagram_id": "17985541182260874",
       "ig_trial": false,
       "stats": {
-        "yt_views": 58,
-        "yt_likes": 1,
-        "yt_comments": 1,
-        "yt_avp": 30.6,
-        "yt_avd": 18.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 153,
         "ig_saved": 0,
         "ig_shares": 0,
@@ -979,8 +854,8 @@
         "ig_likes": 0,
         "ig_comments": 1,
         "ig_avg_watch_s": 4.5,
-        "score": 948.5,
-        "fetched": "2026-10-17T20:01:42+00:00"
+        "score": 346.5,
+        "fetched": "2026-10-18T12:36:06+00:00"
       }
     },
     {
@@ -1016,13 +891,6 @@
       "ig_trial": true,
       "carousel_id": "18333289636302466",
       "stats": {
-        "yt_views": 69,
-        "yt_likes": 0,
-        "yt_comments": 1,
-        "yt_avp": 19.8,
-        "yt_avd": 11.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
         "ig_reach": 230,
         "ig_saved": 0,
         "ig_shares": 1,
@@ -1030,8 +898,8 @@
         "ig_likes": 1,
         "ig_comments": 1,
         "ig_avg_watch_s": 6.3,
-        "score": 1012.0,
-        "fetched": "2026-10-17T20:01:43+00:00"
+        "score": 586.0,
+        "fetched": "2026-10-18T12:36:07+00:00"
       }
     },
     {
@@ -1066,22 +934,15 @@
       "instagram_id": "18084425102706371",
       "ig_trial": false,
       "stats": {
-        "yt_views": 91,
-        "yt_likes": 0,
-        "yt_comments": 1,
-        "yt_avp": 56.6,
-        "yt_avd": 31.0,
-        "yt_subs": 0,
-        "yt_shares": 0,
-        "ig_reach": 1830,
+        "ig_reach": 1833,
         "ig_saved": 9,
         "ig_shares": 1,
         "ig_views": 2207,
         "ig_likes": 40,
         "ig_comments": 1,
         "ig_avg_watch_s": 15.4,
-        "score": 5756.0,
-        "fetched": "2026-10-17T20:01:44+00:00"
+        "score": 4757.5,
+        "fetched": "2026-10-18T12:36:08+00:00"
       }
     },
     {
@@ -1116,18 +977,15 @@
       "instagram_id": "18152353228536053",
       "ig_trial": true,
       "stats": {
-        "yt_views": 7,
-        "yt_likes": 0,
-        "yt_comments": 1,
-        "ig_reach": 169,
+        "ig_reach": 170,
         "ig_saved": 0,
         "ig_shares": 0,
-        "ig_views": 192,
+        "ig_views": 193,
         "ig_likes": 0,
         "ig_comments": 1,
         "ig_avg_watch_s": 5.2,
-        "score": 455.5,
-        "fetched": "2026-10-17T20:01:45+00:00"
+        "score": 390.0,
+        "fetched": "2026-10-18T12:36:09+00:00"
       }
     },
     {
@@ -1162,9 +1020,6 @@
       "instagram_id": "17885635917506014",
       "ig_trial": false,
       "stats": {
-        "yt_views": 6,
-        "yt_likes": 0,
-        "yt_comments": 1,
         "ig_reach": 154,
         "ig_saved": 0,
         "ig_shares": 0,
@@ -1172,8 +1027,8 @@
         "ig_likes": 1,
         "ig_comments": 1,
         "ig_avg_watch_s": 5.4,
-        "score": 457.0,
-        "fetched": "2026-10-17T20:01:46+00:00"
+        "score": 391.0,
+        "fetched": "2026-10-18T12:36:09+00:00"
       }
     },
     {
@@ -1208,18 +1063,15 @@
       "instagram_id": "18131482954773624",
       "ig_trial": true,
       "stats": {
-        "yt_views": 4,
-        "yt_likes": 0,
-        "yt_comments": 1,
-        "ig_reach": 135,
+        "ig_reach": 136,
         "ig_saved": 0,
         "ig_shares": 0,
-        "ig_views": 151,
+        "ig_views": 152,
         "ig_likes": 1,
         "ig_comments": 1,
         "ig_avg_watch_s": 6.6,
-        "score": 433.5,
-        "fetched": "2026-10-17T20:01:47+00:00"
+        "score": 371.0,
+        "fetched": "2026-10-18T12:36:10+00:00"
       }
     },
     {
@@ -1253,6 +1105,38 @@
       "youtube_id": "4jU2XYTJhsU",
       "instagram_id": "18127187095829404",
       "ig_trial": false
+    },
+    {
+      "time": "2026-10-18T16:00:00+00:00",
+      "topic": "How PS5 Pro's PSSR Upscales Games With ML",
+      "format": "flagship: inside",
+      "seed": 1129882136,
+      "features": {
+        "angle": "inside",
+        "layouts": [
+          "flagship: inside"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Paper",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "lydian",
+        "length": "mid",
+        "level": null,
+        "trend": true,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "curiosity",
+        "cover": "band",
+        "lmode": "quick",
+        "trial": true
+      },
+      "title_alt": "How PS5 Pro PSSR ML upscaling works under the hood #shorts",
+      "title_style": "curiosity",
+      "instagram_id": "18099395957093345",
+      "ig_trial": true,
+      "carousel_id": "18423170179155263"
     }
   ],
   "series_counts": {
@@ -1281,7 +1165,8 @@
     "flagship: follow",
     "flagship: news-what",
     "flagship: countdown",
-    "flagship: what-if"
+    "flagship: what-if",
+    "flagship: inside"
   ],
   "used_palettes": [
     "0:0"
@@ -1656,6 +1541,20 @@
       },
       "format": "flagship: what-if",
       "angle": "what-if"
+    },
+    {
+      "posted_at": "2026-10-18T16:02:12+00:00",
+      "style": {
+        "name": "Paper Pixel Workshop",
+        "palette": {
+          "ink": "#F2E3C6",
+          "bone": "#2B1B17",
+          "signal": "#E8512F",
+          "ash": "#B79F7E"
+        }
+      },
+      "format": "flagship: inside",
+      "angle": "inside"
     }
   ],
   "scene_signatures": [
@@ -1826,32 +1725,34 @@
   ],
   "insights": {
     "n": 17,
-    "updated": "2026-10-17T20:01:47+00:00",
+    "updated": "2026-10-18T12:36:10+00:00",
     "best": {
       "angle": [
-        "journey"
+        "journey",
+        "versus"
       ],
       "layouts": [
-        "radial",
         "timeline",
+        "radial",
         "wave"
       ],
       "types": [
-        "donut",
         "code",
-        "burst"
+        "burst",
+        "orbit"
       ],
       "cams": [
         "dutch",
-        "fly",
-        "push"
+        "spiral",
+        "fly"
       ],
       "hue": [
         "Jade"
       ],
       "voice": [],
       "music": [
-        "major"
+        "major",
+        "lydian"
       ],
       "length": [
         "mid"
@@ -1871,13 +1772,10 @@
         "countdown"
       ],
       "layouts": [
-        "ring",
         "scatter",
         "Scale"
       ],
-      "types": [
-        "wave"
-      ],
+      "types": [],
       "cams": [],
       "hue": [
         "Cyan"
@@ -1903,116 +1801,115 @@
       ],
       "lmode": [
         "quick",
-        "deep",
-        "short"
+        "short",
+        "deep"
       ],
       "trial": [
-        "False",
         "True"
       ]
     },
     "lift": {
       "angle": {
-        "journey": 1.69,
-        "versus": 1.1,
-        "countdown": 0.27
+        "journey": 1.47,
+        "versus": 1.12,
+        "countdown": 0.26
       },
       "layouts": {
-        "row": 1.48,
+        "depth": 1.76,
         "wave": 2.32,
-        "stack": 1.6,
-        "depth": 1.6,
-        "scatter": 0.55,
-        "ring": 0.84,
-        "pyramid": 1.68,
-        "tree": 1.42,
-        "diagonal": 2.05,
+        "pyramid": 1.62,
+        "ring": 1.03,
+        "scatter": 0.62,
+        "stack": 1.76,
+        "row": 1.63,
+        "diagonal": 2.03,
         "cluster": 2.19,
-        "spiral": 1.38,
-        "radial": 2.4,
-        "timeline": 2.4,
-        "grid": 1.29,
-        "Scale": 0.32
+        "tree": 1.5,
+        "spiral": 1.35,
+        "timeline": 2.37,
+        "grid": 1.19,
+        "radial": 2.37,
+        "Scale": 0.16
       },
       "types": {
-        "link": 1.84,
-        "tunnel": 1.32,
-        "text": 1.72,
-        "code": 2.13,
-        "wave": 0.8,
-        "matrix": 1.78,
-        "burst": 1.94,
-        "panel": 1.54,
-        "beam": 1.78,
-        "stream": 1.72,
-        "ring": 1.72,
-        "orbit": 1.62,
-        "object": 1.55,
-        "particles": 1.55,
-        "counter": 1.88,
-        "stack": 1.76,
-        "bars": 1.51,
-        "network": 1.89,
-        "cylinder": 1.3,
-        "gauge": 1.88,
-        "sphere": 1.29,
-        "donut": 2.16
+        "burst": 2.0,
+        "text": 1.74,
+        "object": 1.56,
+        "beam": 1.83,
+        "ring": 1.74,
+        "particles": 1.56,
+        "link": 1.86,
+        "wave": 0.86,
+        "stream": 1.74,
+        "code": 2.19,
+        "panel": 1.67,
+        "orbit": 2.0,
+        "tunnel": 1.51,
+        "matrix": 1.83,
+        "bars": 1.34,
+        "network": 1.86,
+        "stack": 1.64,
+        "gauge": 1.72,
+        "counter": 1.72,
+        "cylinder": 1.4,
+        "sphere": 1.19,
+        "donut": 1.91
       },
       "cams": {
-        "crane": 1.72,
-        "dolly": 1.72,
-        "low": 1.28,
-        "fly": 1.94,
-        "spiral": 1.62,
-        "orbit": 1.72,
-        "push": 1.94,
-        "dutch": 2.05
+        "spiral": 2.0,
+        "crane": 1.74,
+        "fly": 2.0,
+        "push": 2.0,
+        "orbit": 1.74,
+        "low": 1.36,
+        "dolly": 1.74,
+        "dutch": 2.03
       },
       "hue": {
-        "Cyan": 0.51,
-        "Jade": 2.33
+        "Cyan": 0.47,
+        "Jade": 2.07
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "lydian": 1.04,
-        "dorian": 0.81,
-        "major": 1.57,
-        "phrygian": 0.33
+        "lydian": 1.32,
+        "dorian": 0.74,
+        "major": 1.38,
+        "phrygian": 0.25
       },
       "length": {
-        "mid": 1.22,
-        "short": 0.96,
-        "long": 0.34
+        "mid": 1.26,
+        "short": 0.95,
+        "long": 0.21
       },
       "level": {
-        "beginner": 1.08,
-        "engineer": 1.1
+        "beginner": 1.09,
+        "engineer": 0.96
       },
       "trend": {
-        "False": 0.96,
-        "True": 1.05
+        "False": 0.99,
+        "True": 1.02
       },
       "cta": {
-        "save": 1.72
+        "save": 1.67
       },
       "title": {
-        "direct": 0.31,
-        "curiosity": 0.62
+        "direct": 0.2,
+        "curiosity": 0.67
       },
       "cover": {
-        "band": 0.69,
-        "bold": 0.31
+        "band": 0.71,
+        "bold": 0.25
       },
       "lmode": {
-        "quick": 0.72,
-        "deep": 0.28,
-        "short": 0.17
+        "quick": 0.75,
+        "deep": 0.19,
+        "short": 0.22
       },
       "trial": {
-        "True": 0.27,
-        "False": 0.79
+        "True": 0.23,
+        "False": 0.86
       }
     }
   },
@@ -2094,6 +1991,11 @@
     {
       "time": "2026-10-17T22:01:11+00:00",
       "ok": true
+    },
+    {
+      "time": "2026-10-18T16:02:12+00:00",
+      "ok": false,
+      "error": "upload failed on a platform"
     }
   ],
   "series": {
@@ -2227,6 +2129,23 @@
       },
       "name": "Macro Silicon Noir",
       "story_format": "what-if"
+    },
+    {
+      "family": "paper cut-out",
+      "fonts": {
+        "display": "DMSerifDisplay",
+        "body": "Fraunces",
+        "mono": "SpaceMono"
+      },
+      "palette": {
+        "bg": "#F2E3C6",
+        "ink": "#2B1B17",
+        "accent": "#E8512F",
+        "accent2": "#1F8A8A",
+        "muted": "#B79F7E"
+      },
+      "name": "Paper Pixel Workshop",
+      "story_format": "inside"
     }
   ]
 }
