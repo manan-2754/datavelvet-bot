@@ -24,7 +24,8 @@
     "Why the new iPhone Duo preorders sold out so fast",
     "How Google Play vets apps and ranks search results",
     "How Apple Handoff transfers active session state across devices",
-    "How the PS5 upscales games with machine learning (PSSR) under the hood"
+    "How the PS5 upscales games with machine learning (PSSR) under the hood",
+    "Instagram generating your feed"
   ],
   "used_bank": [
     "dns_explained"
@@ -1137,6 +1138,37 @@
       "instagram_id": "18099395957093345",
       "ig_trial": true,
       "carousel_id": "18423170179155263"
+    },
+    {
+      "time": "2026-10-18T22:00:00+00:00",
+      "topic": "How Instagram Really Builds Your Feed",
+      "format": "flagship: myth",
+      "seed": 1706646782,
+      "features": {
+        "angle": "myth",
+        "layouts": [
+          "flagship: myth"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Funnel",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "major",
+        "length": "mid",
+        "level": null,
+        "trend": false,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "curiosity",
+        "cover": "bold",
+        "lmode": "quick",
+        "trial": false
+      },
+      "title_alt": "How Instagram generates your feed under the hood #shorts",
+      "title_style": "curiosity",
+      "instagram_id": "18157083004507896",
+      "ig_trial": false
     }
   ],
   "series_counts": {
@@ -1166,7 +1198,8 @@
     "flagship: news-what",
     "flagship: countdown",
     "flagship: what-if",
-    "flagship: inside"
+    "flagship: inside",
+    "flagship: myth"
   ],
   "used_palettes": [
     "0:0"
@@ -1555,6 +1588,20 @@
       },
       "format": "flagship: inside",
       "angle": "inside"
+    },
+    {
+      "posted_at": "2026-10-18T22:00:58+00:00",
+      "style": {
+        "name": "Funnel Blueprint",
+        "palette": {
+          "ink": "#0A2A5E",
+          "bone": "#F2F8FF",
+          "signal": "#5CE1FF",
+          "ash": "#7FA3D6"
+        }
+      },
+      "format": "flagship: myth",
+      "angle": "myth"
     }
   ],
   "scene_signatures": [
@@ -1725,15 +1772,15 @@
   ],
   "insights": {
     "n": 17,
-    "updated": "2026-10-18T12:36:10+00:00",
+    "updated": "2026-10-18T16:32:59+00:00",
     "best": {
       "angle": [
         "journey",
         "versus"
       ],
       "layouts": [
-        "timeline",
         "radial",
+        "timeline",
         "wave"
       ],
       "types": [
@@ -1744,7 +1791,7 @@
       "cams": [
         "dutch",
         "spiral",
-        "fly"
+        "push"
       ],
       "hue": [
         "Jade"
@@ -1815,53 +1862,53 @@
         "countdown": 0.26
       },
       "layouts": {
+        "ring": 1.03,
         "depth": 1.76,
+        "stack": 1.76,
         "wave": 2.32,
         "pyramid": 1.62,
-        "ring": 1.03,
         "scatter": 0.62,
-        "stack": 1.76,
         "row": 1.63,
-        "diagonal": 2.03,
-        "cluster": 2.19,
-        "tree": 1.5,
         "spiral": 1.35,
+        "diagonal": 2.03,
+        "tree": 1.5,
+        "cluster": 2.19,
+        "radial": 2.37,
         "timeline": 2.37,
         "grid": 1.19,
-        "radial": 2.37,
         "Scale": 0.16
       },
       "types": {
-        "burst": 2.0,
-        "text": 1.74,
-        "object": 1.56,
         "beam": 1.83,
-        "ring": 1.74,
-        "particles": 1.56,
+        "burst": 2.0,
         "link": 1.86,
-        "wave": 0.86,
-        "stream": 1.74,
-        "code": 2.19,
         "panel": 1.67,
+        "ring": 1.74,
+        "object": 1.56,
+        "stream": 1.74,
         "orbit": 2.0,
+        "particles": 1.56,
         "tunnel": 1.51,
+        "wave": 0.86,
+        "text": 1.74,
+        "code": 2.19,
         "matrix": 1.83,
         "bars": 1.34,
-        "network": 1.86,
-        "stack": 1.64,
         "gauge": 1.72,
         "counter": 1.72,
+        "stack": 1.64,
         "cylinder": 1.4,
+        "network": 1.86,
         "sphere": 1.19,
         "donut": 1.91
       },
       "cams": {
-        "spiral": 2.0,
         "crane": 1.74,
-        "fly": 2.0,
+        "spiral": 2.0,
         "push": 2.0,
         "orbit": 1.74,
         "low": 1.36,
+        "fly": 2.0,
         "dolly": 1.74,
         "dutch": 2.03
       },
@@ -1994,6 +2041,11 @@
     },
     {
       "time": "2026-10-18T16:02:12+00:00",
+      "ok": false,
+      "error": "upload failed on a platform"
+    },
+    {
+      "time": "2026-10-18T22:00:58+00:00",
       "ok": false,
       "error": "upload failed on a platform"
     }
@@ -2146,6 +2198,23 @@
       },
       "name": "Paper Pixel Workshop",
       "story_format": "inside"
+    },
+    {
+      "family": "engineering blueprint",
+      "fonts": {
+        "display": "BebasNeue",
+        "body": "IBMPlexSans",
+        "mono": "SpaceMono"
+      },
+      "palette": {
+        "bg": "#0A2A5E",
+        "ink": "#F2F8FF",
+        "accent": "#5CE1FF",
+        "accent2": "#FFC857",
+        "muted": "#7FA3D6"
+      },
+      "name": "Funnel Blueprint",
+      "story_format": "myth"
     }
   ]
 }
