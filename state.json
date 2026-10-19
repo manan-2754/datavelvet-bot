@@ -25,7 +25,8 @@
     "How Google Play vets apps and ranks search results",
     "How Apple Handoff transfers active session state across devices",
     "How the PS5 upscales games with machine learning (PSSR) under the hood",
-    "Instagram generating your feed"
+    "Instagram generating your feed",
+    "How the Nintendo Switch 2 runs games in handheld vs docked mode"
   ],
   "used_bank": [
     "dns_explained"
@@ -61,7 +62,7 @@
         "ig_comments": 2,
         "ig_avg_watch_s": 12.0,
         "score": 914.0,
-        "fetched": "2026-10-18T12:35:53+00:00"
+        "fetched": "2026-10-19T14:01:09+00:00"
       }
     },
     {
@@ -78,12 +79,12 @@
         "ig_reach": 459,
         "ig_saved": 3,
         "ig_shares": 1,
-        "ig_views": 524,
+        "ig_views": 525,
         "ig_likes": 5,
         "ig_comments": 0,
         "ig_avg_watch_s": 8.6,
-        "score": 1144.5,
-        "fetched": "2026-10-18T12:35:53+00:00"
+        "score": 1145.5,
+        "fetched": "2026-10-19T14:01:10+00:00"
       }
     },
     {
@@ -102,7 +103,7 @@
         "ig_comments": 0,
         "ig_avg_watch_s": 3.8,
         "score": 751.0,
-        "fetched": "2026-10-18T12:35:54+00:00"
+        "fetched": "2026-10-19T14:01:10+00:00"
       }
     },
     {
@@ -120,7 +121,7 @@
         "ig_comments": 0,
         "ig_avg_watch_s": 5.6,
         "score": 1488.0,
-        "fetched": "2026-10-18T12:35:55+00:00"
+        "fetched": "2026-10-19T14:01:11+00:00"
       }
     },
     {
@@ -139,7 +140,7 @@
         "ig_comments": 0,
         "ig_avg_watch_s": 6.7,
         "score": 529.0,
-        "fetched": "2026-10-18T12:35:56+00:00"
+        "fetched": "2026-10-19T14:01:12+00:00"
       }
     },
     {
@@ -158,7 +159,7 @@
         "ig_comments": 0,
         "ig_avg_watch_s": 7.5,
         "score": 1719.5,
-        "fetched": "2026-10-18T12:35:56+00:00"
+        "fetched": "2026-10-19T14:01:13+00:00"
       }
     },
     {
@@ -177,7 +178,7 @@
         "ig_comments": 0,
         "ig_avg_watch_s": 7.9,
         "score": 492.0,
-        "fetched": "2026-10-18T12:35:57+00:00"
+        "fetched": "2026-10-19T14:01:16+00:00"
       }
     },
     {
@@ -304,7 +305,7 @@
         "ig_comments": 0,
         "ig_avg_watch_s": 7.4,
         "score": 1787.5,
-        "fetched": "2026-10-18T12:35:58+00:00"
+        "fetched": "2026-10-19T14:01:17+00:00"
       }
     },
     {
@@ -371,7 +372,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 7.0,
         "score": 926.0,
-        "fetched": "2026-10-18T12:35:59+00:00"
+        "fetched": "2026-10-19T14:01:17+00:00"
       }
     },
     {
@@ -436,7 +437,7 @@
         "ig_comments": 2,
         "ig_avg_watch_s": 9.2,
         "score": 5183.5,
-        "fetched": "2026-10-18T12:36:00+00:00"
+        "fetched": "2026-10-19T14:01:18+00:00"
       }
     },
     {
@@ -495,7 +496,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 10.1,
         "score": 4947.5,
-        "fetched": "2026-10-18T12:36:00+00:00"
+        "fetched": "2026-10-19T14:01:19+00:00"
       }
     },
     {
@@ -561,7 +562,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 11.0,
         "score": 6321.0,
-        "fetched": "2026-10-18T12:36:01+00:00"
+        "fetched": "2026-10-19T14:01:20+00:00"
       }
     },
     {
@@ -624,7 +625,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 5.2,
         "score": 372.0,
-        "fetched": "2026-10-18T12:36:02+00:00"
+        "fetched": "2026-10-19T14:01:21+00:00"
       }
     },
     {
@@ -669,7 +670,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 5.2,
         "score": 419.5,
-        "fetched": "2026-10-18T12:36:03+00:00"
+        "fetched": "2026-10-19T14:01:21+00:00"
       },
       "title_swapped": true
     },
@@ -716,7 +717,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 5.3,
         "score": 468.0,
-        "fetched": "2026-10-18T12:36:04+00:00"
+        "fetched": "2026-10-19T14:01:22+00:00"
       }
     },
     {
@@ -765,7 +766,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 7.9,
         "score": 522.5,
-        "fetched": "2026-10-18T12:36:04+00:00"
+        "fetched": "2026-10-19T14:01:23+00:00"
       }
     },
     {
@@ -813,7 +814,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 5.7,
         "score": 153.5,
-        "fetched": "2026-10-18T12:36:05+00:00"
+        "fetched": "2026-10-19T14:01:24+00:00"
       }
     },
     {
@@ -856,7 +857,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 4.5,
         "score": 346.5,
-        "fetched": "2026-10-18T12:36:06+00:00"
+        "fetched": "2026-10-19T14:01:25+00:00"
       }
     },
     {
@@ -900,7 +901,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 6.3,
         "score": 586.0,
-        "fetched": "2026-10-18T12:36:07+00:00"
+        "fetched": "2026-10-19T14:01:25+00:00"
       }
     },
     {
@@ -935,15 +936,15 @@
       "instagram_id": "18084425102706371",
       "ig_trial": false,
       "stats": {
-        "ig_reach": 1833,
+        "ig_reach": 1835,
         "ig_saved": 9,
         "ig_shares": 1,
-        "ig_views": 2207,
+        "ig_views": 2209,
         "ig_likes": 40,
         "ig_comments": 1,
         "ig_avg_watch_s": 15.4,
-        "score": 4757.5,
-        "fetched": "2026-10-18T12:36:08+00:00"
+        "score": 4760.5,
+        "fetched": "2026-10-19T14:01:26+00:00"
       }
     },
     {
@@ -986,7 +987,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 5.2,
         "score": 390.0,
-        "fetched": "2026-10-18T12:36:09+00:00"
+        "fetched": "2026-10-19T14:01:27+00:00"
       }
     },
     {
@@ -1029,7 +1030,7 @@
         "ig_comments": 1,
         "ig_avg_watch_s": 5.4,
         "score": 391.0,
-        "fetched": "2026-10-18T12:36:09+00:00"
+        "fetched": "2026-10-19T14:01:28+00:00"
       }
     },
     {
@@ -1064,15 +1065,15 @@
       "instagram_id": "18131482954773624",
       "ig_trial": true,
       "stats": {
-        "ig_reach": 136,
+        "ig_reach": 137,
         "ig_saved": 0,
         "ig_shares": 0,
-        "ig_views": 152,
+        "ig_views": 153,
         "ig_likes": 1,
         "ig_comments": 1,
-        "ig_avg_watch_s": 6.6,
-        "score": 371.0,
-        "fetched": "2026-10-18T12:36:10+00:00"
+        "ig_avg_watch_s": 6.5,
+        "score": 371.5,
+        "fetched": "2026-10-19T14:01:29+00:00"
       }
     },
     {
@@ -1105,7 +1106,18 @@
       "title_style": "curiosity",
       "youtube_id": "4jU2XYTJhsU",
       "instagram_id": "18127187095829404",
-      "ig_trial": false
+      "ig_trial": false,
+      "stats": {
+        "ig_reach": 132,
+        "ig_saved": 0,
+        "ig_shares": 0,
+        "ig_views": 153,
+        "ig_likes": 0,
+        "ig_comments": 1,
+        "ig_avg_watch_s": 4.9,
+        "score": 328.0,
+        "fetched": "2026-10-19T14:01:30+00:00"
+      }
     },
     {
       "time": "2026-10-18T16:00:00+00:00",
@@ -1137,7 +1149,18 @@
       "title_style": "curiosity",
       "instagram_id": "18099395957093345",
       "ig_trial": true,
-      "carousel_id": "18423170179155263"
+      "carousel_id": "18423170179155263",
+      "stats": {
+        "ig_reach": 164,
+        "ig_saved": 1,
+        "ig_shares": 0,
+        "ig_views": 183,
+        "ig_likes": 2,
+        "ig_comments": 1,
+        "ig_avg_watch_s": 8.9,
+        "score": 504.0,
+        "fetched": "2026-10-19T14:01:31+00:00"
+      }
     },
     {
       "time": "2026-10-18T22:00:00+00:00",
@@ -1169,6 +1192,37 @@
       "title_style": "curiosity",
       "instagram_id": "18157083004507896",
       "ig_trial": false
+    },
+    {
+      "time": "2026-10-19T16:00:00+00:00",
+      "topic": "Switch 2 Docked vs Handheld: The Real Mechanism",
+      "format": "flagship: countdown",
+      "seed": 1131377473,
+      "features": {
+        "angle": "countdown",
+        "layouts": [
+          "flagship: countdown"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Midnight",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "minor",
+        "length": "short",
+        "level": null,
+        "trend": true,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "curiosity",
+        "cover": "band",
+        "lmode": "short",
+        "trial": true
+      },
+      "title_alt": "How Switch 2 handheld vs docked mode works under the hood #shorts",
+      "title_style": "curiosity",
+      "instagram_id": "18145288882548143",
+      "ig_trial": true
     }
   ],
   "series_counts": {
@@ -1199,7 +1253,8 @@
     "flagship: countdown",
     "flagship: what-if",
     "flagship: inside",
-    "flagship: myth"
+    "flagship: myth",
+    "flagship: countdown"
   ],
   "used_palettes": [
     "0:0"
@@ -1602,6 +1657,20 @@
       },
       "format": "flagship: myth",
       "angle": "myth"
+    },
+    {
+      "posted_at": "2026-10-19T16:01:14+00:00",
+      "style": {
+        "name": "Midnight Neon Dock",
+        "palette": {
+          "ink": "#120A24",
+          "bone": "#F6F1FF",
+          "signal": "#FF3D9A",
+          "ash": "#8A7FB0"
+        }
+      },
+      "format": "flagship: countdown",
+      "angle": "countdown"
     }
   ],
   "scene_signatures": [
@@ -1771,10 +1840,11 @@
     "world: Play > Ladder > Manifest > ABR > Open Connect > Scale"
   ],
   "insights": {
-    "n": 17,
-    "updated": "2026-10-18T16:32:59+00:00",
+    "n": 19,
+    "updated": "2026-10-19T14:01:31+00:00",
     "best": {
       "angle": [
+        "inside",
         "journey",
         "versus"
       ],
@@ -1790,8 +1860,8 @@
       ],
       "cams": [
         "dutch",
-        "spiral",
-        "push"
+        "push",
+        "spiral"
       ],
       "hue": [
         "Jade"
@@ -1804,7 +1874,9 @@
       "length": [
         "mid"
       ],
-      "level": [],
+      "level": [
+        "beginner"
+      ],
       "trend": [],
       "cta": [
         "save"
@@ -1852,111 +1924,114 @@
         "deep"
       ],
       "trial": [
+        "False",
         "True"
       ]
     },
     "lift": {
       "angle": {
-        "journey": 1.47,
-        "versus": 1.12,
-        "countdown": 0.26
+        "journey": 1.6,
+        "versus": 1.22,
+        "countdown": 0.28,
+        "inside": 1.64
       },
       "layouts": {
-        "ring": 1.03,
-        "depth": 1.76,
-        "stack": 1.76,
-        "wave": 2.32,
-        "pyramid": 1.62,
-        "scatter": 0.62,
-        "row": 1.63,
-        "spiral": 1.35,
-        "diagonal": 2.03,
-        "tree": 1.5,
-        "cluster": 2.19,
-        "radial": 2.37,
-        "timeline": 2.37,
-        "grid": 1.19,
-        "Scale": 0.16
+        "row": 1.77,
+        "pyramid": 1.76,
+        "ring": 1.12,
+        "stack": 1.91,
+        "depth": 1.91,
+        "scatter": 0.68,
+        "wave": 2.52,
+        "cluster": 2.38,
+        "spiral": 1.47,
+        "tree": 1.64,
+        "diagonal": 2.21,
+        "radial": 2.57,
+        "grid": 1.29,
+        "timeline": 2.57,
+        "Scale": 0.18,
+        "flagship: inside": 1.64
       },
       "types": {
-        "beam": 1.83,
-        "burst": 2.0,
-        "link": 1.86,
-        "panel": 1.67,
-        "ring": 1.74,
-        "object": 1.56,
-        "stream": 1.74,
-        "orbit": 2.0,
-        "particles": 1.56,
-        "tunnel": 1.51,
-        "wave": 0.86,
-        "text": 1.74,
-        "code": 2.19,
-        "matrix": 1.83,
-        "bars": 1.34,
-        "gauge": 1.72,
-        "counter": 1.72,
-        "stack": 1.64,
-        "cylinder": 1.4,
-        "network": 1.86,
-        "sphere": 1.19,
-        "donut": 1.91
+        "object": 1.7,
+        "burst": 2.17,
+        "panel": 1.82,
+        "tunnel": 1.64,
+        "link": 2.02,
+        "text": 1.89,
+        "stream": 1.89,
+        "wave": 0.94,
+        "particles": 1.7,
+        "code": 2.38,
+        "ring": 1.89,
+        "matrix": 1.99,
+        "orbit": 2.17,
+        "beam": 1.99,
+        "counter": 1.87,
+        "gauge": 1.87,
+        "network": 2.02,
+        "bars": 1.46,
+        "stack": 1.78,
+        "cylinder": 1.52,
+        "sphere": 1.29,
+        "donut": 2.08
       },
       "cams": {
-        "crane": 1.74,
-        "spiral": 2.0,
-        "push": 2.0,
-        "orbit": 1.74,
-        "low": 1.36,
-        "fly": 2.0,
-        "dolly": 1.74,
-        "dutch": 2.03
+        "crane": 1.89,
+        "push": 2.17,
+        "low": 1.47,
+        "spiral": 2.17,
+        "fly": 2.17,
+        "dolly": 1.89,
+        "orbit": 1.89,
+        "dutch": 2.21
       },
       "hue": {
-        "Cyan": 0.47,
-        "Jade": 2.07
+        "Cyan": 0.51,
+        "Jade": 2.25
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "lydian": 1.32,
-        "dorian": 0.74,
-        "major": 1.38,
-        "phrygian": 0.25
+        "lydian": 1.16,
+        "dorian": 0.8,
+        "major": 1.18,
+        "phrygian": 0.28
       },
       "length": {
-        "mid": 1.26,
-        "short": 0.95,
-        "long": 0.21
+        "mid": 1.18,
+        "short": 1.03,
+        "long": 0.23
       },
       "level": {
-        "beginner": 1.09,
-        "engineer": 0.96
+        "beginner": 1.19,
+        "engineer": 1.04
       },
       "trend": {
-        "False": 0.99,
-        "True": 1.02
+        "False": 1.07,
+        "True": 0.94
       },
       "cta": {
-        "save": 1.67
+        "save": 1.81
       },
       "title": {
-        "direct": 0.2,
-        "curiosity": 0.67
+        "direct": 0.22,
+        "curiosity": 0.61
       },
       "cover": {
-        "band": 0.71,
-        "bold": 0.25
+        "band": 0.63,
+        "bold": 0.27
       },
       "lmode": {
-        "quick": 0.75,
-        "deep": 0.19,
-        "short": 0.22
+        "quick": 0.66,
+        "deep": 0.21,
+        "short": 0.24
       },
       "trial": {
-        "True": 0.23,
-        "False": 0.86
+        "True": 0.26,
+        "False": 0.79
       }
     }
   },
@@ -2046,6 +2121,11 @@
     },
     {
       "time": "2026-10-18T22:00:58+00:00",
+      "ok": false,
+      "error": "upload failed on a platform"
+    },
+    {
+      "time": "2026-10-19T16:01:14+00:00",
       "ok": false,
       "error": "upload failed on a platform"
     }
@@ -2215,6 +2295,23 @@
       },
       "name": "Funnel Blueprint",
       "story_format": "myth"
+    },
+    {
+      "family": "neon night city",
+      "fonts": {
+        "display": "Unbounded",
+        "body": "SpaceGrotesk",
+        "mono": "MajorMonoDisplay"
+      },
+      "palette": {
+        "bg": "#120A24",
+        "ink": "#F6F1FF",
+        "accent": "#FF3D9A",
+        "accent2": "#2EF2E0",
+        "muted": "#8A7FB0"
+      },
+      "name": "Midnight Neon Dock",
+      "story_format": "countdown"
     }
   ]
 }
