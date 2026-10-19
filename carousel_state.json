@@ -68,7 +68,13 @@
       "style": "3d",
       "lane": "dev",
       "source_topic": "What actually happens when you type google.com",
-      "instagram_id": "17913090813517624"
+      "instagram_id": "17913090813517624",
+      "stats": {
+        "reach": 5,
+        "saved": 1,
+        "shares": 0,
+        "likes": 0
+      }
     },
     {
       "time": "2026-10-18T00:01:04+00:00",
@@ -79,6 +85,16 @@
       "lane": "dev",
       "source_topic": "How virtual memory works",
       "instagram_id": "18128954474496602"
+    },
+    {
+      "time": "2026-10-19T00:00:43+00:00",
+      "topic": "How Windows on Arm runs x86 games with an RTX GPU",
+      "format": "glossary",
+      "theme": "-",
+      "style": "3d",
+      "lane": "dev",
+      "source_topic": "How Windows on Arm runs x86 games with an RTX GPU",
+      "instagram_id": "18130382920703969"
     }
   ]
 }
