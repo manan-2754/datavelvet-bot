@@ -416,7 +416,13 @@
   "3a4c889f1f39353a",
   "9dc28091d3325808",
   "a4aa7d214b6e42a2",
-  "8dd3af1e56ae658c"
+  "8dd3af1e56ae658c",
+  "7059741da8ac06ab",
+  "dccb5baef576ec6c",
+  "515dd10899a34674",
+  "c89f110d65a4ade6",
+  "9ff43be73e826ef5",
+  "feae9c0b78694e3b"
  ],
  "posts": [
   {
@@ -424,6 +430,13 @@
    "topic": "Why the new iPhone Duo preorders sold out so fast",
    "headline": "Apple iPhone Duo preorders sell out, deliveries extend to late January - Yahoo Finance",
    "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPYTZNd2dCOVJMRl9ZSjRJVWQ5RGZ6bm5SSmtKUk9GZjFkV0c1ODBwLVYyYzRPOS1SR2V3a2NxTmtqdVZZcmFKT3ZhRDlEZXFpWDd0N1JGQWdqMDBlc3gxMTRnR0ZoRE9Xb0RSamZEUzFWaGdnUFhvcE1scGxQbC0xZ0lWSFlXMDhqUWh6YUZKWTlDenZ2MzhJbUNrUmhRWGRBUmJ2WVlhY1lxVlVMTXNTSnV6amNrNkFMUkgyYXVhaUlqekFkN0FaWg?oc=5",
+   "long_form": false
+  },
+  {
+   "time": "2026-10-19T12:00:30-04:00",
+   "topic": "What Nvidia's new open AI models for agents actually do",
+   "headline": "Nvidia launches new open models to run agents in the enterprise and on PCs",
+   "url": "https://techcrunch.com/2026/10/19/nvidia-launches-new-open-models-to-run-agents-in-the-enterprise-and-on-pcs/",
    "long_form": false
   }
  ]
