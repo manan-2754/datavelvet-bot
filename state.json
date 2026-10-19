@@ -26,7 +26,8 @@
     "How Apple Handoff transfers active session state across devices",
     "How the PS5 upscales games with machine learning (PSSR) under the hood",
     "Instagram generating your feed",
-    "How the Nintendo Switch 2 runs games in handheld vs docked mode"
+    "How the Nintendo Switch 2 runs games in handheld vs docked mode",
+    "How Apple silicon's unified memory makes MacBook Pros fast"
   ],
   "used_bank": [
     "dns_explained"
@@ -1191,7 +1192,18 @@
       "title_alt": "How Instagram generates your feed under the hood #shorts",
       "title_style": "curiosity",
       "instagram_id": "18157083004507896",
-      "ig_trial": false
+      "ig_trial": false,
+      "stats": {
+        "ig_reach": 104,
+        "ig_saved": 1,
+        "ig_shares": 0,
+        "ig_views": 119,
+        "ig_likes": 2,
+        "ig_comments": 1,
+        "ig_avg_watch_s": 4.7,
+        "score": 368.0,
+        "fetched": "2026-10-19T19:20:58+00:00"
+      }
     },
     {
       "time": "2026-10-19T16:00:00+00:00",
@@ -1223,6 +1235,37 @@
       "title_style": "curiosity",
       "instagram_id": "18145288882548143",
       "ig_trial": true
+    },
+    {
+      "time": "2026-10-19T22:00:00+00:00",
+      "topic": "Apple Unified Memory: Why the GPU Never Gets a Copy",
+      "format": "flagship: follow",
+      "seed": 1833884671,
+      "features": {
+        "angle": "follow",
+        "layouts": [
+          "flagship: follow"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Swiss",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "minor",
+        "length": "mid",
+        "level": null,
+        "trend": true,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "direct",
+        "cover": "bold",
+        "lmode": "quick",
+        "trial": false
+      },
+      "title_alt": "DataVelvet: Why Your Mac's GPU Never Gets a Copy #shorts",
+      "title_style": "direct",
+      "instagram_id": "18412599061088041",
+      "ig_trial": false
     }
   ],
   "series_counts": {
@@ -1254,7 +1297,8 @@
     "flagship: what-if",
     "flagship: inside",
     "flagship: myth",
-    "flagship: countdown"
+    "flagship: countdown",
+    "flagship: follow"
   ],
   "used_palettes": [
     "0:0"
@@ -1671,6 +1715,20 @@
       },
       "format": "flagship: countdown",
       "angle": "countdown"
+    },
+    {
+      "posted_at": "2026-10-19T22:01:20+00:00",
+      "style": {
+        "name": "Swiss Pointer Poster",
+        "palette": {
+          "ink": "#F4F1EA",
+          "bone": "#111111",
+          "signal": "#FF3B1F",
+          "ash": "#B9B4A8"
+        }
+      },
+      "format": "flagship: follow",
+      "angle": "follow"
     }
   ],
   "scene_signatures": [
@@ -1840,8 +1898,8 @@
     "world: Play > Ladder > Manifest > ABR > Open Connect > Scale"
   ],
   "insights": {
-    "n": 19,
-    "updated": "2026-10-19T14:01:31+00:00",
+    "n": 20,
+    "updated": "2026-10-19T19:20:58+00:00",
     "best": {
       "angle": [
         "inside",
@@ -1860,15 +1918,14 @@
       ],
       "cams": [
         "dutch",
-        "push",
-        "spiral"
+        "spiral",
+        "push"
       ],
       "hue": [
         "Jade"
       ],
       "voice": [],
       "music": [
-        "major",
         "lydian"
       ],
       "length": [
@@ -1888,10 +1945,12 @@
     },
     "worst": {
       "angle": [
+        "myth",
         "countdown"
       ],
       "layouts": [
         "scatter",
+        "flagship: myth",
         "Scale"
       ],
       "types": [],
@@ -1930,108 +1989,110 @@
     },
     "lift": {
       "angle": {
-        "journey": 1.6,
-        "versus": 1.22,
-        "countdown": 0.28,
-        "inside": 1.64
+        "journey": 1.66,
+        "versus": 1.27,
+        "countdown": 0.29,
+        "myth": 0.31,
+        "inside": 1.7
       },
       "layouts": {
-        "row": 1.77,
-        "pyramid": 1.76,
-        "ring": 1.12,
-        "stack": 1.91,
-        "depth": 1.91,
-        "scatter": 0.68,
-        "wave": 2.52,
-        "cluster": 2.38,
-        "spiral": 1.47,
-        "tree": 1.64,
-        "diagonal": 2.21,
-        "radial": 2.57,
-        "grid": 1.29,
-        "timeline": 2.57,
-        "Scale": 0.18,
-        "flagship: inside": 1.64
+        "ring": 1.16,
+        "depth": 1.99,
+        "scatter": 0.7,
+        "wave": 2.62,
+        "pyramid": 1.83,
+        "stack": 1.99,
+        "row": 1.84,
+        "cluster": 2.48,
+        "spiral": 1.53,
+        "tree": 1.7,
+        "diagonal": 2.3,
+        "radial": 2.68,
+        "timeline": 2.68,
+        "grid": 1.35,
+        "Scale": 0.19,
+        "flagship: myth": 0.31,
+        "flagship: inside": 1.7
       },
       "types": {
-        "object": 1.7,
-        "burst": 2.17,
-        "panel": 1.82,
-        "tunnel": 1.64,
-        "link": 2.02,
-        "text": 1.89,
-        "stream": 1.89,
-        "wave": 0.94,
-        "particles": 1.7,
-        "code": 2.38,
-        "ring": 1.89,
-        "matrix": 1.99,
-        "orbit": 2.17,
-        "beam": 1.99,
-        "counter": 1.87,
-        "gauge": 1.87,
-        "network": 2.02,
-        "bars": 1.46,
-        "stack": 1.78,
-        "cylinder": 1.52,
-        "sphere": 1.29,
-        "donut": 2.08
+        "burst": 2.26,
+        "orbit": 2.26,
+        "ring": 1.97,
+        "particles": 1.77,
+        "text": 1.97,
+        "stream": 1.97,
+        "panel": 1.89,
+        "code": 2.48,
+        "tunnel": 1.7,
+        "wave": 0.97,
+        "link": 2.11,
+        "object": 1.77,
+        "matrix": 2.07,
+        "beam": 2.07,
+        "counter": 1.95,
+        "cylinder": 1.58,
+        "bars": 1.52,
+        "stack": 1.86,
+        "network": 2.1,
+        "gauge": 1.95,
+        "sphere": 1.35,
+        "donut": 2.16
       },
       "cams": {
-        "crane": 1.89,
-        "push": 2.17,
-        "low": 1.47,
-        "spiral": 2.17,
-        "fly": 2.17,
-        "dolly": 1.89,
-        "orbit": 1.89,
-        "dutch": 2.21
+        "orbit": 1.97,
+        "spiral": 2.26,
+        "push": 2.26,
+        "fly": 2.26,
+        "dolly": 1.97,
+        "crane": 1.97,
+        "low": 1.53,
+        "dutch": 2.3
       },
       "hue": {
-        "Cyan": 0.51,
-        "Jade": 2.25
+        "Cyan": 0.53,
+        "Jade": 2.34
       },
       "voice": {
         "en-US-AndrewMultilingualNeural": 1.0
       },
       "music": {
-        "lydian": 1.16,
-        "dorian": 0.8,
-        "major": 1.18,
-        "phrygian": 0.28
+        "lydian": 1.2,
+        "dorian": 0.84,
+        "major": 1.03,
+        "phrygian": 0.29
       },
       "length": {
-        "mid": 1.18,
-        "short": 1.03,
-        "long": 0.23
+        "mid": 1.15,
+        "short": 1.07,
+        "long": 0.24
       },
       "level": {
-        "beginner": 1.19,
-        "engineer": 1.04
+        "beginner": 1.23,
+        "engineer": 1.09
       },
       "trend": {
-        "False": 1.07,
-        "True": 0.94
+        "False": 1.03,
+        "True": 0.97
       },
       "cta": {
-        "save": 1.81
+        "save": 1.89
       },
       "title": {
-        "direct": 0.22,
-        "curiosity": 0.61
+        "direct": 0.23,
+        "curiosity": 0.59
       },
       "cover": {
-        "band": 0.63,
+        "band": 0.65,
         "bold": 0.27
       },
       "lmode": {
-        "quick": 0.66,
-        "deep": 0.21,
-        "short": 0.24
+        "quick": 0.63,
+        "deep": 0.22,
+        "short": 0.25
       },
       "trial": {
-        "True": 0.26,
-        "False": 0.79
+        "True": 0.27,
+        "False": 0.72
       }
     }
   },
@@ -2126,6 +2187,11 @@
     },
     {
       "time": "2026-10-19T16:01:14+00:00",
+      "ok": false,
+      "error": "upload failed on a platform"
+    },
+    {
+      "time": "2026-10-19T22:01:20+00:00",
       "ok": false,
       "error": "upload failed on a platform"
     }
@@ -2312,6 +2378,23 @@
       },
       "name": "Midnight Neon Dock",
       "story_format": "countdown"
+    },
+    {
+      "family": "swiss poster",
+      "fonts": {
+        "display": "Anton",
+        "body": "SpaceGrotesk",
+        "mono": "SpaceMono"
+      },
+      "palette": {
+        "bg": "#F4F1EA",
+        "ink": "#111111",
+        "accent": "#FF3B1F",
+        "accent2": "#1A3BFF",
+        "muted": "#B9B4A8"
+      },
+      "name": "Swiss Pointer Poster",
+      "story_format": "follow"
     }
   ]
 }
