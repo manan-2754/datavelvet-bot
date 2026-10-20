@@ -84,7 +84,13 @@
       "style": "deck",
       "lane": "dev",
       "source_topic": "How virtual memory works",
-      "instagram_id": "18128954474496602"
+      "instagram_id": "18128954474496602",
+      "stats": {
+        "reach": 1,
+        "saved": 0,
+        "shares": 0,
+        "likes": 0
+      }
     },
     {
       "time": "2026-10-19T00:00:43+00:00",
@@ -95,6 +101,16 @@
       "lane": "dev",
       "source_topic": "How Windows on Arm runs x86 games with an RTX GPU",
       "instagram_id": "18130382920703969"
+    },
+    {
+      "time": "2026-10-20T00:00:41+00:00",
+      "topic": "How HTTPS/TLS encryption works",
+      "format": "cheatsheet",
+      "theme": "-",
+      "style": "3d",
+      "lane": "dev",
+      "source_topic": "How HTTPS/TLS encryption works",
+      "instagram_id": "18116535932115106"
     }
   ]
 }
