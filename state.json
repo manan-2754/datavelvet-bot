@@ -28,7 +28,8 @@
     "Instagram generating your feed",
     "How the Nintendo Switch 2 runs games in handheld vs docked mode",
     "How Apple silicon's unified memory makes MacBook Pros fast",
-    "Why a Google cloud outage can take down banks"
+    "Why a Google cloud outage can take down banks",
+    "How Google Home speakers work: background updates, cloud sync, and data"
   ],
   "used_bank": [
     "dns_explained"
@@ -1309,6 +1310,37 @@
       "title_style": "curiosity",
       "instagram_id": "18350798956248747",
       "ig_trial": true
+    },
+    {
+      "time": "2026-10-20T16:00:00+00:00",
+      "topic": "Google Home: What Really Leaves Your Speaker",
+      "format": "flagship: myth",
+      "seed": 189200575,
+      "features": {
+        "angle": "myth",
+        "layouts": [
+          "flagship: myth"
+        ],
+        "types": [],
+        "cams": [],
+        "hue": "Amber",
+        "voice": "en-US-AndrewMultilingualNeural",
+        "music": "minor",
+        "length": "mid",
+        "level": null,
+        "trend": true,
+        "series": null,
+        "cta": null,
+        "fmt": null,
+        "title": "curiosity",
+        "cover": "band",
+        "lmode": "quick",
+        "trial": false
+      },
+      "title_alt": "How Google Home speakers work under the hood #shorts",
+      "title_style": "curiosity",
+      "instagram_id": "18124055236705766",
+      "ig_trial": false
     }
   ],
   "series_counts": {
@@ -1342,7 +1374,8 @@
     "flagship: myth",
     "flagship: countdown",
     "flagship: follow",
-    "flagship: news-how"
+    "flagship: news-how",
+    "flagship: myth"
   ],
   "used_palettes": [
     "0:0"
@@ -1787,6 +1820,20 @@
       },
       "format": "flagship: news-how",
       "angle": "news-how"
+    },
+    {
+      "posted_at": "2026-10-20T16:01:34+00:00",
+      "style": {
+        "name": "Amber Phosphor Log",
+        "palette": {
+          "ink": "#0B0904",
+          "bone": "#FFC247",
+          "signal": "#FF7A1A",
+          "ash": "#7A5A24"
+        }
+      },
+      "format": "flagship: myth",
+      "angle": "myth"
     }
   ],
   "scene_signatures": [
@@ -1957,7 +2004,7 @@
   ],
   "insights": {
     "n": 21,
-    "updated": "2026-10-20T12:02:02+00:00",
+    "updated": "2026-10-20T13:32:34+00:00",
     "best": {
       "angle": [
         "inside",
@@ -1965,19 +2012,19 @@
         "versus"
       ],
       "layouts": [
-        "timeline",
         "radial",
+        "timeline",
         "wave"
       ],
       "types": [
         "code",
-        "burst",
-        "orbit"
+        "orbit",
+        "burst"
       ],
       "cams": [
         "dutch",
-        "push",
-        "fly"
+        "fly",
+        "push"
       ],
       "hue": [
         "Jade"
@@ -2055,57 +2102,57 @@
         "inside": 1.77
       },
       "layouts": {
-        "pyramid": 1.9,
-        "depth": 2.06,
+        "ring": 1.2,
         "scatter": 0.73,
+        "pyramid": 1.9,
+        "wave": 2.72,
         "stack": 2.06,
         "row": 1.91,
-        "wave": 2.72,
-        "ring": 1.2,
-        "tree": 1.77,
-        "diagonal": 2.38,
+        "depth": 2.06,
         "cluster": 2.57,
+        "diagonal": 2.38,
+        "tree": 1.77,
         "spiral": 1.59,
-        "timeline": 2.78,
-        "radial": 2.78,
         "grid": 1.4,
+        "radial": 2.78,
+        "timeline": 2.78,
         "Scale": 0.19,
         "flagship: myth": 0.32,
         "flagship: inside": 1.77,
         "flagship: countdown": 0.24
       },
       "types": {
-        "text": 2.05,
-        "particles": 1.83,
-        "tunnel": 1.77,
-        "burst": 2.34,
-        "stream": 2.05,
-        "code": 2.57,
-        "ring": 2.05,
         "link": 2.19,
         "beam": 2.15,
-        "matrix": 2.15,
-        "wave": 1.01,
-        "orbit": 2.34,
         "panel": 1.97,
+        "ring": 2.05,
+        "particles": 1.83,
         "object": 1.83,
+        "tunnel": 1.77,
+        "orbit": 2.34,
+        "burst": 2.34,
+        "text": 2.05,
+        "stream": 2.05,
+        "wave": 1.01,
+        "code": 2.57,
+        "matrix": 2.15,
+        "gauge": 2.02,
         "bars": 1.58,
         "counter": 2.02,
-        "gauge": 2.02,
-        "stack": 1.93,
         "network": 2.18,
+        "stack": 1.93,
         "cylinder": 1.64,
         "sphere": 1.4,
         "donut": 2.25
       },
       "cams": {
+        "low": 1.59,
+        "fly": 2.34,
+        "push": 2.34,
         "crane": 2.05,
         "dolly": 2.05,
-        "push": 2.34,
-        "fly": 2.34,
-        "spiral": 2.34,
         "orbit": 2.05,
-        "low": 1.59,
+        "spiral": 2.34,
         "dutch": 2.38
       },
       "hue": {
@@ -2258,6 +2305,11 @@
     },
     {
       "time": "2026-10-20T12:17:38+00:00",
+      "ok": false,
+      "error": "upload failed on a platform"
+    },
+    {
+      "time": "2026-10-20T16:01:34+00:00",
       "ok": false,
       "error": "upload failed on a platform"
     }
@@ -2478,6 +2530,23 @@
       },
       "name": "Isometric Cloud District",
       "story_format": "news-how"
+    },
+    {
+      "family": "retro terminal",
+      "fonts": {
+        "display": "JetBrainsMono",
+        "body": "IBMPlexSans",
+        "mono": "JetBrainsMono"
+      },
+      "palette": {
+        "bg": "#0B0904",
+        "ink": "#FFC247",
+        "accent": "#FF7A1A",
+        "accent2": "#7DF9C2",
+        "muted": "#7A5A24"
+      },
+      "name": "Amber Phosphor Log",
+      "story_format": "myth"
     }
   ]
 }
