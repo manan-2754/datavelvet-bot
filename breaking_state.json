@@ -495,7 +495,11 @@
   "7a02579d050bf048",
   "8fd2671828c54d33",
   "b492890dced4101c",
-  "7c4d2fcead07cf5d"
+  "7c4d2fcead07cf5d",
+  "3820c45d60f3f740",
+  "ffa45fdce54510c6",
+  "01171aeba89c58bd",
+  "bf4b5be0fdfea9fa"
  ],
  "posts": [
   {
@@ -510,6 +514,13 @@
    "topic": "What Nvidia's new open AI models for agents actually do",
    "headline": "Nvidia launches new open models to run agents in the enterprise and on PCs",
    "url": "https://techcrunch.com/2026/10/19/nvidia-launches-new-open-models-to-run-agents-in-the-enterprise-and-on-pcs/",
+   "long_form": false
+  },
+  {
+   "time": "2026-10-20T08:00:37-04:00",
+   "topic": "Why a Google cloud outage can take down banks",
+   "headline": "Google cloud outage takes down banks",
+   "url": "https://www.neowin.net/news/google-cloud-outage-takes-down-hsbc-revolut-bank-of-scotland-llyods-equifax-more/",
    "long_form": false
   }
  ]
