@@ -596,7 +596,16 @@
   "d16c0e81d295266d",
   "0648f14478faff36",
   "cd770b1bee320065",
-  "a9c5180610031269"
+  "a9c5180610031269",
+  "78b8fa522c56845e",
+  "05178c6ba1c12e8b",
+  "e0aee1b8adc0aed0",
+  "7cc7e13e835bd995",
+  "05c2bc8f56d883a0",
+  "60af36ddea5b4177",
+  "97c8d742313ea36d",
+  "a3c06c873cd0b553",
+  "77d00766810cf802"
  ],
  "posts": [
   {
@@ -618,6 +627,13 @@
    "topic": "Why a Google cloud outage can take down banks",
    "headline": "Google cloud outage takes down banks",
    "url": "https://www.neowin.net/news/google-cloud-outage-takes-down-hsbc-revolut-bank-of-scotland-llyods-equifax-more/",
+   "long_form": false
+  },
+  {
+   "time": "2026-10-21T09:00:34-04:00",
+   "topic": "What Apple's foldable iPhone Duo is and what it does",
+   "headline": "iPhone Duo Review: Waiting to Refine Foldables Was the Right Move - Gizmodo",
+   "url": "https://news.google.com/rss/articles/CBMiXEFVX3lxTFAwdUdfZTZLLUV6S2xpVlVxZTM4eVp2QnFkTWtMUGE2TVh1c2didFRtNUNTR3hZN2E0RF90Nkt0Yy0weVUtSDRZLVNLMUdqX3JmdkhPZTdpMzRiaUNK?oc=5",
    "long_form": false
   }
  ]
