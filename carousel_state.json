@@ -116,7 +116,13 @@
       "style": "3d",
       "lane": "dev",
       "source_topic": "How HTTPS/TLS encryption works",
-      "instagram_id": "18116535932115106"
+      "instagram_id": "18116535932115106",
+      "stats": {
+        "reach": 1,
+        "saved": 0,
+        "shares": 0,
+        "likes": 0
+      }
     },
     {
       "time": "2026-10-21T00:00:51+00:00",
@@ -127,6 +133,16 @@
       "lane": "dev",
       "source_topic": "Why your phone gets hot while charging",
       "instagram_id": "18187368823410744"
+    },
+    {
+      "time": "2026-10-22T00:00:44+00:00",
+      "topic": "How Paxos consensus works",
+      "format": "mythfact",
+      "theme": "-",
+      "style": "3d",
+      "lane": "dev",
+      "source_topic": "How Paxos consensus works",
+      "instagram_id": "17941734759364573"
     }
   ]
 }
