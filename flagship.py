@@ -581,6 +581,26 @@ def slot_taken(slot):
     return bool(last and datetime.fromisoformat(last) > target - timedelta(hours=3))
 
 
+def preflight():
+    """Posting runs stop in seconds (and the workflow emails) when Claude credit or the YouTube login is dead,
+    instead of crawling through backups for hours or quietly posting to Instagram only."""
+    import anthropic
+    try:
+        if os.getenv("ANTHROPIC_API_KEY"):
+            anthropic.Anthropic(timeout=60.0, max_retries=1).messages.create(
+                model=writer.CLAUDE_MODEL, max_tokens=1, messages=[{"role": "user", "content": "ok"}])
+    except anthropic.BadRequestError as e:
+        if "credit balance" in str(e):
+            raise SystemExit("❌ Anthropic credit is empty - top up at console.anthropic.com (Plans & Billing), then re-run")
+        raise
+    if os.getenv("AUTO_POST_YOUTUBE", "false").lower() == "true":
+        from youtube_upload import get_credentials
+        try:
+            get_credentials()
+        except Exception as e:
+            raise SystemExit(f"❌ YouTube login is dead ({str(e)[:120]}) - run `python youtube_upload.py --auth` and update YT_TOKEN_JSON")
+
+
 def run():
     ap = argparse.ArgumentParser()
     ap.add_argument("--post", action="store_true")
@@ -599,6 +619,7 @@ def run():
         return 0
     state = main.load_state()
     if a.post:
+        preflight()
         try:
             log(f"📈 Analytics: {analytics.collect(state)} post(s) refreshed")
             analytics.learn(state)
@@ -627,6 +648,8 @@ def run_long(a):
         if age < every - 0.5:
             log(f"Last long-form video was {age:.1f} days ago - the next one is due after {every:g} days")
             return 0
+    if a.post:
+        preflight()
     state = main.load_state()
     script, video, meta, look = make_long(state, a.topic or os.getenv("LONG_TOPIC") or None)
     if a.show and Path(main.VLC).exists():
